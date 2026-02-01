@@ -1,0 +1,13 @@
+#!/bin/bash
+# Post-remove script
+# Executed after package removal
+
+set -e
+
+echo "Running post-remove script for $PACKAGE_NAME v$PACKAGE_VERSION"
+
+# Add your post-removal logic here
+# Examples:
+# - Remove leftover directories
+# - Clean up user data (if appropriate)
+# - Update system configuration

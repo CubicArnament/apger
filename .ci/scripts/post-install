@@ -1,0 +1,14 @@
+#!/bin/bash
+# Post-install script
+# Executed after package installation
+
+set -e
+
+echo "Running post-install script for $PACKAGE_NAME v$PACKAGE_VERSION"
+
+# Add your post-installation logic here
+# Examples:
+# - Create symlinks
+# - Set file permissions
+# - Start services
+# - Update system databases

@@ -1,0 +1,13 @@
+#!/bin/bash
+# Pre-install script
+# Executed before package installation
+
+set -e
+
+echo "Running pre-install script for $PACKAGE_NAME v$PACKAGE_VERSION"
+
+# Add your pre-installation logic here
+# Examples:
+# - Check system requirements
+# - Stop running services
+# - Backup existing configuration

@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+apg_root/
+*.apg
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Package manager
+node_modules/
+vendor/

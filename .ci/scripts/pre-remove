@@ -1,0 +1,13 @@
+#!/bin/bash
+# Pre-remove script
+# Executed before package removal
+
+set -e
+
+echo "Running pre-remove script for $PACKAGE_NAME v$PACKAGE_VERSION"
+
+# Add your pre-removal logic here
+# Examples:
+# - Stop running services
+# - Backup user data
+# - Clean up temporary files
