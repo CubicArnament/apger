@@ -4,15 +4,15 @@ on:
   workflow_call:
     inputs:
       recipe_path:
-        description: 'Path to recipe.yaml'
+        description: "Path to recipe.yaml"
         required: false
         type: string
-        default: '.ci/recipe.yaml'
+        default: ".ci/recipe.yaml"
       scripts_path:
-        description: 'Path to scripts directory'
+        description: "Path to scripts directory"
         required: false
         type: string
-        default: '.ci/scripts'
+        default: ".ci/scripts"
 
 jobs:
   build:
@@ -130,9 +130,9 @@ jobs:
 
           # Generate md5sums
           cd "$APG_ROOT"
-          find data -type f -exec md5sum {} \; > md5sums
+          find data -type f -exec md5sum {} \; | sed 's|data/||g' > md5sums
           if [ -d "home" ]; then
-            find home -type f -exec md5sum {} \; >> md5sums
+            find home -type f -exec md5sum {} \; | sed 's|home/||g' >> md5sums
           fi
 
           # Create .apg archive
