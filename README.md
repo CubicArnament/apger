@@ -1,39 +1,39 @@
 # APGer - NurOS Package Builder
 
-Автоматизированная система сборки пакетов для NurOS в формате APGv2 с использованием GitHub Actions.
+Automated package build system for NurOS in APGv2 format using GitHub Actions.
 
-## Возможности
+## Features
 
-- Автоматическая сборка пакетов из исходного кода
-- Генерация метаданных в строгом JSON формате
-- Создание контрольных сумм MD5 для всех файлов
-- Поддержка пользовательских скриптов (pre/post install/remove)
-- Автоматическое создание релизов с `.apg` архивами
-- Деплой в корень репозитория для binary sync
+- Automatic package building from source code
+- Strict JSON metadata generation
+- MD5 checksums for all files
+- Lifecycle scripts support (pre/post install/remove)
+- Automatic GitHub Releases with `.apg` archives
+- Binary deployment to repository root
 
-## Структура проекта
+## Project Structure
 
 ```
 apger/
 ├── .github/
 │   └── workflows/
-│       ├── apger-engine.yml    # Переиспользуемый workflow
-│       └── build.yml            # Триггер для сборки
+│       ├── apger-engine.yml    # Reusable workflow
+│       └── build.yml            # Build trigger
 ├── .ci/
-│   ├── recipe.yaml              # Конфигурация пакета
-│   └── scripts/                 # Пользовательские скрипты
+│   ├── recipe.yaml              # Package configuration
+│   └── scripts/                 # Lifecycle scripts
 │       ├── pre-install
 │       ├── post-install
 │       ├── pre-remove
 │       └── post-remove
-└── home/                        # Опциональные домашние файлы
+└── home/                        # Optional home directory files
 ```
 
-## Быстрый старт
+## Quick Start
 
-### 1. Настройка recipe.yaml
+### 1. Configure recipe.yaml
 
-Отредактируйте `.ci/recipe.yaml` для вашего пакета:
+Edit `.ci/recipe.yaml` for your package:
 
 ```yaml
 package:
@@ -56,24 +56,39 @@ source:
   url: "https://example.com/source-1.0.0.tar.xz"
 
 build:
+  dependencies: ["build-essential", "libncurses-dev"]
   script: "./configure --prefix=/usr && make"
 
 install:
   script: "make DESTDIR=\"$DESTDIR\" install"
 ```
 
-### 2. Настройка скриптов (опционально)
+### 2. Configure Build Dependencies (Optional)
 
-Отредактируйте скрипты в `.ci/scripts/`:
+If your build requires additional packages (compilers, libraries), add them to `build.dependencies`:
 
-- `pre-install` - выполняется перед установкой
-- `post-install` - выполняется после установки
-- `pre-remove` - выполняется перед удалением
-- `post-remove` - выполняется после удалением
+```yaml
+build:
+  dependencies: ["build-essential", "cmake", "libssl-dev"]
+  script: "./configure --prefix=/usr && make"
+```
 
-### 3. Запуск сборки
+APGer will automatically install these packages via `apt-get` before building.
 
-Коммит и пуш в ветку `main` автоматически запустит сборку:
+### 3. Configure Lifecycle Scripts (Optional)
+
+Edit scripts in `.ci/scripts/`:
+
+- `pre-install` - executed before package installation
+- `post-install` - executed after package installation
+- `pre-remove` - executed before package removal
+- `post-remove` - executed after package removal
+
+Available variables in scripts: `$PACKAGE_NAME`, `$PACKAGE_VERSION`
+
+### 4. Run Build
+
+Commit and push to `main` branch to automatically trigger the build:
 
 ```bash
 git add .
@@ -81,22 +96,22 @@ git commit -m "Update package configuration"
 git push origin main
 ```
 
-Или запустите вручную через GitHub Actions UI.
+Or trigger manually via GitHub Actions UI.
 
-## Формат APGv2
+## APGv2 Format
 
-Созданный `.apg` архив содержит:
+Created `.apg` archive contains:
 
 ```
 package-name-version.apg
-├── data/              # Установленные файлы (из $DESTDIR)
-├── home/              # Домашние файлы (опционально)
-├── scripts/           # Пользовательские скрипты
-├── metadata.json      # Метаданные пакета
-└── md5sums            # Контрольные суммы
+├── data/              # Installed files (from $DESTDIR)
+├── home/              # Home directory files (optional)
+├── scripts/           # Lifecycle scripts
+├── metadata.json      # Package metadata
+└── md5sums            # File checksums
 ```
 
-### Пример metadata.json
+### Example metadata.json
 
 ```json
 {
@@ -119,16 +134,16 @@ package-name-version.apg
 
 ## Binary Deployment
 
-После успешной сборки:
+After successful build:
 
-1. Содержимое `apg_root` распаковывается в корень репозитория
-2. Создается коммит от `github-actions[bot]`
-3. Создается GitHub Release с тегом `v{version}`
-4. `.apg` файл прикрепляется к релизу
+1. `apg_root` contents are extracted to repository root
+2. Commit is created by `github-actions[bot]`
+3. GitHub Release is created with tag `v{version}`
+4. `.apg` file is attached to the release
 
-## Использование как переиспользуемый workflow
+## Use as Reusable Workflow
 
-В другом репозитории создайте `.github/workflows/build.yml`:
+In another repository, create `.github/workflows/build.yml`:
 
 ```yaml
 name: Build Package
@@ -146,37 +161,38 @@ jobs:
       scripts_path: '.ci/scripts'
 ```
 
-## Переменные окружения
+## Environment Variables
 
-Во время сборки доступны:
+Available during build:
 
-- `$DESTDIR` - путь для установки файлов (`apg_root/data/`)
-- `$PACKAGE_NAME` - имя пакета (в скриптах)
-- `$PACKAGE_VERSION` - версия пакета (в скриптах)
+- `$DESTDIR` - installation path for files (`apg_root/data/`)
+- `$PACKAGE_NAME` - package name (in scripts)
+- `$PACKAGE_VERSION` - package version (in scripts)
 
-## Требования
+## Requirements
 
 - Ubuntu runner (GitHub Actions)
-- `yq` для парсинга YAML
-- `bash` для выполнения скриптов
-- Исходный код должен быть доступен по URL
+- `yq` for YAML parsing
+- `jq` for JSON processing
+- `bash` for script execution
+- Source code must be accessible via URL
 
-## Типы пакетов
+## Package Types
 
-- `binary` - исполняемые программы
-- `library` - библиотеки
-- `meta` - мета-пакеты (только зависимости)
+- `binary` - executable programs
+- `library` - libraries
+- `meta` - meta-packages (dependencies only)
 
-## Архитектуры
+## Architectures
 
 - `x86_64` - AMD64/Intel 64-bit
 - `aarch64` - ARM 64-bit
-- `any` - независимая от архитектуры
+- `any` - architecture-independent
 
-## Лицензия
+## License
 
 MIT
 
-## Автор
+## Author
 
 AnmiTaliDev <anmitali198@gmail.com>
