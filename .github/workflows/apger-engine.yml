@@ -28,8 +28,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y yq
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
 
       - name: Parse recipe and build package
         run: |
@@ -62,8 +62,8 @@ jobs:
 
           # Download and extract source
           cd "$BUILD_DIR"
-          wget -q "$SOURCE_URL" -O source.tar.xz
-          tar -xf source.tar.xz --strip-components=1
+          wget -q "$SOURCE_URL" -O source.tar.gz
+          tar -xf source.tar.gz --strip-components=1
 
           # Build
           eval "$BUILD_SCRIPT"
