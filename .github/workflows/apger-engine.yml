@@ -145,35 +145,24 @@ jobs:
       - name: Deploy to repository root
         run: |
           set -e
-
+    
           APG_ROOT="$(pwd)/apg_root"
-
-          # Extract contents to repository root
           cp "$APG_ROOT/metadata.json" .
           cp "$APG_ROOT/md5sums" .
-
           if [ -d "$APG_ROOT/data" ]; then
-            cp -r "$APG_ROOT/data"/* .
+            cp -r "$APG_ROOT/data" .
           fi
-
           if [ -d "$APG_ROOT/home" ]; then
             cp -r "$APG_ROOT/home" .
           fi
-
           if [ -d "$APG_ROOT/scripts" ]; then
             cp -r "$APG_ROOT/scripts" .
           fi
-
-          # Commit and push with retry
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "Deploy package ${{ env.PACKAGE_NAME }} v${{ env.PACKAGE_VERSION }}" || echo "No changes to commit"
-          
-          # Retry push with pull if rejected (5 attempts with 60 second delay)
-          for i in {1..5}; do
-            git pull --rebase origin main && git push && break || sleep 60
-          done
+          git push 
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -185,3 +174,4 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
