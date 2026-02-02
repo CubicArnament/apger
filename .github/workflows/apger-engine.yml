@@ -1,21 +1,21 @@
-name: APGer Engine - Build NurOS Packages
+name: Build Package
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
     inputs:
-      recipe_path:
-        description: "Path to recipe.yaml"
+      versions:
+        description: 'Versions (comma-separated: 2.33.0,2.34.0,2.35.0 or leave empty for recipe.yaml version)'
         required: false
         type: string
-        default: ".ci/recipe.yaml"
-      scripts_path:
-        description: "Path to scripts directory"
-        required: false
-        type: string
-        default: ".ci/scripts"
 
 jobs:
-  build:
+  build-packages:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -31,60 +31,95 @@ jobs:
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
-      - name: Parse recipe and build package
+      - name: Parse versions
+        id: versions
+        run: |
+          if [ -n "${{ github.event.inputs.versions }}" ]; then
+            # Split version string into array
+            VERSIONS="${{ github.event.inputs.versions }}"
+          else
+            # Get version from recipe.yaml
+            VERSIONS=$(yq eval '.package.version' .ci/recipe.yaml)
+          fi
+          
+          # Save for next steps
+          echo "versions=$VERSIONS" >> $GITHUB_OUTPUT
+
+      - name: Build all versions sequentially
         run: |
           set -e
-
-          RECIPE_PATH="${{ inputs.recipe_path }}"
-          SCRIPTS_PATH="${{ inputs.scripts_path }}"
-
-          # Parse metadata
-          NAME=$(yq eval '.package.name' "$RECIPE_PATH")
-          VERSION=$(yq eval '.package.version' "$RECIPE_PATH")
-          TYPE=$(yq eval '.package.type' "$RECIPE_PATH")
-          ARCH=$(yq eval '.package.architecture' "$RECIPE_PATH")
-          DESC=$(yq eval '.package.description' "$RECIPE_PATH")
-          MAINTAINER=$(yq eval '.package.maintainer' "$RECIPE_PATH")
-          LICENSE=$(yq eval '.package.license' "$RECIPE_PATH")
-          HOMEPAGE=$(yq eval '.package.homepage' "$RECIPE_PATH")
-          SOURCE_URL=$(yq eval '.source.url' "$RECIPE_PATH")
-          BUILD_SCRIPT=$(yq eval '.build.script' "$RECIPE_PATH")
-          INSTALL_SCRIPT=$(yq eval '.install.script' "$RECIPE_PATH")
-
-          # Setup build environment
-          BUILD_DIR="$(pwd)/build"
-          DESTDIR="$(pwd)/apg_root/data"
-          APG_ROOT="$(pwd)/apg_root"
-
-          mkdir -p "$BUILD_DIR"
-          mkdir -p "$DESTDIR"
-          mkdir -p "$APG_ROOT/scripts"
-
-          # Download and extract source
-          cd "$BUILD_DIR"
-          wget -q "$SOURCE_URL" -O source.tar.gz
-          tar -xf source.tar.gz --strip-components=1
-
-          # Build
-          eval "$BUILD_SCRIPT"
-
-          # Install
-          export DESTDIR
-          eval "$INSTALL_SCRIPT"
-
-          # Copy scripts if they exist
-          cd "$APG_ROOT"
-          if [ -d "$GITHUB_WORKSPACE/$SCRIPTS_PATH" ]; then
-            cp -r "$GITHUB_WORKSPACE/$SCRIPTS_PATH"/* scripts/ 2>/dev/null || true
-          fi
-
-          # Copy home directory if exists
-          if [ -d "$GITHUB_WORKSPACE/home" ]; then
-            cp -r "$GITHUB_WORKSPACE/home" .
-          fi
-
-          # Generate metadata.json
-          cat > metadata.json << 'METADATA_EOF'
+          
+          RECIPE_PATH=".ci/recipe.yaml"
+          SCRIPTS_PATH=".ci/scripts"
+          
+          # Split versions by comma
+          IFS=',' read -ra VERSION_ARRAY <<< "${{ steps.versions.outputs.versions }}"
+          
+          for VERSION in "${VERSION_ARRAY[@]}"; do
+            VERSION=$(echo "$VERSION" | xargs) # Trim whitespace
+            
+            echo "================================"
+            echo "Building version: $VERSION"
+            echo "================================"
+            
+            # Clean previous artifacts
+            rm -rf build apg_root *.apg
+            
+            # Update version in recipe.yaml
+            yq eval -i ".package.version = \"$VERSION\"" "$RECIPE_PATH"
+            
+            # Parse metadata
+            NAME=$(yq eval '.package.name' "$RECIPE_PATH")
+            TYPE=$(yq eval '.package.type' "$RECIPE_PATH")
+            ARCH=$(yq eval '.package.architecture' "$RECIPE_PATH")
+            DESC=$(yq eval '.package.description' "$RECIPE_PATH")
+            MAINTAINER=$(yq eval '.package.maintainer' "$RECIPE_PATH")
+            LICENSE=$(yq eval '.package.license' "$RECIPE_PATH")
+            HOMEPAGE=$(yq eval '.package.homepage' "$RECIPE_PATH")
+            SOURCE_URL=$(yq eval '.source.url' "$RECIPE_PATH")
+            BUILD_SCRIPT=$(yq eval '.build.script' "$RECIPE_PATH")
+            INSTALL_SCRIPT=$(yq eval '.install.script' "$RECIPE_PATH")
+            
+            # Substitute {{VERSION}} in source.url if used
+            SOURCE_URL=$(echo "$SOURCE_URL" | sed "s/{{VERSION}}/$VERSION/g")
+            
+            # Setup build environment
+            BUILD_DIR="$(pwd)/build"
+            DESTDIR="$(pwd)/apg_root/data"
+            APG_ROOT="$(pwd)/apg_root"
+            
+            mkdir -p "$BUILD_DIR"
+            mkdir -p "$DESTDIR"
+            mkdir -p "$APG_ROOT/scripts"
+            
+            # Download and extract source
+            cd "$BUILD_DIR"
+            echo "Downloading: $SOURCE_URL"
+            wget -q "$SOURCE_URL" -O source.tar.gz
+            tar -xf source.tar.gz --strip-components=1
+            
+            # Build
+            echo "Building..."
+            eval "$BUILD_SCRIPT"
+            
+            # Install
+            echo "Installing..."
+            export DESTDIR
+            eval "$INSTALL_SCRIPT"
+            
+            # Copy scripts
+            cd "$APG_ROOT"
+            if [ -d "$GITHUB_WORKSPACE/$SCRIPTS_PATH" ]; then
+              cp -r "$GITHUB_WORKSPACE/$SCRIPTS_PATH"/* scripts/ 2>/dev/null || true
+            fi
+            
+            # Copy home directory if exists
+            if [ -d "$GITHUB_WORKSPACE/home" ]; then
+              cp -r "$GITHUB_WORKSPACE/home" .
+            fi
+            
+            # Generate metadata.json
+            cat > metadata.json << 'METADATA_EOF'
           {
             "name": "",
             "version": "",
@@ -102,76 +137,74 @@ jobs:
             "conf": []
           }
           METADATA_EOF
-
-          # Populate metadata.json using yq
-          yq eval -i ".name = \"$NAME\"" metadata.json
-          yq eval -i ".version = \"$VERSION\"" metadata.json
-          yq eval -i ".type = \"$TYPE\"" metadata.json
-          yq eval -i ".architecture = \"$ARCH\"" metadata.json
-          yq eval -i ".description = \"$DESC\"" metadata.json
-          yq eval -i ".maintainer = \"$MAINTAINER\"" metadata.json
-          yq eval -i ".license = \"$LICENSE\"" metadata.json
-          yq eval -i ".homepage = \"$HOMEPAGE\"" metadata.json
-
-          # Arrays
-          TAGS=$(yq eval '.package.tags // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
-          DEPS=$(yq eval '.package.dependencies // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
-          CONFLICTS=$(yq eval '.package.conflicts // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
-          PROVIDES=$(yq eval '.package.provides // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
-          REPLACES=$(yq eval '.package.replaces // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
-          CONF=$(yq eval '.package.conf // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
-
-          yq eval -i ".tags = $TAGS" metadata.json -P
-          yq eval -i ".dependencies = $DEPS" metadata.json -P
-          yq eval -i ".conflicts = $CONFLICTS" metadata.json -P
-          yq eval -i ".provides = $PROVIDES" metadata.json -P
-          yq eval -i ".replaces = $REPLACES" metadata.json -P
-          yq eval -i ".conf = $CONF" metadata.json -P
-
-          # Generate md5sums
-          cd "$APG_ROOT"
-          find data -type f -exec md5sum {} \; | sed 's|data/||g' > md5sums
-          if [ -d "home" ]; then
-            find home -type f -exec md5sum {} \; | sed 's|home/||g' >> md5sums
-          fi
-
-          # Create .apg archive
-          cd "$GITHUB_WORKSPACE"
-          tar -cJf "${NAME}-${VERSION}.apg" -C apg_root .
-
-          echo "PACKAGE_NAME=$NAME" >> $GITHUB_ENV
-          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Deploy to repository root
-        run: |
-          set -e
-    
-          APG_ROOT="$(pwd)/apg_root"
-          cp "$APG_ROOT/metadata.json" .
-          cp "$APG_ROOT/md5sums" .
-          if [ -d "$APG_ROOT/data" ]; then
-            cp -r "$APG_ROOT/data" .
-          fi
-          if [ -d "$APG_ROOT/home" ]; then
-            cp -r "$APG_ROOT/home" .
-          fi
-          if [ -d "$APG_ROOT/scripts" ]; then
-            cp -r "$APG_ROOT/scripts" .
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Deploy package ${{ env.PACKAGE_NAME }} v${{ env.PACKAGE_VERSION }}" || echo "No changes to commit"
-          git push 
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ env.PACKAGE_VERSION }}
-          name: ${{ env.PACKAGE_NAME }} v${{ env.PACKAGE_VERSION }}
-          files: ${{ env.PACKAGE_NAME }}-${{ env.PACKAGE_VERSION }}.apg
-          draft: false
-          prerelease: false
+            
+            yq eval -i ".name = \"$NAME\"" metadata.json
+            yq eval -i ".version = \"$VERSION\"" metadata.json
+            yq eval -i ".type = \"$TYPE\"" metadata.json
+            yq eval -i ".architecture = \"$ARCH\"" metadata.json
+            yq eval -i ".description = \"$DESC\"" metadata.json
+            yq eval -i ".maintainer = \"$MAINTAINER\"" metadata.json
+            yq eval -i ".license = \"$LICENSE\"" metadata.json
+            yq eval -i ".homepage = \"$HOMEPAGE\"" metadata.json
+            
+            # Arrays
+            TAGS=$(yq eval '.package.tags // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
+            DEPS=$(yq eval '.package.dependencies // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
+            CONFLICTS=$(yq eval '.package.conflicts // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
+            PROVIDES=$(yq eval '.package.provides // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
+            REPLACES=$(yq eval '.package.replaces // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
+            CONF=$(yq eval '.package.conf // []' "$GITHUB_WORKSPACE/$RECIPE_PATH" -o=json)
+            
+            yq eval -i ".tags = $TAGS" metadata.json -P
+            yq eval -i ".dependencies = $DEPS" metadata.json -P
+            yq eval -i ".conflicts = $CONFLICTS" metadata.json -P
+            yq eval -i ".provides = $PROVIDES" metadata.json -P
+            yq eval -i ".replaces = $REPLACES" metadata.json -P
+            yq eval -i ".conf = $CONF" metadata.json -P
+            
+            # Generate md5sums
+            find data -type f -exec md5sum {} \; | sed 's|data/||g' > md5sums
+            if [ -d "home" ]; then
+              find home -type f -exec md5sum {} \; | sed 's|home/||g' >> md5sums
+            fi
+            
+            # Create .apg archive
+            cd "$GITHUB_WORKSPACE"
+            tar -cJf "${NAME}-${VERSION}.apg" -C apg_root .
+            
+            # Deploy to repository
+            echo "Deploying to repository..."
+            cp "$APG_ROOT/metadata.json" .
+            cp "$APG_ROOT/md5sums" .
+            if [ -d "$APG_ROOT/data" ]; then
+              rm -rf data
+              cp -r "$APG_ROOT/data" .
+            fi
+            if [ -d "$APG_ROOT/home" ]; then
+              rm -rf home
+              cp -r "$APG_ROOT/home" .
+            fi
+            if [ -d "$APG_ROOT/scripts" ]; then
+              rm -rf scripts
+              cp -r "$APG_ROOT/scripts" .
+            fi
+            
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "Deploy package $NAME v$VERSION" || echo "No changes"
+            git push
+            
+            # Create release
+            echo "Creating release..."
+            gh release create "v$VERSION" \
+              "${NAME}-${VERSION}.apg" \
+              --title "$NAME v$VERSION" \
+              --notes "Automated build of $NAME version $VERSION" \
+              || echo "Release already exists"
+            
+            echo "✓ Version $VERSION completed"
+            echo ""
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
