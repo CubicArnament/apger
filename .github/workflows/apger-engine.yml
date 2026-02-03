@@ -79,6 +79,13 @@ jobs:
             SOURCE_URL=$(yq eval '.source.url' "$RECIPE_PATH")
             BUILD_SCRIPT=$(yq eval '.build.script' "$RECIPE_PATH")
             INSTALL_SCRIPT=$(yq eval '.install.script' "$RECIPE_PATH")
+
+            BUILD_DEPS=$(yq eval '.build.dependencies // []' "$RECIPE_PATH" -o=json | jq -r '.[]' | tr '\n' ' ')
+            if [ -n "$BUILD_DEPS" ]; then
+              echo "Installing build dependencies: $BUILD_DEPS"
+              sudo apt-get update -qq
+              sudo apt-get install -y $BUILD_DEPS
+            fi
             
             # Substitute {{VERSION}} in source.url if used
             SOURCE_URL=$(echo "$SOURCE_URL" | sed "s/{{VERSION}}/$VERSION/g")
