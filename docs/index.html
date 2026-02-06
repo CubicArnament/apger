@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APGer Engine - Документация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .nav {
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>APGer Engine - Документация</h1>
+    
+    <div class="section">
+        <h2>Обзор</h2>
+        <p>APGer - это гибкий Python 3.12+ движок сборки для Arch Linux сред, предназначенный для автоматического создания пакетов в формате APGv2 с использованием GitHub Actions.</p>
+        <p>APGer автоматизирует процесс сборки пакетов из исходного кода, генерации строгих метаданных JSON, контрольных сумм файлов и создания архивов .apg с автоматическими GitHub Releases.</p>
+    </div>
+
+    <div class="section">
+        <h2>Структура проекта</h2>
+        <ul>
+            <li><strong>repodata/</strong>: TOML файлы, определяющие пакеты</li>
+            <li><strong>.ci/</strong>: Движок сборки и конфигурация</li>
+            <li><strong>.github/workflows/</strong>: CI/CD рабочие процессы</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Формат TOML рецептов</h2>
+        <pre><code>[package]
+name = "package-name"
+version = "latest" # Должен быть динамически разрешен
+architecture = "x86_64"
+source = "https://git.kernel.org/pub/scm/.../tool.tar.gz"
+
+[build]
+template = "meson" # Опции: cmake, meson, autotools, cargo, python-pep517
+use = ["shared", "lto", "nls"]
+extra_flags = "-Dcustom_option=true"</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>Процесс сборки</h2>
+        <ol>
+            <li>Парсинг TOML рецептов из repodata/</li>
+            <li>Загрузка исходного кода</li>
+            <li>Сборка с использованием указанного шаблона</li>
+            <li>Создание APG пакета</li>
+            <li>Подпись пакета с использованием PGP</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Документация API</h2>
+        <p>Для подробной документации API смотрите сгенерированные HTML файлы в директории <code>docs/html</code>.</p>
+        <p>Чтобы сгенерировать документацию, выполните:</p>
+        <pre><code>make html_docs</code></pre>
+    </div>
+
+    <div class="nav">
+        <a href="#top">Наверх</a> | 
+        <a href="docs/html/index.html">API Документация</a>
+    </div>
+</body>
+</html>
