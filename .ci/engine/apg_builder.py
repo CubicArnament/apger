@@ -1,5 +1,9 @@
 """
-Модуль для создания APG пакетов в формате tar.zst
+@file apg_builder.py
+@brief Модуль для создания APG пакетов в формате tar.zst
+
+Этот модуль предоставляет класс APGPackageBuilder для создания
+APG пакетов из установленных файлов.
 """
 
 import json
@@ -15,15 +19,28 @@ from ..utils.logging_utils import get_logger
 
 class APGPackageBuilder:
     """
-    Класс для создания APG пакетов в формате tar.zst
+    @class APGPackageBuilder
+    @brief Класс для создания APG пакетов в формате tar.zst
+    
+    Этот класс отвечает за создание APG пакетов из установленных файлов,
+    включая генерацию метаданных, контрольных сумм и упаковку в архив.
     """
     
     def __init__(self):
+        """
+        @brief Конструктор класса APGPackageBuilder
+        """
         self.logger = get_logger(self.__class__.__name__)
     
     def create_apg_package(self, package_info: Dict[str, Any], install_dir: str, output_dir: str, filesystem_yaml_path: str = "../.ci/filesystem_example.yaml", metadata_yaml_path: str = "../.ci/metadata_example.yaml") -> str:
         """
-        Создает APG пакет из установленных файлов
+        @brief Создает APG пакет из установленных файлов
+        @param package_info Информация о пакете
+        @param install_dir Директория с установленными файлами
+        @param output_dir Директория для вывода пакета
+        @param filesystem_yaml_path Путь к YAML файлу с конфигурацией файловой системы
+        @param metadata_yaml_path Путь к YAML файлу с метаданными
+        @return Путь к созданному APG пакету
         """
         package_name = package_info['package']['name']
         version = package_info['package']['version']

@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
-APGer Engine - Main executable
+@file main.py
+@brief Главный исполняемый файл APGer Engine
+
+Этот файл содержит основную логику для запуска APGer Engine,
+включая парсинг TOML файлов, загрузку исходников, сборку пакетов
+и создание APG архивов.
 """
 
 import sys
@@ -19,6 +24,9 @@ from utils.logging_utils import setup_logging, get_logger
 
 
 def main():
+    """
+    @brief Основная функция запуска APGer Engine
+    """
     # Настраиваем логирование
     setup_logging()
     logger = get_logger(__name__)

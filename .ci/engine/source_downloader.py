@@ -1,5 +1,9 @@
 """
-Модуль для загрузки исходных кодов из различных источников
+@file source_downloader.py
+@brief Модуль для загрузки исходных кодов из различных источников
+
+Этот модуль предоставляет класс SourceDownloader для загрузки
+исходных кодов из различных источников (Git, архивы и др.).
 """
 
 import requests
@@ -15,10 +19,17 @@ from ..utils.logging_utils import get_logger
 
 class SourceDownloader:
     """
-    Класс для загрузки исходных кодов из различных источников
+    @class SourceDownloader
+    @brief Класс для загрузки исходных кодов из различных источников
+    
+    Этот класс отвечает за загрузку исходных кодов из различных источников
+    (Git, архивы и др.) и их подготовку для дальнейшей обработки.
     """
     
     def __init__(self):
+        """
+        @brief Конструктор класса SourceDownloader
+        """
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'APGer-Engine/1.0'
@@ -27,7 +38,10 @@ class SourceDownloader:
     
     def download_source(self, source_url: str, destination_dir: str) -> bool:
         """
-        Загружает исходники из указанного URL в директорию назначения
+        @brief Загружает исходники из указанного URL в директорию назначения
+        @param source_url URL источника
+        @param destination_dir Директория назначения
+        @return True в случае успеха, иначе False
         """
         self.logger.info(f"[DOWNLOAD] Загрузка исходников из {source_url}")
         
@@ -44,7 +58,10 @@ class SourceDownloader:
     
     def _download_git_repo(self, git_url: str, destination_dir: str) -> bool:
         """
-        Загружает Git репозиторий
+        @brief Загружает Git репозиторий
+        @param git_url URL Git репозитория
+        @param destination_dir Директория для сохранения
+        @return True в случае успеха, иначе False
         """
         try:
             result = subprocess.run([
@@ -59,7 +76,10 @@ class SourceDownloader:
     
     def _download_archive(self, archive_url: str, destination_dir: str) -> bool:
         """
-        Загружает и распаковывает архив
+        @brief Загружает и распаковывает архив
+        @param archive_url URL архива
+        @param destination_dir Директория для сохранения
+        @return True в случае успеха, иначе False
         """
         # Создаем временный файл для загрузки
         with tempfile.NamedTemporaryFile(delete=False, suffix='.download') as tmp_file:

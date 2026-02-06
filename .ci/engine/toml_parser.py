@@ -1,5 +1,9 @@
 """
-Модуль для парсинга TOML файлов
+@file toml_parser.py
+@brief Модуль для парсинга TOML файлов
+
+Этот модуль предоставляет класс TOMLParser для парсинга TOML файлов
+из директории repodata и валидации их структуры.
 """
 
 import toml
@@ -11,17 +15,26 @@ from .flag_translator import FlagTranslator
 
 class TOMLParser:
     """
-    Класс для парсинга TOML файлов из папки repodata
+    @class TOMLParser
+    @brief Класс для парсинга TOML файлов из папки repodata
+    
+    Этот класс отвечает за парсинг TOML файлов, валидацию их структуры
+    и подготовку данных для дальнейшей обработки.
     """
     
     def __init__(self, repodata_dir: str = "repodata"):
+        """
+        @brief Конструктор класса TOMLParser
+        @param repodata_dir Директория с TOML файлами (по умолчанию "repodata")
+        """
         self.repodata_dir = Path(repodata_dir)
         self.version_resolver = VersionResolver()
         self.flag_translator = FlagTranslator()
         
     def parse_all_packages(self) -> List[Dict[str, Any]]:
         """
-        Парсит все TOML файлы в папке repodata и возвращает список пакетов
+        @brief Парсит все TOML файлы в папке repodata и возвращает список пакетов
+        @return Список словарей с информацией о пакетах
         """
         packages = []
         
@@ -59,7 +72,9 @@ class TOMLParser:
     
     def _validate_toml_structure(self, toml_file: Path) -> bool:
         """
-        Проверяет, соответствует ли TOML файл стандартной структуре
+        @brief Проверяет, соответствует ли TOML файл стандартной структуре
+        @param toml_file Путь к TOML файлу для проверки
+        @return True если структура корректна, иначе False
         """
         try:
             with open(toml_file, 'r', encoding='utf-8') as f:
@@ -120,7 +135,9 @@ class TOMLParser:
     
     def parse_package(self, toml_file: Path) -> Dict[str, Any]:
         """
-        Парсит один TOML файл и возвращает словарь с данными пакета
+        @brief Парсит один TOML файл и возвращает словарь с данными пакета
+        @param toml_file Путь к TOML файлу
+        @return Словарь с информацией о пакете
         """
         with open(toml_file, 'r', encoding='utf-8') as f:
             data = toml.load(f)

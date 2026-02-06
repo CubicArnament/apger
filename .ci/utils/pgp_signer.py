@@ -1,5 +1,9 @@
 """
-Модуль для PGP подписи пакетов
+@file pgp_signer.py
+@brief Модуль для PGP подписи пакетов
+
+Этот модуль предоставляет класс PGPSigner для подписи
+пакетов с использованием Sequoia PGP.
 """
 
 import subprocess
@@ -9,15 +13,24 @@ from ..utils.logging_utils import get_logger
 
 class PGPSigner:
     """
-    Класс для подписи пакетов с использованием Sequoia PGP
+    @class PGPSigner
+    @brief Класс для подписи пакетов с использованием Sequoia PGP
+    
+    Этот класс отвечает за подпись пакетов с использованием
+    Sequoia PGP (команда sq).
     """
     
     def __init__(self):
+        """
+        @brief Конструктор класса PGPSigner
+        """
         self.logger = get_logger(self.__class__.__name__)
     
     def sign_package_with_sq(self, package_path: str) -> bool:
         """
-        Подписывает пакет с использованием sq (Sequoia PGP)
+        @brief Подписывает пакет с использованием sq (Sequoia PGP)
+        @param package_path Путь к пакету для подписи
+        @return True в случае успеха, иначе False
         """
         try:
             # Создаем detached подпись с помощью sq

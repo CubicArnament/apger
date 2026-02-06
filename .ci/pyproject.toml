@@ -29,6 +29,8 @@ dev = [
     "black",
     "flake8",
     "mypy",
+    "sphinx>=4.0",
+    "sphinx-rtd-theme",
 ]
 
 [project.scripts]
