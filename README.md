@@ -2,10 +2,9 @@
 
 Automated package build system for NurOS in APGv2 format using GitHub Actions.
 
-## Features
+APGer is a flexible Python 3.12+ build engine for creating APG packages for NurOS. It parses TOML recipes from the `repodata` directory, downloads sources, builds packages using various build systems (meson, cmake, autotools, cargo, python-pep517), and creates signed APG packages.
 
-- Automatic package building from source code
-- Strict JSON metadata generation
+For detailed documentation, see the `docs/` directory.
 - MD5 checksums for all files
 - Lifecycle scripts support (pre/post install/remove)
 - Automatic GitHub Releases with `.apg` archives

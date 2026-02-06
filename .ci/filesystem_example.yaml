@@ -1,0 +1,25 @@
+# Пример структуры файловой системы для пакета htop
+filesystem:
+  files:
+    # Бинарный файл htop
+    - source: "build/htop"
+      destination: "/usr/bin/htop"
+      permissions: "755"
+    
+    # Мануал
+    - source: "htop.1"
+      destination: "/usr/share/man/man1/htop.1"
+      permissions: "644"
+  
+  directories:
+    # Директория для конфигурационных файлов
+    - path: "/etc/xdg/htop"
+      permissions: "755"
+    # Директория для документации
+    - path: "/usr/share/doc/htop"
+      permissions: "755"
+  
+  symlinks:
+    # Ссылка для совместимости
+    - source: "/usr/bin/htop"
+      destination: "/usr/local/bin/htop"

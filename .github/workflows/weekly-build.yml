@@ -1,0 +1,82 @@
+name: Weekly Package Build
+
+on:
+  schedule:
+    # Запускать каждую неделю в 00:00 UTC в воскресенье
+    - cron: '0 0 * * 0'
+  workflow_dispatch:  # Возможность ручного запуска
+
+jobs:
+  build-packages:
+    runs-on: ubuntu-latest  # Host система
+    container:
+      image: archlinux:latest  # Используем Arch Linux как rolling дистрибутив
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.2'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: ".ci/pyproject.toml"
+
+      - name: Install system dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm zstd git gnupg sq python-pyyaml python-pip
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.PGP_PRIVATE_KEY }}
+          # Убран passphrase, так как ключ не зашифрован
+
+      - name: Create output directory
+        run: |
+          mkdir -p dist/output
+
+      - name: Install dependencies with uv
+        run: |
+          cd .ci
+          python -m pip install --upgrade pip
+          uv sync --system
+
+      - name: Run APGer Engine
+        run: |
+          cd .ci
+          uv run --system python -m main
+
+      - name: Sign packages with sq
+        run: |
+          # Подписываем все созданные пакеты с помощью sq
+          for pkg in dist/output/*.apg; do
+            if [ -f "$pkg" ]; then
+              sq sign --detached "$pkg"
+              echo "Пакет $pkg подписан с помощью sq"
+            fi
+          done
+          
+          # Убедимся, что все файлы подписи также находятся в dist/output
+          ls -la dist/output/
+
+      - name: Commit and push if there are changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/output
+          if [ -n "$(git status --porcelain dist/output)" ]; then
+            git commit -m "Weekly package build [skip ci]"
+            git push
+          fi

@@ -1,0 +1,15 @@
+# Пример метаданных для пакета cool-tool
+package:
+  type: "binary"
+  description: "Cool tool description"
+  maintainer: "AnmiTaliDev <anmitali198@gmail.com>"
+  license: "GPL-3.0"
+  homepage: "https://example.com"
+  tags: ["tool", "utility"]
+  dependencies:
+    - "glibc"
+    - "zlib"
+  conflicts: []
+  provides: []
+  replaces: []
+  conf: ["/etc/cool-tool.conf"]
