@@ -27,4 +27,4 @@ jobs:
     - name: Lint with ruff
       run: |
         cd .ci
-        ruff check . --config pyproject.toml
+        ruff check .
