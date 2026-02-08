@@ -1,0 +1,32 @@
+# Minimal Sphinx Makefile для генерации документации
+
+# Вы можете задать параметры извне через переменные окружения
+SPHINXBUILD ?= sphinx-build
+SOURCEDIR = .
+BUILDDIR = _build
+
+# Параметры sphinx-build
+SPHINXOPTS ?=
+
+.PHONY: help clean html latexpdf
+
+help:
+	@echo "Доступные цели:"
+	@echo "  html       - генерирует HTML документацию"
+	@echo "  latexpdf   - генерирует PDF документацию (требуется LaTeX)"
+	@echo "  clean      - удаляет сгенерированную документацию"
+
+clean:
+	rm -rf $(BUILDDIR)/*
+
+html:
+	$(SPHINXBUILD) -b html $(SPHINXOPTS) $(SOURCEDIR) $(BUILDDIR)/html
+	@echo
+	@echo "HTML документация сгенерирована в $(BUILDDIR)/html/index.html"
+
+latexpdf:
+	$(SPHINXBUILD) -b latex $(SPHINXOPTS) $(SOURCEDIR) $(BUILDDIR)/latex
+	@echo "PDF документация будет создана в $(BUILDDIR)/latex после компиляции LaTeX"
+	@echo "Запуск компиляции LaTeX..."
+	$(MAKE) -C $(BUILDDIR)/latex all-pdf
+	@echo "PDF документация создана в $(BUILDDIR)/latex"
