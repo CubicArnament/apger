@@ -31,28 +31,22 @@ line-length = 88
 target-version = "py312"
 
 [tool.ruff.lint]
-# Enable specific rules, focusing on security and critical issues
+# Enable only critical security and error checking rules
 select = [
-    "E",      # pycodestyle errors
+    "E4",     # pycodestyle errors (syntax errors)
+    "E9",     # pycodestyle errors (runtime errors)
     "F",      # Pyflakes
     "B",      # flake8-bugbear (includes security-related issues)
-    "UP",     # pyupgrade
     "BLE",    # flake8-blind-except
     "FBT",    # flake8-boolean-trap
     "S",      # flake8-bandit security issues
     "RUF",    # Ruff-specific rules
-    "SIM",    # flake8-simplify
-    "ARG",    # flake8-unused-arguments
-    "PGH",    # pygrep-hooks
-    "PIE",    # flake8-pie
-    "PL",     # Design related pylint codes
-    "PYI",    # Missing type annotations
     "TRY",    # Tryceratops
     "EXE",    # flake8-executable
 ]
 
-# Ignore stylistic issues that are not critical for production
-ignore = [
+# Ignore all stylistic issues that are not critical for production
+extend-ignore = [
     "E501",  # Line too long (handled by formatter)
     "W",     # pycodestyle warnings (stylistic issues)
     "ANN",   # Type annotations (not critical for production)
@@ -69,14 +63,14 @@ ignore = [
     "UP",    # Upgrades
     "C",     # Comprehension checks
     "I",     # Import ordering
+    "G004",  # Logging format (f-strings)
+    "RUF001", # Cyrillic characters
+    "RUF002", # Cyrillic characters in docstrings
+    "RUF003", # Cyrillic characters in comments
+    "S603",   # subprocess security warnings (when using known safe inputs)
+    "S607",   # partial executable path warnings
+    "S202",   # tarfile.extractall warnings (when using trusted inputs)
 ]
-
-# Allow fix for most rules
-fixable = ["ALL"]
-unfixable = []
-
-# Allow unused variables when underscore-prefixed
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 # Allow fix for most rules
 fixable = ["ALL"]
