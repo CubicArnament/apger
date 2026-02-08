@@ -290,9 +290,10 @@ class CargoTemplate(BuildTemplate):
         self.logger.info("[BUILD] Настройка Cargo не требуется для %s", self.name)
         return True
 
-    def compile(self) -> bool:
+    def compile(self, extra_flags: list[str] | None = None) -> bool:
         """
         @brief Компиляция Cargo проекта
+        @param extra_flags Дополнительные флаги для компиляции
         @return True в случае успеха, иначе False
         """
         self.logger.info("[BUILD] Компиляция Cargo для %s", self.name)
@@ -357,9 +358,10 @@ class PythonPEP517Template(BuildTemplate):
             self.logger.exception("[BUILD] Ошибка установки зависимостей для Python PEP 517 для %s: %s", self.name, e.stderr)
             return False
 
-    def compile(self) -> bool:
+    def compile(self, extra_flags: list[str] | None = None) -> bool:
         """
         @brief Сборка Python PEP 517 проекта
+        @param extra_flags Дополнительные флаги для компиляции
         @return True в случае успеха, иначе False
         """
         self.logger.info("[BUILD] Сборка Python PEP 517 для %s", self.name)
