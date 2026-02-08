@@ -23,21 +23,21 @@ html_docs:
 open_docs: html_docs
 	@echo "Открытие HTML документации в браузере..."
 ifeq ($(OS),Windows_NT)
-	start docs\html\index.html
+	start html\index.html
 else
 	@if command -v xdg-open >/dev/null 2>&1; then \
-		xdg-open docs/html/index.html; \
+		xdg-open html/index.html; \
 	elif command -v open >/dev/null 2>&1; then \
-		open docs/html/index.html; \
+		open html/index.html; \
 	else \
-		echo "Could not open browser automatically. Please open docs/html/index.html manually."; \
+		echo "Could not open browser automatically. Please open html/index.html manually."; \
 	fi
 endif
 
 gen_docs:
 	@echo "Генерация HTML документации..."
 	@doxygen Doxyfile
-	@echo "Документация сгенерирована в docs/html/index.html"
+	@echo "Документация сгенерирована в html/index.html"
 
 clean:
 	@echo "Очистка сгенерированной документации..."
