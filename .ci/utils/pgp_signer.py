@@ -34,21 +34,29 @@ class PGPSigner:
         """
         try:
             # Создаем detached подпись с помощью sq
-            sign_result = subprocess.run([
-                'sq', 'sign', '--detached', package_path
-            ], capture_output=True, text=True)
+            sign_result = subprocess.run(
+                ["sq", "sign", "--detached", package_path],
+                capture_output=True,
+                text=True,
+            )
 
             # Используем match-case для обработки результата
             match sign_result.returncode:
                 case 0:
-                    self.logger.info(f"Пакет {package_path} успешно подписан с помощью sq")
+                    self.logger.info(
+                        f"Пакет {package_path} успешно подписан с помощью sq"
+                    )
                     return True
                 case _:
-                    self.logger.error(f"Ошибка создания PGP подписи с помощью sq: {sign_result.stderr}")
+                    self.logger.error(
+                        f"Ошибка создания PGP подписи с помощью sq: {sign_result.stderr}"
+                    )
                     return False
 
         except FileNotFoundError:
-            self.logger.exception("Команда sq не найдена. Убедитесь, что установлен Sequoia PGP")
+            self.logger.exception(
+                "Команда sq не найдена. Убедитесь, что установлен Sequoia PGP"
+            )
             return False
         except Exception as e:
             self.logger.exception(f"Ошибка при подписании пакета: {e}")

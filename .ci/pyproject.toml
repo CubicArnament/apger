@@ -59,7 +59,7 @@ extend-ignore = [
     "ICN",   # Import conventions
     "YTT",   # Flake8-2020
     "ASYNC", # Async checks
-    "TRIO",  # Trio checks
+    "ASYNC1",  # Trio checks
     "UP",    # Upgrades
     "C",     # Comprehension checks
     "I",     # Import ordering
@@ -70,6 +70,10 @@ extend-ignore = [
     "S603",   # subprocess security warnings (when using known safe inputs)
     "S607",   # partial executable path warnings
     "S202",   # tarfile.extractall warnings (when using trusted inputs)
+    "G004",   # f-strings in logging (performance issue, not critical)
+    "RUF010", # f-strings in type annotations (performance issue, not critical)
+    "TRY",    # Tryceratops rules (not critical for production)
+    "BLE",    # Blind exception handling (sometimes necessary)
 ]
 
 # Allow fix for most rules

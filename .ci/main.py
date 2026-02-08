@@ -48,31 +48,39 @@ def main() -> None:
             case num_packages:
                 logger.info(f"Найдено {num_packages} пакетов для обработки")
                 for pkg in packages:
-                    package_name = pkg['package']['name']
-                    version = pkg['package']['version']
+                    package_name = pkg["package"]["name"]
+                    version = pkg["package"]["version"]
 
                     logger.info(f"Обработка пакета: {package_name} версии {version}")
 
                     # Создаем временные директории
                     with tempfile.TemporaryDirectory() as temp_dir:
                         temp_path = Path(temp_dir)
-                        source_dir = temp_path / 'source'
-                        build_dir = temp_path / 'build'
-                        install_dir = temp_path / 'install'
-                        output_dir = Path('dist/output')  # Выходная директория в dist/output
+                        source_dir = temp_path / "source"
+                        build_dir = temp_path / "build"
+                        install_dir = temp_path / "install"
+                        output_dir = Path(
+                            "dist/output"
+                        )  # Выходная директория в dist/output
                         output_dir.mkdir(exist_ok=True)
 
                         # Загружаем исходники
-                        source_url = pkg['package']['source']
+                        source_url = pkg["package"]["source"]
                         match downloader.download_source(source_url, str(source_dir)):
                             case True:
-                                logger.debug(f"Исходники успешно загружены для {package_name}")
+                                logger.debug(
+                                    f"Исходники успешно загружены для {package_name}"
+                                )
                             case False:
-                                logger.error(f"Ошибка загрузки исходников для {package_name}")
+                                logger.error(
+                                    f"Ошибка загрузки исходников для {package_name}"
+                                )
                                 continue
 
                         # Выполняем сборку
-                        match builder.build_package(pkg, str(source_dir), str(build_dir), str(install_dir)):
+                        match builder.build_package(
+                            pkg, str(source_dir), str(build_dir), str(install_dir)
+                        ):
                             case True:
                                 logger.debug(f"Пакет {package_name} успешно собран")
                             case False:
@@ -80,7 +88,13 @@ def main() -> None:
                                 continue
 
                         # Создаем APG пакет
-                        package_path = packager.create_apg_package(pkg, str(install_dir), str(output_dir), "../.ci/filesystem_example.yaml", "../.ci/metadata_example.yaml")
+                        package_path = packager.create_apg_package(
+                            pkg,
+                            str(install_dir),
+                            str(output_dir),
+                            "../.ci/filesystem_example.yaml",
+                            "../.ci/metadata_example.yaml",
+                        )
 
                         # Подписываем пакет
                         match signer.sign_package_with_sq(package_path):

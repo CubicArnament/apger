@@ -22,7 +22,9 @@ class BuildTemplate:
     для настройки, компиляции и установки проектов.
     """
 
-    def __init__(self, name: str, source_dir: str, build_dir: str, install_dir: str) -> None:
+    def __init__(
+        self, name: str, source_dir: str, build_dir: str, install_dir: str
+    ) -> None:
         """
         @brief Конструктор класса BuildTemplate
         @param name Имя пакета
@@ -76,11 +78,12 @@ class MesonTemplate(BuildTemplate):
         self.logger.info("[BUILD] Настройка Meson для %s", self.name)
 
         cmd = [
-            'meson', 'setup',
+            "meson",
+            "setup",
             self.build_dir,
             self.source_dir,
-            '--prefix=/usr',
-            f"--destdir={self.install_dir}"
+            "--prefix=/usr",
+            f"--destdir={self.install_dir}",
         ]
 
         if extra_flags:
@@ -91,7 +94,9 @@ class MesonTemplate(BuildTemplate):
             self.logger.info("[BUILD] Настройка Meson завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка настройки Meson для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка настройки Meson для %s: %s", self.name, e.stderr
+            )
             return False
 
     def compile(self) -> bool:
@@ -101,14 +106,16 @@ class MesonTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Компиляция Meson для %s", self.name)
 
-        cmd = ['meson', 'compile', '-C', self.build_dir]
+        cmd = ["meson", "compile", "-C", self.build_dir]
 
         try:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             self.logger.info("[BUILD] Компиляция Meson завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка компиляции Meson для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка компиляции Meson для %s: %s", self.name, e.stderr
+            )
             return False
 
     def install(self) -> bool:
@@ -118,14 +125,16 @@ class MesonTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Установка Meson для %s", self.name)
 
-        cmd = ['meson', 'install', '-C', self.build_dir, '--skip-subprojects']
+        cmd = ["meson", "install", "-C", self.build_dir, "--skip-subprojects"]
 
         try:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             self.logger.info("[BUILD] Установка Meson завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка установки Meson для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка установки Meson для %s: %s", self.name, e.stderr
+            )
             return False
 
 
@@ -146,12 +155,12 @@ class CMakeTemplate(BuildTemplate):
         self.logger.info("[BUILD] Настройка CMake для %s", self.name)
 
         cmd = [
-            'cmake',
+            "cmake",
             f"-S{self.source_dir}",
             f"-B{self.build_dir}",
-            '-DCMAKE_INSTALL_PREFIX=/usr',
-            '-DCMAKE_INSTALL_LIBDIR=lib',
-            '-DCMAKE_BUILD_TYPE=Release'
+            "-DCMAKE_INSTALL_PREFIX=/usr",
+            "-DCMAKE_INSTALL_LIBDIR=lib",
+            "-DCMAKE_BUILD_TYPE=Release",
         ]
 
         if extra_flags:
@@ -162,7 +171,9 @@ class CMakeTemplate(BuildTemplate):
             self.logger.info("[BUILD] Настройка CMake завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка настройки CMake для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка настройки CMake для %s: %s", self.name, e.stderr
+            )
             return False
 
     def compile(self) -> bool:
@@ -172,14 +183,16 @@ class CMakeTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Компиляция CMake для %s", self.name)
 
-        cmd = ['cmake', '--build', self.build_dir, '--parallel']
+        cmd = ["cmake", "--build", self.build_dir, "--parallel"]
 
         try:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             self.logger.info("[BUILD] Компиляция CMake завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка компиляции CMake для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка компиляции CMake для %s: %s", self.name, e.stderr
+            )
             return False
 
     def install(self) -> bool:
@@ -189,14 +202,16 @@ class CMakeTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Установка CMake для %s", self.name)
 
-        cmd = ['cmake', '--install', self.build_dir, f"--prefix={self.install_dir}/usr"]
+        cmd = ["cmake", "--install", self.build_dir, f"--prefix={self.install_dir}/usr"]
 
         try:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             self.logger.info("[BUILD] Установка CMake завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка установки CMake для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка установки CMake для %s: %s", self.name, e.stderr
+            )
             return False
 
 
@@ -218,21 +233,29 @@ class AutotoolsTemplate(BuildTemplate):
 
         configure_cmd = [
             f"{self.source_dir}/configure",
-            '--prefix=/usr',
-            '--libdir=/usr/lib',
-            '--disable-dependency-tracking',
-            '--disable-silent-rules'
+            "--prefix=/usr",
+            "--libdir=/usr/lib",
+            "--disable-dependency-tracking",
+            "--disable-silent-rules",
         ]
 
         if extra_flags:
             configure_cmd.extend(extra_flags)
 
         try:
-            subprocess.run(configure_cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                configure_cmd,
+                cwd=self.source_dir,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
             self.logger.info("[BUILD] Настройка Autotools завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка настройки Autotools для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка настройки Autotools для %s: %s", self.name, e.stderr
+            )
             return False
 
     def compile(self) -> bool:
@@ -242,14 +265,18 @@ class AutotoolsTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Компиляция Autotools для %s", self.name)
 
-        cmd = ['make', '-j$(nproc)']
+        cmd = ["make", "-j$(nproc)"]
 
         try:
-            subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                cmd, cwd=self.source_dir, check=True, capture_output=True, text=True
+            )
             self.logger.info("[BUILD] Компиляция Autotools завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка компиляции Autotools для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка компиляции Autotools для %s: %s", self.name, e.stderr
+            )
             return False
 
     def install(self) -> bool:
@@ -259,14 +286,18 @@ class AutotoolsTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Установка Autotools для %s", self.name)
 
-        cmd = ['make', f"DESTDIR={self.install_dir}", 'install']
+        cmd = ["make", f"DESTDIR={self.install_dir}", "install"]
 
         try:
-            subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                cmd, cwd=self.source_dir, check=True, capture_output=True, text=True
+            )
             self.logger.info("[BUILD] Установка Autotools завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка установки Autotools для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка установки Autotools для %s: %s", self.name, e.stderr
+            )
             return False
 
 
@@ -298,17 +329,21 @@ class CargoTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Компиляция Cargo для %s", self.name)
 
-        cmd = ['cargo', 'build', '--release']
+        cmd = ["cargo", "build", "--release"]
 
         if extra_flags:
             cmd.extend(extra_flags)
 
         try:
-            subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                cmd, cwd=self.source_dir, check=True, capture_output=True, text=True
+            )
             self.logger.info("[BUILD] Компиляция Cargo завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка компиляции Cargo для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка компиляции Cargo для %s: %s", self.name, e.stderr
+            )
             return False
 
     def install(self) -> bool:
@@ -319,13 +354,13 @@ class CargoTemplate(BuildTemplate):
         self.logger.info("[BUILD] Установка Cargo для %s", self.name)
 
         # Для Rust нужно вручную скопировать бинарники
-        target_dir = Path(self.source_dir) / 'target' / 'release'
-        bin_dir = Path(self.install_dir) / 'usr' / 'bin'
+        target_dir = Path(self.source_dir) / "target" / "release"
+        bin_dir = Path(self.install_dir) / "usr" / "bin"
         bin_dir.mkdir(parents=True, exist_ok=True)
 
         # Копируем все бинарники из target/release
         for binary in target_dir.iterdir():
-            if binary.is_file() and not binary.name.endswith('.d'):
+            if binary.is_file() and not binary.name.endswith(".d"):
                 dest_path = bin_dir / binary.name
                 shutil.copy2(binary, dest_path)
 
@@ -361,17 +396,25 @@ class GradleTemplate(BuildTemplate):
         """
         self.logger.info("[BUILD] Компиляция Gradle для %s", self.name)
 
-        cmd = ['./gradlew', 'build'] if (Path(self.source_dir) / 'gradlew').exists() else ['gradle', 'build']
+        cmd = (
+            ["./gradlew", "build"]
+            if (Path(self.source_dir) / "gradlew").exists()
+            else ["gradle", "build"]
+        )
 
         if extra_flags:
             cmd.extend(extra_flags)
 
         try:
-            subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                cmd, cwd=self.source_dir, check=True, capture_output=True, text=True
+            )
             self.logger.info("[BUILD] Компиляция Gradle завершена для %s", self.name)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка компиляции Gradle для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка компиляции Gradle для %s: %s", self.name, e.stderr
+            )
             return False
 
     def install(self) -> bool:
@@ -382,15 +425,15 @@ class GradleTemplate(BuildTemplate):
         self.logger.info("[BUILD] Установка Gradle для %s", self.name)
 
         # Находим JAR/WAR файлы и копируем их в директорию установки
-        build_dir = Path(self.source_dir) / 'build' / 'libs'
-        install_bin_dir = Path(self.install_dir) / 'usr' / 'share' / 'java'
+        build_dir = Path(self.source_dir) / "build" / "libs"
+        install_bin_dir = Path(self.install_dir) / "usr" / "share" / "java"
         install_bin_dir.mkdir(parents=True, exist_ok=True)
 
         if build_dir.exists():
-            for jar_file in build_dir.glob('*.jar'):
+            for jar_file in build_dir.glob("*.jar"):
                 dest_path = install_bin_dir / jar_file.name
                 shutil.copy2(jar_file, dest_path)
-            for war_file in build_dir.glob('*.war'):
+            for war_file in build_dir.glob("*.war"):
                 dest_path = install_bin_dir / war_file.name
                 shutil.copy2(war_file, dest_path)
 
@@ -416,11 +459,22 @@ class PythonPEP517Template(BuildTemplate):
 
         # Устанавливаем зависимости для сборки
         try:
-            subprocess.run(['pip', 'install', 'build', 'wheel'], check=True, capture_output=True, text=True)
-            self.logger.info("[BUILD] Зависимости для Python PEP 517 установлены для %s", self.name)
+            subprocess.run(
+                ["pip", "install", "build", "wheel"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.logger.info(
+                "[BUILD] Зависимости для Python PEP 517 установлены для %s", self.name
+            )
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка установки зависимостей для Python PEP 517 для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка установки зависимостей для Python PEP 517 для %s: %s",
+                self.name,
+                e.stderr,
+            )
             return False
 
     def compile(self, extra_flags: list[str] | None = None) -> bool:
@@ -431,20 +485,26 @@ class PythonPEP517Template(BuildTemplate):
         """
         self.logger.info("[BUILD] Сборка Python PEP 517 для %s", self.name)
 
-        cmd = ['python', '-m', 'build', '--wheel', '--outdir', self.build_dir]
+        cmd = ["python", "-m", "build", "--wheel", "--outdir", self.build_dir]
 
         if extra_flags:
             # Добавляем флаги как параметры конфигурации
             for flag in extra_flags:
-                if flag.startswith('--config-settings='):
+                if flag.startswith("--config-settings="):
                     cmd.append(flag)
 
         try:
-            subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
-            self.logger.info("[BUILD] Сборка Python PEP 517 завершена для %s", self.name)
+            subprocess.run(
+                cmd, cwd=self.source_dir, check=True, capture_output=True, text=True
+            )
+            self.logger.info(
+                "[BUILD] Сборка Python PEP 517 завершена для %s", self.name
+            )
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка сборки Python PEP 517 для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка сборки Python PEP 517 для %s: %s", self.name, e.stderr
+            )
             return False
 
     def install(self) -> bool:
@@ -464,18 +524,26 @@ class PythonPEP517Template(BuildTemplate):
         # Устанавливаем wheel в временный каталог
         wheel_file = wheel_files[0]
         cmd = [
-            'pip', 'install',
-            '--root', self.install_dir,
-            '--no-deps',  # Не устанавливаем зависимости
-            str(wheel_file)
+            "pip",
+            "install",
+            "--root",
+            self.install_dir,
+            "--no-deps",  # Не устанавливаем зависимости
+            str(wheel_file),
         ]
 
         try:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
-            self.logger.info("[BUILD] Установка Python PEP 517 завершена для %s", self.name)
+            self.logger.info(
+                "[BUILD] Установка Python PEP 517 завершена для %s", self.name
+            )
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception("[BUILD] Ошибка установки Python PEP 517 для %s: %s", self.name, e.stderr)
+            self.logger.exception(
+                "[BUILD] Ошибка установки Python PEP 517 для %s: %s",
+                self.name,
+                e.stderr,
+            )
             return False
 
 
@@ -502,29 +570,31 @@ class BuildManager:
         """
         # Используем match-case для определения шаблона
         match template_name:
-            case 'meson':
+            case "meson":
                 self.logger.debug("Выбран шаблон Meson для сборки")
                 return MesonTemplate
-            case 'cmake':
+            case "cmake":
                 self.logger.debug("Выбран шаблон CMake для сборки")
                 return CMakeTemplate
-            case 'autotools':
+            case "autotools":
                 self.logger.debug("Выбран шаблон Autotools для сборки")
                 return AutotoolsTemplate
-            case 'cargo':
+            case "cargo":
                 self.logger.debug("Выбран шаблон Cargo для сборки")
                 return CargoTemplate
-            case 'python-pep517':
+            case "python-pep517":
                 self.logger.debug("Выбран шаблон Python PEP 517 для сборки")
                 return PythonPEP517Template
-            case 'gradle':
+            case "gradle":
                 self.logger.debug("Выбран шаблон Gradle для сборки")
                 return GradleTemplate
             case _:
                 self.logger.warning("Шаблон сборки %s не поддерживается", template_name)
                 return None
 
-    def build_package(self, package_info: dict, source_dir: str, build_dir: str, install_dir: str) -> bool:
+    def build_package(
+        self, package_info: dict, source_dir: str, build_dir: str, install_dir: str
+    ) -> bool:
         """
         @brief Выполнение сборки пакета
         @param package_info Информация о пакете
@@ -533,8 +603,8 @@ class BuildManager:
         @param install_dir Директория для установки
         @return True в случае успеха, иначе False
         """
-        build_info = package_info.get('build', {})
-        template_name = build_info.get('template', 'meson')
+        build_info = package_info.get("build", {})
+        template_name = build_info.get("template", "meson")
 
         # Получаем класс шаблона
         template_class = self.get_template(template_name)
@@ -544,33 +614,41 @@ class BuildManager:
 
         # Создаем экземпляр шаблона
         builder = template_class(
-            name=package_info['package']['name'],
+            name=package_info["package"]["name"],
             source_dir=source_dir,
             build_dir=build_dir,
-            install_dir=install_dir
+            install_dir=install_dir,
         )
 
         # Получаем дополнительные флаги
-        extra_flags = build_info.get('extra_flags', [])
+        extra_flags = build_info.get("extra_flags", [])
         if isinstance(extra_flags, str):
             extra_flags = [extra_flags]
 
         # Добавляем переведенные флаги, если они есть
-        if 'translated_flags' in build_info:
-            extra_flags.extend(build_info['translated_flags'])
+        if "translated_flags" in build_info:
+            extra_flags.extend(build_info["translated_flags"])
 
         # Выполняем этапы сборки
         if not builder.setup(extra_flags):
-            self.logger.error("Ошибка на этапе setup для %s", package_info['package']['name'])
+            self.logger.error(
+                "Ошибка на этапе setup для %s", package_info["package"]["name"]
+            )
             return False
 
         if not builder.compile():
-            self.logger.error("Ошибка на этапе compile для %s", package_info['package']['name'])
+            self.logger.error(
+                "Ошибка на этапе compile для %s", package_info["package"]["name"]
+            )
             return False
 
         if not builder.install():
-            self.logger.error("Ошибка на этапе install для %s", package_info['package']['name'])
+            self.logger.error(
+                "Ошибка на этапе install для %s", package_info["package"]["name"]
+            )
             return False
 
-        self.logger.info("Сборка пакета %s завершена успешно", package_info['package']['name'])
+        self.logger.info(
+            "Сборка пакета %s завершена успешно", package_info["package"]["name"]
+        )
         return True

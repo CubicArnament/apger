@@ -78,72 +78,88 @@ class JSONParser:
         @return True если структура корректна, иначе False
         """
         try:
-            with open(json_file, encoding='utf-8') as f:
+            with open(json_file, encoding="utf-8") as f:
                 data = json.load(f)
 
             # Проверяем наличие обязательных секций
-            if 'package' not in data:
-                print(f"Файл {json_file.name} не содержит обязательной секции 'package'")
+            if "package" not in data:
+                print(
+                    f"Файл {json_file.name} не содержит обязательной секции 'package'"
+                )
                 return False
 
-            package_info = data['package']
+            package_info = data["package"]
 
             # Проверяем наличие обязательных полей в секции package
-            required_fields = ['name', 'version', 'architecture', 'source']
+            required_fields = ["name", "version", "architecture", "source"]
             for field in required_fields:
                 if field not in package_info:
-                    print(f"Файл {json_file.name} не содержит обязательного поля '{field}' в секции 'package'")
+                    print(
+                        f"Файл {json_file.name} не содержит обязательного поля '{field}' в секции 'package'"
+                    )
                     return False
 
             # Проверяем, что поля имеют правильный тип
-            match isinstance(package_info['name'], str):
+            match isinstance(package_info["name"], str):
                 case False:
                     print(f"Поле 'name' в файле {json_file.name} должно быть строкой")
                     return False
 
-            match isinstance(package_info['version'], str):
+            match isinstance(package_info["version"], str):
                 case False:
-                    print(f"Поле 'version' в файле {json_file.name} должно быть строкой")
+                    print(
+                        f"Поле 'version' в файле {json_file.name} должно быть строкой"
+                    )
                     return False
 
-            match isinstance(package_info['architecture'], str):
+            match isinstance(package_info["architecture"], str):
                 case False:
-                    print(f"Поле 'architecture' в файле {json_file.name} должно быть строкой")
+                    print(
+                        f"Поле 'architecture' в файле {json_file.name} должно быть строкой"
+                    )
                     return False
 
-            match isinstance(package_info['source'], str):
+            match isinstance(package_info["source"], str):
                 case False:
                     print(f"Поле 'source' в файле {json_file.name} должно быть строкой")
                     return False
 
             # Проверяем наличие секции build
-            if 'build' not in data:
+            if "build" not in data:
                 print(f"Файл {json_file.name} не содержит обязательной секции 'build'")
                 return False
 
-            build_info = data['build']
+            build_info = data["build"]
 
             # Проверяем наличие обязательного поля template в секции build
-            if 'template' not in build_info:
-                print(f"Файл {json_file.name} не содержит обязательного поля 'template' в секции 'build'")
+            if "template" not in build_info:
+                print(
+                    f"Файл {json_file.name} не содержит обязательного поля 'template' в секции 'build'"
+                )
                 return False
 
-            match isinstance(build_info['template'], str):
+            match isinstance(build_info["template"], str):
                 case False:
-                    print(f"Поле 'template' в файле {json_file.name} должно быть строкой")
+                    print(
+                        f"Поле 'template' в файле {json_file.name} должно быть строкой"
+                    )
                     return False
 
             # Проверяем, что build.dependencies является массивом строк (если присутствует)
-            if 'dependencies' in build_info:
-                match isinstance(build_info['dependencies'], list):
+            if "dependencies" in build_info:
+                match isinstance(build_info["dependencies"], list):
                     case False:
-                        print(f"Поле 'dependencies' в секции 'build' файла {json_file.name} должно быть массивом")
+                        print(
+                            f"Поле 'dependencies' в секции 'build' файла {json_file.name} должно быть массивом"
+                        )
                         return False
                     case True:
-                        for dep in build_info['dependencies']:
+                        for dep in build_info["dependencies"]:
                             match isinstance(dep, str):
                                 case False:
-                                    print(f"Каждая зависимость в 'build.dependencies' файла {json_file.name} должна быть строкой")
+                                    print(
+                                        f"Каждая зависимость в 'build.dependencies' файла {json_file.name} должна быть строкой"
+                                    )
                                     return False
 
             return True
@@ -161,46 +177,54 @@ class JSONParser:
         @param json_file Путь к JSON файлу
         @return Словарь с информацией о пакете
         """
-        with open(json_file, encoding='utf-8') as f:
+        with open(json_file, encoding="utf-8") as f:
             data = json.load(f)
 
         # Проверяем обязательные поля
-        if 'package' not in data:
+        if "package" not in data:
             raise ValueError(f"В файле {json_file} отсутствует секция 'package'")
 
-        package_info = data['package']
+        package_info = data["package"]
 
         # Проверяем наличие обязательных полей
-        required_fields = ['name', 'version', 'architecture', 'source']
+        required_fields = ["name", "version", "architecture", "source"]
         for field in required_fields:
             if field not in package_info:
-                raise ValueError(f"В файле {json_file} отсутствует поле {field} в секции 'package'")
+                raise ValueError(
+                    f"В файле {json_file} отсутствует поле {field} в секции 'package'"
+                )
 
         # Если версия указана как "latest", определяем актуальную версию
-        match package_info['version']:
-            case 'latest':
-                print("Определение последней версии для {}".format(package_info['name']))
-                resolved_version = self.version_resolver.resolve_latest_version(package_info['source'])
-                package_info['version'] = resolved_version
+        match package_info["version"]:
+            case "latest":
+                print(
+                    "Определение последней версии для {}".format(package_info["name"])
+                )
+                resolved_version = self.version_resolver.resolve_latest_version(
+                    package_info["source"]
+                )
+                package_info["version"] = resolved_version
             case _:
                 # Версия указана явно, ничего не меняем
                 pass
 
         # Обрабатываем секцию build
-        build_info = data.get('build', {})
+        build_info = data.get("build", {})
 
         # Если указаны use флаги, преобразуем их в аргументы сборки
-        if 'use' in build_info and 'template' in build_info:
-            use_flags = build_info.get('use', [])
-            build_template = build_info.get('template', 'meson')  # По умолчанию meson
+        if "use" in build_info and "template" in build_info:
+            use_flags = build_info.get("use", [])
+            build_template = build_info.get("template", "meson")  # По умолчанию meson
 
-            translated_flags = self.flag_translator.translate_flags(build_template, use_flags)
-            build_info['translated_flags'] = translated_flags
+            translated_flags = self.flag_translator.translate_flags(
+                build_template, use_flags
+            )
+            build_info["translated_flags"] = translated_flags
 
         # Добавляем остальные секции если они есть
         result = {
-            'package': package_info,
-            'build': build_info,
+            "package": package_info,
+            "build": build_info,
         }
 
         return result

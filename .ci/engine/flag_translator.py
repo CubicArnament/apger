@@ -24,46 +24,46 @@ class FlagTranslator:
         """
         # Словари преобразования флагов для каждой системы сборки
         self.flag_mappings = {
-            'meson': {
-                'nls': '-Dnls=enabled',
-                'shared': '-Ddefault_library=shared',
-                'lto': '-Db_lto=true',
-                'debug': '-Dbuildtype=debug',
-                'release': '-Dbuildtype=release',
-                'optimizations': '-Db_lto=true -Db_pgo=generate'
+            "meson": {
+                "nls": "-Dnls=enabled",
+                "shared": "-Ddefault_library=shared",
+                "lto": "-Db_lto=true",
+                "debug": "-Dbuildtype=debug",
+                "release": "-Dbuildtype=release",
+                "optimizations": "-Db_lto=true -Db_pgo=generate",
             },
-            'cmake': {
-                'nls': '-DENABLE_NLS=ON',
-                'shared': '-DBUILD_SHARED_LIBS=ON',
-                'lto': '-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON',
-                'debug': '-DCMAKE_BUILD_TYPE=Debug',
-                'release': '-DCMAKE_BUILD_TYPE=Release',
-                'optimizations': '-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON'
+            "cmake": {
+                "nls": "-DENABLE_NLS=ON",
+                "shared": "-DBUILD_SHARED_LIBS=ON",
+                "lto": "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
+                "debug": "-DCMAKE_BUILD_TYPE=Debug",
+                "release": "-DCMAKE_BUILD_TYPE=Release",
+                "optimizations": "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
             },
-            'autotools': {
-                'nls': '--enable-nls',
-                'shared': '--enable-shared --disable-static',
-                'lto': '--enable-lto',
-                'debug': '--enable-debug',
-                'release': '--disable-debug',
-                'optimizations': '--enable-lto --enable-optimizations'
+            "autotools": {
+                "nls": "--enable-nls",
+                "shared": "--enable-shared --disable-static",
+                "lto": "--enable-lto",
+                "debug": "--enable-debug",
+                "release": "--disable-debug",
+                "optimizations": "--enable-lto --enable-optimizations",
             },
-            'cargo': {
-                'nls': '--features=nls',
-                'shared': '--features=shared',
-                'lto': '--release',
-                'debug': '--debug',
-                'release': '--release',
-                'optimizations': '--release'
+            "cargo": {
+                "nls": "--features=nls",
+                "shared": "--features=shared",
+                "lto": "--release",
+                "debug": "--debug",
+                "release": "--release",
+                "optimizations": "--release",
             },
-            'python-pep517': {
-                'nls': '--config-settings="--build-option=--with-nls"',
-                'shared': '--config-settings="--build-option=--enable-shared"',
-                'lto': '--config-settings="--global-option=--enable-lto"',
-                'debug': '--config-settings="--build-option=--debug"',
-                'release': '--config-settings="--build-option=--release"',
-                'optimizations': '--config-settings="--global-option=--enable-optimizations"'
-            }
+            "python-pep517": {
+                "nls": '--config-settings="--build-option=--with-nls"',
+                "shared": '--config-settings="--build-option=--enable-shared"',
+                "lto": '--config-settings="--global-option=--enable-lto"',
+                "debug": '--config-settings="--build-option=--debug"',
+                "release": '--config-settings="--build-option=--release"',
+                "optimizations": '--config-settings="--global-option=--enable-optimizations"',
+            },
         }
         self.logger = get_logger(self.__class__.__name__)
 
@@ -85,9 +85,13 @@ class FlagTranslator:
                         case True:
                             translated_flags.append(flag_map[flag])
                         case False:
-                            self.logger.warning(f"Флаг {flag} не поддерживается для системы сборки {system}")
+                            self.logger.warning(
+                                f"Флаг {flag} не поддерживается для системы сборки {system}"
+                            )
 
                 return translated_flags
             case _:
-                self.logger.warning(f"Система сборки {build_system} не поддерживается в FlagTranslator")
+                self.logger.warning(
+                    f"Система сборки {build_system} не поддерживается в FlagTranslator"
+                )
                 return []

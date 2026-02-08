@@ -18,7 +18,7 @@ def setup_logging(level=logging.INFO) -> logging.Logger:
     """
     # Создаем форматтер
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Создаем хендлер для stdout
