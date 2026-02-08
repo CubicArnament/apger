@@ -1,0 +1,126 @@
+/* Поддержка темного режима для APGer документации */
+
+/* Определение переменных для светлой и темной темы */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --header-bg: #426477;
+  --header-text: #ffffff;
+  --link-color: #426477;
+  --link-hover: #6a93be;
+  --code-bg: #f8f8f8;
+  --code-text: #333333;
+  --border-color: #cccccc;
+  --section-bg: #f9f9f9;
+  --nav-bg: #f0f0f0;
+  --nav-text: #333333;
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --header-bg: #2d4450;
+    --header-text: #ffffff;
+    --link-color: #6a93be;
+    --link-hover: #a4c2d6;
+    --code-bg: #2d2d2d;
+    --code-text: #f8f8f2;
+    --border-color: #555555;
+    --section-bg: #2d2d2d;
+    --nav-bg: #2d2d2d;
+    --nav-text: #e0e0e0;
+  }
+}
+
+/* Альтернативные стили для расширений темизации */
+body.dark-mode {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --header-bg: #2d4450;
+  --header-text: #ffffff;
+  --link-color: #6a93be;
+  --link-hover: #a4c2d6;
+  --code-bg: #2d2d2d;
+  --code-text: #f8f8f2;
+  --border-color: #555555;
+  --section-bg: #2d2d2d;
+  --nav-bg: #2d2d2d;
+  --nav-text: #e0e0e0;
+}
+
+/* Применение переменных к элементам */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+div#titlearea {
+  background: var(--header-bg);
+  color: var(--header-text);
+}
+
+a:link, a:visited {
+  color: var(--link-color);
+}
+
+a:hover, a:active {
+  color: var(--link-hover);
+}
+
+code, pre, .json-container {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  border: 1px solid var(--border-color);
+}
+
+.section {
+  background-color: var(--section-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 1em;
+  margin: 1em 0;
+}
+
+.nav {
+  background-color: var(--nav-bg);
+  color: var(--nav-text);
+  border: 1px solid var(--border-color);
+}
+
+table.doxtable th {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+}
+
+table.doxtable td {
+  border: 1px solid var(--border-color);
+}
+
+div#nav-tree {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+#nav-tree .selected {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+}
+
+#nav-tree a {
+  color: var(--text-color);
+}
+
+.memdoc {
+  border: 1px solid var(--border-color);
+}
+
+div.fragment {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+}
+
+pre.fragment {
+  background: var(--code-bg);
+}

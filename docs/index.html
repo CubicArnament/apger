@@ -4,91 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APGer Engine - Документация</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            line-height: 1.6;
-        }
-        .nav {
-            margin-top: 20px;
-        }
-        .section {
-            margin-bottom: 40px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        a {
-            color: #3498db;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        code {
-            background-color: #f4f4f4;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        .json-container {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="custom/lfs-style.css">
+    <link rel="stylesheet" type="text/css" href="custom/dark-mode-support.css">
 </head>
 <body>
-    <h1>APGer Engine - Документация</h1>
-
-    <div class="section">
-        <h2>Обзор</h2>
-        <p>APGer - это гибкий Python 3.12+ движок сборки для Arch Linux сред, предназначенный для автоматического создания пакетов в формате APGv2 с использованием GitHub Actions.</p>
-        <p>APGer автоматизирует процесс сборки пакетов из исходного кода, генерации строгих метаданных JSON, контрольных сумм файлов и создания архивов .apg с автоматическими GitHub Releases.</p>
-    </div>
-
-    <div class="section">
-        <h2>Структура проекта</h2>
-        <ul>
-            <li><strong>repodata/</strong>: JSON файлы, определяющие пакеты</li>
-            <li><strong>.ci/</strong>: Движок сборки и конфигурация</li>
-            <li><strong>.github/workflows/</strong>: CI/CD рабочие процессы</li>
-        </ul>
-    </div>
-
-    <div class="section">
-        <h2>Формат JSON рецептов</h2>
-        <p>Ниже приведен пример JSON-файла, который используется для описания пакета:</p>
-        <div class="json-container">
-            <pre id="example-json">Загрузка JSON-файла...</pre>
+    <div id="top">
+        <div id="titlearea">
+            <table cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td id="projectlogo"><img alt="Logo" src="custom/logo.png"/></td>
+                        <td id="projectalign">
+                            <div id="projectname">APGer Engine<span id="projectnumber">&#160;<small>v2.0</small></span></div>
+                            <div id="projectbrief">Flexible Python 3.12+ build engine for Arch Linux environments</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="section">
-        <h2>Процесс сборки</h2>
-        <ol>
-            <li>Парсинг JSON рецептов из repodata/</li>
-            <li>Загрузка исходного кода</li>
-            <li>Сборка с использованием указанного шаблона</li>
-            <li>Создание APG пакета</li>
-            <li>Подпись пакета с использованием PGP</li>
-        </ol>
-    </div>
+    <div class="contents">
+        <div class="section" id="overview">
+            <h1>Обзор</h1>
+            <p>APGer - это гибкий Python 3.12+ движок сборки для Arch Linux сред, предназначенный для автоматического создания пакетов в формате APGv2 с использованием GitHub Actions.</p>
+            <p>APGer автоматизирует процесс сборки пакетов из исходного кода, генерации строгих метаданных JSON, контрольных сумм файлов и создания архивов .apg с автоматическими GitHub Releases.</p>
+            <p>Основные возможности:</p>
+            <ul>
+                <li>Поддержка различных систем сборки (Meson, CMake, Autotools, Cargo, Python PEP 517)</li>
+                <li>Автоматическое определение последних версий пакетов</li>
+                <li>Безопасная подпись пакетов с использованием PGP</li>
+                <li>Генерация документации с помощью Doxygen</li>
+                <li>Интеграция с GitHub Actions для автоматической сборки</li>
+            </ul>
+        </div>
 
-    <div class="section">
-        <h2>Документация API</h2>
-        <p>Для подробной документации API смотрите сгенерированные HTML файлы в директории <code>docs/html</code>.</p>
-        <p>Чтобы сгенерировать документацию, выполните:</p>
-        <pre><code>make html_docs</code></pre>
+        <div class="section" id="structure">
+            <h1>Структура проекта</h1>
+            <ul>
+                <li><strong>repodata/</strong>: JSON файлы, определяющие пакеты</li>
+                <li><strong>.ci/</strong>: Движок сборки и конфигурация</li>
+                <li><strong>.github/workflows/</strong>: CI/CD рабочие процессы</li>
+                <li><strong>docs/</strong>: Документация и генератор документации</li>
+                <li><strong>dist/</strong>: Выходные пакеты</li>
+            </ul>
+        </div>
+
+        <div class="section" id="format">
+            <h1>Формат JSON рецептов</h1>
+            <p>Ниже приведен пример JSON-файла, который используется для описания пакета:</p>
+            <div class="json-container">
+                <pre id="example-json">Загрузка JSON-файла...</pre>
+            </div>
+        </div>
+
+        <div class="section" id="build-process">
+            <h1>Процесс сборки</h1>
+            <ol>
+                <li>Парсинг JSON рецептов из repodata/</li>
+                <li>Загрузка исходного кода</li>
+                <li>Сборка с использованием указанного шаблона</li>
+                <li>Создание APG пакета</li>
+                <li>Подпись пакета с использованием PGP</li>
+                <li>Размещение пакета в репозитории</li>
+            </ol>
+        </div>
+
+        <div class="section" id="api-docs">
+            <h1>Документация API</h1>
+            <p>Для подробной документации API смотрите сгенерированные HTML файлы в директории <code>docs/html</code>.</p>
+            <p>Чтобы сгенерировать документацию, выполните:</p>
+            <pre><code>make html_docs</code></pre>
+            <p>Для просмотра документации онлайн перейдите по ссылке: <a href="html/index.html">API Документация</a></p>
+        </div>
+
+        <div class="section" id="installation">
+            <h1>Установка</h1>
+            <p>Для установки APGer Engine выполните следующие шаги:</p>
+            <ol>
+                <li>Клонируйте репозиторий: <code>git clone https://github.com/username/apger.git</code></li>
+                <li>Установите зависимости: <code>pip install -r requirements.txt</code></li>
+                <li>Настройте конфигурацию в соответствии с вашими потребностями</li>
+            </ol>
+        </div>
+
+        <div class="section" id="usage">
+            <h1>Использование</h1>
+            <p>Для запуска APGer Engine выполните:</p>
+            <pre><code>cd .ci && python main.py</code></pre>
+            <p>Или используйте Makefile:</p>
+            <pre><code>make build</code></pre>
+        </div>
+
+        <div class="section" id="configuration">
+            <h1>Конфигурация</h1>
+            <p>Конфигурация проекта осуществляется через JSON файлы в директории repodata. Каждый файл описывает один пакет и включает:</p>
+            <ul>
+                <li>Информацию о пакете (имя, версия, архитектура)</li>
+                <li>Источник исходного кода</li>
+                <li>Шаблон сборки</li>
+                <li>Зависимости сборки</li>
+                <li>Сценарии сборки и установки</li>
+            </ul>
+        </div>
+
+        <div class="section" id="examples">
+            <h1>Примеры</h1>
+            <p>Примеры конфигурационных файлов находятся в директории <code>repodata/</code>.</p>
+            <p>Пример простого пакета:</p>
+            <pre><code>{
+  "package": {
+    "name": "example-package",
+    "version": "1.0.0",
+    "architecture": "x86_64",
+    "description": "Example package description",
+    "maintainer": "Your Name <email@example.com>",
+    "license": "GPL-3.0",
+    "dependencies": ["dep1", "dep2 >= 1.0"]
+  },
+  "build": {
+    "template": "meson",
+    "dependencies": ["build-essential", "meson", "ninja"]
+  }
+}</code></pre>
+        </div>
+
+        <div class="section" id="troubleshooting">
+            <h1>Устранение неполадок</h1>
+            <p>Если у вас возникли проблемы с APGer Engine, проверьте следующее:</p>
+            <ul>
+                <li>Установлена ли Python 3.12 или выше</li>
+                <li>Доступны ли все зависимости сборки</li>
+                <li>Правильно ли настроены пути к исходникам</li>
+                <li>Доступен ли интернет для загрузки исходников</li>
+            </ul>
+        </div>
+
+        <div class="section" id="development">
+            <h1>Разработка</h1>
+            <p>Для участия в разработке APGer Engine:</p>
+            <ol>
+                <li>Форкните репозиторий</li>
+                <li>Создайте ветку для новой фичи: <code>git checkout -b feature-name</code></li>
+                <li>Сделайте изменения и закоммитьте их: <code>git commit -m 'Add some feature'</code></li>
+                <li>Запушьте ветку: <code>git push origin feature-name</code></li>
+                <li>Создайте Pull Request</li>
+            </ol>
+        </div>
     </div>
 
     <div class="nav">
@@ -106,6 +168,28 @@
             .catch(error => {
                 document.getElementById('example-json').textContent = 'Ошибка загрузки JSON-файла: ' + error.message;
             });
+
+        // Поддержка Dark Reader и других тем
+        (function() {
+            // Проверяем, установлена ли темная тема
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Функция для обновления стилей
+            function updateStyles() {
+                // Добавляем класс для темной темы если она предпочитаема
+                if (prefersDarkScheme.matches) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            // Обновляем стили при загрузке страницы
+            updateStyles();
+            
+            // Наблюдаем за изменениями предпочтений темы
+            prefersDarkScheme.addEventListener('change', updateStyles);
+        })();
     </script>
 </body>
 </html>
