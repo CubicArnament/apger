@@ -15,15 +15,15 @@ def test_json_parser():
         from engine.json_parser import JSONParser
         parser = JSONParser('../repodata')  # Используем repodata как директорию
         packages = parser.parse_all_packages()
-        print(f'Успешно распознано {len(packages)} пакетов')
+        print("Успешно распознано {} пакетов".format(len(packages)))
         
         if packages:
             pkg = packages[0]
-            print(f"Пример данных пакета: {pkg['package']['name']} - {pkg['package']['version']}")
+            print("Пример данных пакета: {} - {}".format(pkg['package']['name'], pkg['package']['version']))
             
         return True
     except Exception as e:
-        print(f"Ошибка при тестировании парсера: {e}")
+        print("Ошибка при тестировании парсера: {}".format(e))
         return False
 
 if __name__ == "__main__":

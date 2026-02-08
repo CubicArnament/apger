@@ -179,7 +179,7 @@ class JSONParser:
         # Если версия указана как "latest", определяем актуальную версию
         match package_info['version']:
             case 'latest':
-                print(f"Определение последней версии для {package_info['name']}")
+                print("Определение последней версии для {}".format(package_info['name']))
                 resolved_version = self.version_resolver.resolve_latest_version(package_info['source'])
                 package_info['version'] = resolved_version
             case _:

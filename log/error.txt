@@ -1,0 +1,3176 @@
+Run cd docs
+Генерация HTML документации с помощью Doxygen...
+warning: ignoring unsupported tag 'PYTHON_DEFAULT_SCOPE' at line 33, file Doxyfile
+warning: Tag 'HTML_TIMESTAMP' at line 63 of file 'Doxyfile' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+warning: Tag 'CLASS_DIAGRAMS' at line 100 of file 'Doxyfile' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+warning: Tag 'DOT_FONTNAME' at line 102 of file 'Doxyfile' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+warning: Tag 'DOT_FONTSIZE' at line 103 of file 'Doxyfile' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+warning: Tag 'MSCGEN_PATH' at line 122 of file 'Doxyfile' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+warning: Tag 'DOT_TRANSPARENT' at line 128 of file 'Doxyfile' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+Adding custom extension mapping: 'py' will be treated as language 'c'
+Doxygen version used: 1.9.8
+Searching for include files...
+Searching for example files...
+Searching for images...
+Searching for dot files...
+Searching for msc files...
+Searching for dia files...
+Searching for files to exclude
+Searching INPUT for files to process...
+Searching for files in directory /home/runner/work/apger/apger/.ci/engine
+Searching for files in directory /home/runner/work/apger/apger/.ci/engine/__pycache__
+Searching for files in directory /home/runner/work/apger/apger/.ci/utils
+Searching for files in directory /home/runner/work/apger/apger/.ci/utils/__pycache__
+Searching for files in directory /home/runner/work/apger/apger/.ci/scripts
+Reading and parsing tag files
+Parsing files
+Preprocessing /home/runner/work/apger/apger/.ci/engine/__init__.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/__init__.py...
+Preprocessing /home/runner/work/apger/apger/.ci/engine/apg_builder.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/apg_builder.py...
+Preprocessing /home/runner/work/apger/apger/.ci/engine/build_templates.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/build_templates.py...
+Preprocessing /home/runner/work/apger/apger/.ci/engine/flag_translator.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/flag_translator.py...
+Preprocessing /home/runner/work/apger/apger/.ci/engine/json_parser.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/json_parser.py...
+Preprocessing /home/runner/work/apger/apger/.ci/engine/source_downloader.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/source_downloader.py...
+Preprocessing /home/runner/work/apger/apger/.ci/engine/version_resolver.py...
+Parsing file /home/runner/work/apger/apger/.ci/engine/version_resolver.py...
+Preprocessing /home/runner/work/apger/apger/.ci/utils/__init__.py...
+Parsing file /home/runner/work/apger/apger/.ci/utils/__init__.py...
+Preprocessing /home/runner/work/apger/apger/.ci/utils/logging_utils.py...
+Parsing file /home/runner/work/apger/apger/.ci/utils/logging_utils.py...
+Preprocessing /home/runner/work/apger/apger/.ci/utils/pgp_signer.py...
+Parsing file /home/runner/work/apger/apger/.ci/utils/pgp_signer.py...
+Reading /home/runner/work/apger/apger/docs/example.json...
+Building macro definition list...
+Building group list...
+Building directory list...
+Building namespace list...
+Building file list...
+Building class list...
+Building concept list...
+Computing nesting relations for classes...
+Associating documentation with classes...
+Associating documentation with concepts...
+Associating documentation with modules...
+Building example list...
+Searching for enumerations...
+Searching for documented typedefs...
+Searching for members imported via using declarations...
+Searching for included using directives...
+Searching for documented variables...
+Building interface member list...
+Building member list...
+Searching for friends...
+Searching for documented defines...
+Computing class inheritance relations...
+Computing class usage relations...
+Flushing cached template relations that have become invalid...
+Computing class relations...
+Add enum values to enums...
+Searching for member function documentation...
+Creating members for template instances...
+Building page list...
+Search for main page...
+Computing page relations...
+Determining the scope of groups...
+Computing module relations...
+Sorting lists...
+Determining which enums are documented
+Computing member relations...
+Building full member lists recursively...
+Adding members to member groups.
+Computing member references...
+Inheriting documentation...
+Generating disk names...
+Adding source references...
+Adding xrefitems...
+Sorting member lists...
+Setting anonymous enum type...
+Computing dependencies between directories...
+Generating citations page...
+Counting members...
+Counting data structures...
+Resolving user defined references...
+Finding anchors and sections in the documentation...
+Transferring function references...
+Combining using relations...
+Adding members to index pages...
+Correcting members for VHDL...
+Computing tooltip texts...
+Generating style sheet...
+Generating search indices...
+Generating example documentation...
+Generating file sources...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/__init__.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/utils/__init__.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/apg_builder.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/build_templates.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/flag_translator.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/json_parser.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/source_downloader.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/engine/version_resolver.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/utils/logging_utils.py...
+Parsing code for file /home/runner/work/apger/apger/.ci/utils/pgp_signer.py...
+Parsing code for file example.json...
+Generating file documentation...
+Generating page documentation...
+Generating group documentation...
+Generating class documentation...
+Generating concept documentation...
+Generating module documentation...
+Generating namespace documentation...
+Generating graph info page...
+Generating directory documentation...
+Generating dependency graph for directory /home/runner/work/apger/apger/.ci/engine
+Generating dependency graph for directory /home/runner/work/apger/apger/.ci/utils
+Generating index page...
+Generating page index...
+Generating topic index...
+Generating module index...
+Generating module member index...
+Generating namespace index...
+Generating namespace member index...
+Generating concept index...
+Generating annotated compound index...
+Generating alphabetical compound index...
+Generating hierarchical class index...
+Generating graphical class hierarchy...
+Generating member index...
+Generating file index...
+Generating file member index...
+Generating example index...
+finalizing index lists...
+writing tag file...
+Running plantuml with JAVA...
+Running dot...
+Generating dot graphs using 5 parallel threads...
+Running dot for graph 1/3
+Running dot for graph 2/3
+Running dot for graph 3/3
+Patching output file 1/2
+Patching output file 2/2
+type lookup cache used 1/65536 hits=6 misses=1
+symbol lookup cache used 3/65536 hits=2 misses=3
+finished...
+HTML документация сгенерирована в docs\html\index.html
+start docs\html\index.html
+make: start: No such file or directory
+make: *** [Makefile:21: html_docs] Error 127
+Error: Process completed with exit code 2.
+
+
+
+Skip to content
+
+    CubicArnament
+    apger
+
+Repository navigation
+
+    Code
+    Pull requests
+    Actions
+    Projects
+    Security
+    Insights
+    Settings
+
+Owner avatar
+apger
+Public
+forked from NurOS-Linux/apger
+
+Python Linting
+fix: исправление конфигурации ruff и Makefile для кроссплатформенной … #4
+
+    All jobs
+    Run details
+
+Annotations
+1 error
+lint
+failed 2 minutes ago in 8s
+1s
+1s
+0s
+4s
+0s
+Run cd .ci
+warning: `TRIO` has been remapped to `ASYNC1`.
+E501 Line too long (225 > 88)
+  --> engine/apg_builder.py:37:89
+   |
+35 | …
+36 | …
+37 | …tput_dir: str, filesystem_yaml_path: str = "../.ci/filesystem_example.yaml", metadata_yaml_path: str = "../.ci/metadata_example.yaml") -> str:
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+38 | …
+39 | …
+   |
+
+G004 Logging statement uses f-string
+  --> engine/apg_builder.py:89:26
+   |
+87 |             self._create_tar_zst(temp_path, filepath)
+88 |
+89 |         self.logger.info(f"APG пакет создан: {filepath}")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+90 |         return str(filepath)
+   |
+help: Convert to lazy `%` formatting
+
+F821 Undefined name `Dict`
+  --> engine/apg_builder.py:92:56
+   |
+90 |         return str(filepath)
+91 |
+92 |     def _load_metadata_config(self, yaml_path: str) -> Dict[str, Any]:
+   |                                                        ^^^^
+93 |         """
+94 |         Загружает конфигурацию метаданных из YAML файла
+   |
+
+G004 Logging statement uses f-string
+   --> engine/apg_builder.py:101:33
+    |
+ 99 |                 return yaml.safe_load(f)
+100 |         else:
+101 |             self.logger.warning(f"Файл конфигурации метаданных не найден: {yaml_path}")
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+102 |             return {}
+    |
+help: Convert to lazy `%` formatting
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:104:48
+    |
+102 |             return {}
+103 |
+104 |     def _combine_metadata(self, json_metadata: Dict[str, Any], yaml_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    |                                                ^^^^
+105 |         """
+106 |         @brief Объединяет метаданные из JSON и YAML файлов
+    |
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:104:79
+    |
+102 |             return {}
+103 |
+104 |     def _combine_metadata(self, json_metadata: Dict[str, Any], yaml_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    |                                                                               ^^^^
+105 |         """
+106 |         @brief Объединяет метаданные из JSON и YAML файлов
+    |
+
+E501 Line too long (112 > 88)
+   --> engine/apg_builder.py:104:89
+    |
+102 |             return {}
+103 |
+104 |     def _combine_metadata(self, json_metadata: Dict[str, Any], yaml_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+105 |         """
+106 |         @brief Объединяет метаданные из JSON и YAML файлов
+    |
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:104:98
+    |
+102 |             return {}
+103 |
+104 |     def _combine_metadata(self, json_metadata: Dict[str, Any], yaml_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    |                                                                                                  ^^^^
+105 |         """
+106 |         @brief Объединяет метаданные из JSON и YAML файлов
+    |
+
+RUF003 Comment contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/apg_builder.py:111:20
+    |
+109 |         @return Объединенные метаданные
+110 |         """
+111 |         # Начинаем с JSON метаданных
+    |                    ^
+112 |         combined = json_metadata.copy()
+    |
+
+E501 Line too long (90 > 88)
+   --> engine/apg_builder.py:117:89
+    |
+115 | …     if 'package' in yaml_metadata:
+116 | …         for key, value in yaml_metadata['package'].items():
+117 | …             # Если ключ уже существует в JSON, объединяем списки или заменяем значение
+    |                                                                                       ^^
+118 | …             match key in combined['package']:
+119 | …                 case True:
+    |
+
+E501 Line too long (101 > 88)
+   --> engine/apg_builder.py:121:89
+    |
+119 | …     case True:
+120 | …         # Если значения являются списками, объединяем их
+121 | …         match isinstance(combined['package'][key], list) and isinstance(value, list):
+    |                                                                           ^^^^^^^^^^^^^
+122 | …             case True:
+123 | …                 combined['package'][key] = list(set(combined['package'][key] + value))  # Убираем дубликаты
+    |
+
+E501 Line too long (123 > 88)
+   --> engine/apg_builder.py:123:89
+    |
+121 | …     match isinstance(combined['package'][key], list) and isinstance(value, list):
+122 | …         case True:
+123 | …             combined['package'][key] = list(set(combined['package'][key] + value))  # Убираем дубликаты
+    |                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+124 | …         case False:
+125 | …             # В противном случае, используем значение из JSON (приоритет)
+    |
+
+RUF003 Comment contains ambiguous `В` (CYRILLIC CAPITAL LETTER VE). Did you mean `B` (LATIN CAPITAL LETTER B)?
+   --> engine/apg_builder.py:125:35
+    |
+123 | …                 combined['package'][key] = list(set(combined['package'][key] + value))  # Убираем дубликаты
+124 | …             case False:
+125 | …                 # В противном случае, используем значение из JSON (приоритет)
+    |                     ^
+126 | …                 pass
+127 | …     case False:
+    |
+
+E501 Line too long (93 > 88)
+   --> engine/apg_builder.py:125:89
+    |
+123 | …                 combined['package'][key] = list(set(combined['package'][key] + value))  # Убираем дубликаты
+124 | …             case False:
+125 | …                 # В противном случае, используем значение из JSON (приоритет)
+    |                                                                           ^^^^^
+126 | …                 pass
+127 | …     case False:
+    |
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:132:58
+    |
+130 |         return combined
+131 |
+132 |     def _load_filesystem_config(self, yaml_path: str) -> Dict[str, Any]:
+    |                                                          ^^^^
+133 |         """
+134 |         Загружает конфигурацию файловой системы из YAML файла
+    |
+
+G004 Logging statement uses f-string
+   --> engine/apg_builder.py:141:33
+    |
+139 |                 return yaml.safe_load(f)
+140 |         else:
+141 |             self.logger.warning(f"Файл конфигурации файловой системы не найден: {yaml_path}")
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+142 |             return {}
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (93 > 88)
+   --> engine/apg_builder.py:141:89
+    |
+139 |                 return yaml.safe_load(f)
+140 |         else:
+141 |             self.logger.warning(f"Файл конфигурации файловой системы не найден: {yaml_path}")
+    |                                                                                         ^^^^^
+142 |             return {}
+    |
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:144:75
+    |
+142 |             return {}
+143 |
+144 |     def _apply_filesystem_config(self, data_dir: Path, filesystem_config: Dict[str, Any]) -> None:
+    |                                                                           ^^^^
+145 |         """
+146 |         Применяет конфигурацию файловой системы к директории данных
+    |
+
+E501 Line too long (98 > 88)
+   --> engine/apg_builder.py:144:89
+    |
+142 |             return {}
+143 |
+144 |     def _apply_filesystem_config(self, data_dir: Path, filesystem_config: Dict[str, Any]) -> None:
+    |                                                                                         ^^^^^^^^^^
+145 |         """
+146 |         Применяет конфигурацию файловой системы к директории данных
+    |
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:187:48
+    |
+185 |                 link_path.symlink_to(target_path)
+186 |
+187 |     def _generate_metadata(self, package_info: Dict[str, Any]) -> Dict[str, Any]:
+    |                                                ^^^^
+188 |         """
+189 |         Генерирует метаданные для пакета
+    |
+
+F821 Undefined name `Dict`
+   --> engine/apg_builder.py:187:67
+    |
+185 |                 link_path.symlink_to(target_path)
+186 |
+187 |     def _generate_metadata(self, package_info: Dict[str, Any]) -> Dict[str, Any]:
+    |                                                                   ^^^^
+188 |         """
+189 |         Генерирует метаданные для пакета
+    |
+
+E501 Line too long (96 > 88)
+   --> engine/apg_builder.py:194:89
+    |
+193 |         # Рассчитываем общий размер установленных файлов
+194 |         install_size = self._calculate_installed_size(Path(package_info.get('install_dir', '')))
+    |                                                                                         ^^^^^^^^
+195 |
+196 |         metadata = {
+    |
+
+S607 Starting a process with a partial executable path
+   --> engine/apg_builder.py:257:28
+    |
+255 |         # Проверяем, установлен ли zstd
+256 |         try:
+257 |             subprocess.run(['zstd', '--version'], check=True, capture_output=True)
+    |                            ^^^^^^^^^^^^^^^^^^^^^
+258 |         except (subprocess.CalledProcessError, FileNotFoundError):
+259 |             self.logger.exception("Для создания APG пакетов необходим zstd")
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> engine/apg_builder.py:260:13
+    |
+258 |         except (subprocess.CalledProcessError, FileNotFoundError):
+259 |             self.logger.exception("Для создания APG пакетов необходим zstd")
+260 |             raise RuntimeError("Для создания APG пакетов необходим zstd")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+261 |
+262 |         # Создаем tar архив
+    |
+
+TRY003 Avoid specifying long messages outside the exception class
+   --> engine/apg_builder.py:260:19
+    |
+258 |         except (subprocess.CalledProcessError, FileNotFoundError):
+259 |             self.logger.exception("Для создания APG пакетов необходим zstd")
+260 |             raise RuntimeError("Для создания APG пакетов необходим zstd")
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+261 |
+262 |         # Создаем tar архив
+    |
+
+F821 Undefined name `tarfile`
+   --> engine/apg_builder.py:265:14
+    |
+263 |         tar_path = output_path.with_suffix('.tar')
+264 |
+265 |         with tarfile.open(tar_path, 'w') as tar:
+    |              ^^^^^^^
+266 |             for item in source_dir.iterdir():
+267 |                 tar.add(item, arcname=item.name)
+    |
+
+RUF003 Comment contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/apg_builder.py:269:25
+    |
+267 |                 tar.add(item, arcname=item.name)
+268 |
+269 |         # Сжимаем архив с помощью zstd
+    |                         ^
+270 |         subprocess.run([
+271 |             'zstd', '-19',  # Максимальное сжатие
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/apg_builder.py:270:9
+    |
+269 |         # Сжимаем архив с помощью zstd
+270 |         subprocess.run([
+    |         ^^^^^^^^^^^^^^
+271 |             'zstd', '-19',  # Максимальное сжатие
+272 |             '-f',           # Перезаписать файл если существует
+    |
+
+S607 Starting a process with a partial executable path
+   --> engine/apg_builder.py:270:24
+    |
+269 |           # Сжимаем архив с помощью zstd
+270 |           subprocess.run([
+    |  ________________________^
+271 | |             'zstd', '-19',  # Максимальное сжатие
+272 | |             '-f',           # Перезаписать файл если существует
+273 | |             str(tar_path)
+274 | |         ], check=True)
+    | |_________^
+275 |
+276 |           # Переименовываем сжатый файл в .apg
+    |
+
+E501 Line too long (93 > 88)
+  --> engine/build_templates.py:25:89
+   |
+23 |     """
+24 |
+25 |     def __init__(self, name: str, source_dir: str, build_dir: str, install_dir: str) -> None:
+   |                                                                                         ^^^^^
+26 |         """
+27 |         @brief Конструктор класса BuildTemplate
+   |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+  --> engine/build_templates.py:29:38
+   |
+27 |         @brief Конструктор класса BuildTemplate
+28 |         @param name Имя пакета
+29 |         @param source_dir Директория с исходным кодом
+   |                                      ^
+30 |         @param build_dir Директория для сборки
+31 |         @param install_dir Директория для установки
+   |
+
+G004 Logging statement uses f-string
+  --> engine/build_templates.py:76:26
+   |
+74 |         @return True в случае успеха, иначе False
+75 |         """
+76 |         self.logger.info(f"[BUILD] Настройка Meson для {self.name}")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+77 |
+78 |         cmd = [
+   |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+  --> engine/build_templates.py:90:13
+   |
+89 |         try:
+90 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+   |             ^^^^^^^^^^^^^^
+91 |             self.logger.info(f"[BUILD] Настройка Meson завершена для {self.name}")
+92 |             return True
+   |
+
+G004 Logging statement uses f-string
+  --> engine/build_templates.py:91:30
+   |
+89 |         try:
+90 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+91 |             self.logger.info(f"[BUILD] Настройка Meson завершена для {self.name}")
+   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+92 |             return True
+93 |         except subprocess.CalledProcessError as e:
+   |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+  --> engine/build_templates.py:92:13
+   |
+90 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+91 |             self.logger.info(f"[BUILD] Настройка Meson завершена для {self.name}")
+92 |             return True
+   |             ^^^^^^^^^^^
+93 |         except subprocess.CalledProcessError as e:
+94 |             self.logger.exception(f"[BUILD] Ошибка настройки Meson для {self.name}: {e.stderr}")
+   |
+
+G004 Logging statement uses f-string
+  --> engine/build_templates.py:94:35
+   |
+92 |             return True
+93 |         except subprocess.CalledProcessError as e:
+94 |             self.logger.exception(f"[BUILD] Ошибка настройки Meson для {self.name}: {e.stderr}")
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+95 |             return False
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (96 > 88)
+  --> engine/build_templates.py:94:89
+   |
+92 |             return True
+93 |         except subprocess.CalledProcessError as e:
+94 |             self.logger.exception(f"[BUILD] Ошибка настройки Meson для {self.name}: {e.stderr}")
+   |                                                                                         ^^^^^^^^
+95 |             return False
+   |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:102:26
+    |
+100 |         @return True в случае успеха, иначе False
+101 |         """
+102 |         self.logger.info(f"[BUILD] Компиляция Meson для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+103 |
+104 |         cmd = ['meson', 'compile', '-C', self.build_dir]
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:107:13
+    |
+106 |         try:
+107 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+108 |             self.logger.info(f"[BUILD] Компиляция Meson завершена для {self.name}")
+109 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:108:30
+    |
+106 |         try:
+107 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+108 |             self.logger.info(f"[BUILD] Компиляция Meson завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+109 |             return True
+110 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:109:13
+    |
+107 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+108 |             self.logger.info(f"[BUILD] Компиляция Meson завершена для {self.name}")
+109 |             return True
+    |             ^^^^^^^^^^^
+110 |         except subprocess.CalledProcessError as e:
+111 |             self.logger.exception(f"[BUILD] Ошибка компиляции Meson для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:111:35
+    |
+109 |             return True
+110 |         except subprocess.CalledProcessError as e:
+111 |             self.logger.exception(f"[BUILD] Ошибка компиляции Meson для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+112 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (97 > 88)
+   --> engine/build_templates.py:111:89
+    |
+109 |             return True
+110 |         except subprocess.CalledProcessError as e:
+111 |             self.logger.exception(f"[BUILD] Ошибка компиляции Meson для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^
+112 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:119:26
+    |
+117 |         @return True в случае успеха, иначе False
+118 |         """
+119 |         self.logger.info(f"[BUILD] Установка Meson для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+120 |
+121 |         cmd = ['meson', 'install', '-C', self.build_dir, '--skip-subprojects']
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:124:13
+    |
+123 |         try:
+124 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+125 |             self.logger.info(f"[BUILD] Установка Meson завершена для {self.name}")
+126 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:125:30
+    |
+123 |         try:
+124 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+125 |             self.logger.info(f"[BUILD] Установка Meson завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+126 |             return True
+127 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:126:13
+    |
+124 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+125 |             self.logger.info(f"[BUILD] Установка Meson завершена для {self.name}")
+126 |             return True
+    |             ^^^^^^^^^^^
+127 |         except subprocess.CalledProcessError as e:
+128 |             self.logger.exception(f"[BUILD] Ошибка установки Meson для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:128:35
+    |
+126 |             return True
+127 |         except subprocess.CalledProcessError as e:
+128 |             self.logger.exception(f"[BUILD] Ошибка установки Meson для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+129 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:128:89
+    |
+126 |             return True
+127 |         except subprocess.CalledProcessError as e:
+128 |             self.logger.exception(f"[BUILD] Ошибка установки Meson для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^
+129 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:146:26
+    |
+144 |         @return True в случае успеха, иначе False
+145 |         """
+146 |         self.logger.info(f"[BUILD] Настройка CMake для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+147 |
+148 |         cmd = [
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:161:13
+    |
+160 |         try:
+161 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+162 |             self.logger.info(f"[BUILD] Настройка CMake завершена для {self.name}")
+163 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:162:30
+    |
+160 |         try:
+161 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+162 |             self.logger.info(f"[BUILD] Настройка CMake завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+163 |             return True
+164 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:163:13
+    |
+161 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+162 |             self.logger.info(f"[BUILD] Настройка CMake завершена для {self.name}")
+163 |             return True
+    |             ^^^^^^^^^^^
+164 |         except subprocess.CalledProcessError as e:
+165 |             self.logger.exception(f"[BUILD] Ошибка настройки CMake для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:165:35
+    |
+163 |             return True
+164 |         except subprocess.CalledProcessError as e:
+165 |             self.logger.exception(f"[BUILD] Ошибка настройки CMake для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+166 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:165:89
+    |
+163 |             return True
+164 |         except subprocess.CalledProcessError as e:
+165 |             self.logger.exception(f"[BUILD] Ошибка настройки CMake для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^
+166 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:173:26
+    |
+171 |         @return True в случае успеха, иначе False
+172 |         """
+173 |         self.logger.info(f"[BUILD] Компиляция CMake для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+174 |
+175 |         cmd = ['cmake', '--build', self.build_dir, '--parallel']
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:178:13
+    |
+177 |         try:
+178 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+179 |             self.logger.info(f"[BUILD] Компиляция CMake завершена для {self.name}")
+180 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:179:30
+    |
+177 |         try:
+178 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+179 |             self.logger.info(f"[BUILD] Компиляция CMake завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+180 |             return True
+181 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:180:13
+    |
+178 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+179 |             self.logger.info(f"[BUILD] Компиляция CMake завершена для {self.name}")
+180 |             return True
+    |             ^^^^^^^^^^^
+181 |         except subprocess.CalledProcessError as e:
+182 |             self.logger.exception(f"[BUILD] Ошибка компиляции CMake для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:182:35
+    |
+180 |             return True
+181 |         except subprocess.CalledProcessError as e:
+182 |             self.logger.exception(f"[BUILD] Ошибка компиляции CMake для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+183 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (97 > 88)
+   --> engine/build_templates.py:182:89
+    |
+180 |             return True
+181 |         except subprocess.CalledProcessError as e:
+182 |             self.logger.exception(f"[BUILD] Ошибка компиляции CMake для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^
+183 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:190:26
+    |
+188 |         @return True в случае успеха, иначе False
+189 |         """
+190 |         self.logger.info(f"[BUILD] Установка CMake для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+191 |
+192 |         cmd = ['cmake', '--install', self.build_dir, f'--prefix={self.install_dir}/usr']
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:195:13
+    |
+194 |         try:
+195 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+196 |             self.logger.info(f"[BUILD] Установка CMake завершена для {self.name}")
+197 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:196:30
+    |
+194 |         try:
+195 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+196 |             self.logger.info(f"[BUILD] Установка CMake завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+197 |             return True
+198 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:197:13
+    |
+195 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+196 |             self.logger.info(f"[BUILD] Установка CMake завершена для {self.name}")
+197 |             return True
+    |             ^^^^^^^^^^^
+198 |         except subprocess.CalledProcessError as e:
+199 |             self.logger.exception(f"[BUILD] Ошибка установки CMake для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:199:35
+    |
+197 |             return True
+198 |         except subprocess.CalledProcessError as e:
+199 |             self.logger.exception(f"[BUILD] Ошибка установки CMake для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+200 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:199:89
+    |
+197 |             return True
+198 |         except subprocess.CalledProcessError as e:
+199 |             self.logger.exception(f"[BUILD] Ошибка установки CMake для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^
+200 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:217:26
+    |
+215 |         @return True в случае успеха, иначе False
+216 |         """
+217 |         self.logger.info(f"[BUILD] Настройка Autotools для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+218 |
+219 |         configure_cmd = [
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:231:13
+    |
+230 |         try:
+231 |             subprocess.run(configure_cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+232 |             self.logger.info(f"[BUILD] Настройка Autotools завершена для {self.name}")
+233 |             return True
+    |
+
+E501 Line too long (106 > 88)
+   --> engine/build_templates.py:231:89
+    |
+230 |         try:
+231 |             subprocess.run(configure_cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |                                                                                         ^^^^^^^^^^^^^^^^^^
+232 |             self.logger.info(f"[BUILD] Настройка Autotools завершена для {self.name}")
+233 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:232:30
+    |
+230 |         try:
+231 |             subprocess.run(configure_cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+232 |             self.logger.info(f"[BUILD] Настройка Autotools завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+233 |             return True
+234 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:233:13
+    |
+231 |             subprocess.run(configure_cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+232 |             self.logger.info(f"[BUILD] Настройка Autotools завершена для {self.name}")
+233 |             return True
+    |             ^^^^^^^^^^^
+234 |         except subprocess.CalledProcessError as e:
+235 |             self.logger.exception(f"[BUILD] Ошибка настройки Autotools для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:235:35
+    |
+233 |             return True
+234 |         except subprocess.CalledProcessError as e:
+235 |             self.logger.exception(f"[BUILD] Ошибка настройки Autotools для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+236 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (100 > 88)
+   --> engine/build_templates.py:235:89
+    |
+233 |             return True
+234 |         except subprocess.CalledProcessError as e:
+235 |             self.logger.exception(f"[BUILD] Ошибка настройки Autotools для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^^^^
+236 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:243:26
+    |
+241 |         @return True в случае успеха, иначе False
+242 |         """
+243 |         self.logger.info(f"[BUILD] Компиляция Autotools для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+244 |
+245 |         cmd = ['make', '-j$(nproc)']
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:248:13
+    |
+247 |         try:
+248 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+249 |             self.logger.info(f"[BUILD] Компиляция Autotools завершена для {self.name}")
+250 |             return True
+    |
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:248:89
+    |
+247 |         try:
+248 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |                                                                                         ^^^^^^^^
+249 |             self.logger.info(f"[BUILD] Компиляция Autotools завершена для {self.name}")
+250 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:249:30
+    |
+247 |         try:
+248 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+249 |             self.logger.info(f"[BUILD] Компиляция Autotools завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+250 |             return True
+251 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:250:13
+    |
+248 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+249 |             self.logger.info(f"[BUILD] Компиляция Autotools завершена для {self.name}")
+250 |             return True
+    |             ^^^^^^^^^^^
+251 |         except subprocess.CalledProcessError as e:
+252 |             self.logger.exception(f"[BUILD] Ошибка компиляции Autotools для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:252:35
+    |
+250 |             return True
+251 |         except subprocess.CalledProcessError as e:
+252 |             self.logger.exception(f"[BUILD] Ошибка компиляции Autotools для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+253 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (101 > 88)
+   --> engine/build_templates.py:252:89
+    |
+250 |             return True
+251 |         except subprocess.CalledProcessError as e:
+252 |             self.logger.exception(f"[BUILD] Ошибка компиляции Autotools для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^^^^^
+253 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:260:26
+    |
+258 |         @return True в случае успеха, иначе False
+259 |         """
+260 |         self.logger.info(f"[BUILD] Установка Autotools для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+261 |
+262 |         cmd = ['make', f'DESTDIR={self.install_dir}', 'install']
+    |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:265:13
+    |
+264 |         try:
+265 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+266 |             self.logger.info(f"[BUILD] Установка Autotools завершена для {self.name}")
+267 |             return True
+    |
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:265:89
+    |
+264 |         try:
+265 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |                                                                                         ^^^^^^^^
+266 |             self.logger.info(f"[BUILD] Установка Autotools завершена для {self.name}")
+267 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:266:30
+    |
+264 |         try:
+265 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+266 |             self.logger.info(f"[BUILD] Установка Autotools завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+267 |             return True
+268 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:267:13
+    |
+265 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+266 |             self.logger.info(f"[BUILD] Установка Autotools завершена для {self.name}")
+267 |             return True
+    |             ^^^^^^^^^^^
+268 |         except subprocess.CalledProcessError as e:
+269 |             self.logger.exception(f"[BUILD] Ошибка установки Autotools для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:269:35
+    |
+267 |             return True
+268 |         except subprocess.CalledProcessError as e:
+269 |             self.logger.exception(f"[BUILD] Ошибка установки Autotools для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+270 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (100 > 88)
+   --> engine/build_templates.py:269:89
+    |
+267 |             return True
+268 |         except subprocess.CalledProcessError as e:
+269 |             self.logger.exception(f"[BUILD] Ошибка установки Autotools для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^^^^
+270 |             return False
+    |
+
+ARG002 Unused method argument: `extra_flags`
+   --> engine/build_templates.py:281:21
+    |
+279 |     """
+280 |
+281 |     def setup(self, extra_flags: list[str] | None = None) -> bool:
+    |                     ^^^^^^^^^^^
+282 |         """
+283 |         @brief Настройка Cargo проекта
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:287:26
+    |
+285 |         @return True в случае успеха, иначе False
+286 |         """
+287 |         self.logger.info(f"[BUILD] Настройка Cargo для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+288 |
+289 |         # Для Rust обычно не требуется специальная настройка
+    |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:290:26
+    |
+289 |         # Для Rust обычно не требуется специальная настройка
+290 |         self.logger.info(f"[BUILD] Настройка Cargo не требуется для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+291 |         return True
+    |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:298:26
+    |
+296 |         @return True в случае успеха, иначе False
+297 |         """
+298 |         self.logger.info(f"[BUILD] Компиляция Cargo для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+299 |
+300 |         cmd = ['cargo', 'build', '--release']
+    |
+help: Convert to lazy `%` formatting
+
+F821 Undefined name `extra_flags`
+   --> engine/build_templates.py:302:12
+    |
+300 |         cmd = ['cargo', 'build', '--release']
+301 |
+302 |         if extra_flags:
+    |            ^^^^^^^^^^^
+303 |             cmd.extend(extra_flags)
+    |
+
+F821 Undefined name `extra_flags`
+   --> engine/build_templates.py:303:24
+    |
+302 |         if extra_flags:
+303 |             cmd.extend(extra_flags)
+    |                        ^^^^^^^^^^^
+304 |
+305 |         try:
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:306:13
+    |
+305 |         try:
+306 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+307 |             self.logger.info(f"[BUILD] Компиляция Cargo завершена для {self.name}")
+308 |             return True
+    |
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:306:89
+    |
+305 |         try:
+306 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |                                                                                         ^^^^^^^^
+307 |             self.logger.info(f"[BUILD] Компиляция Cargo завершена для {self.name}")
+308 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:307:30
+    |
+305 |         try:
+306 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+307 |             self.logger.info(f"[BUILD] Компиляция Cargo завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+308 |             return True
+309 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:308:13
+    |
+306 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+307 |             self.logger.info(f"[BUILD] Компиляция Cargo завершена для {self.name}")
+308 |             return True
+    |             ^^^^^^^^^^^
+309 |         except subprocess.CalledProcessError as e:
+310 |             self.logger.exception(f"[BUILD] Ошибка компиляции Cargo для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:310:35
+    |
+308 |             return True
+309 |         except subprocess.CalledProcessError as e:
+310 |             self.logger.exception(f"[BUILD] Ошибка компиляции Cargo для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+311 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (97 > 88)
+   --> engine/build_templates.py:310:89
+    |
+308 |             return True
+309 |         except subprocess.CalledProcessError as e:
+310 |             self.logger.exception(f"[BUILD] Ошибка компиляции Cargo для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^
+311 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:318:26
+    |
+316 |         @return True в случае успеха, иначе False
+317 |         """
+318 |         self.logger.info(f"[BUILD] Установка Cargo для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+319 |
+320 |         # Для Rust нужно вручную скопировать бинарники
+    |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:331:26
+    |
+329 |                 shutil.copy2(binary, dest_path)
+330 |
+331 |         self.logger.info(f"[BUILD] Установка Cargo завершена для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+332 |         return True
+    |
+help: Convert to lazy `%` formatting
+
+ARG002 Unused method argument: `extra_flags`
+   --> engine/build_templates.py:343:21
+    |
+341 |     """
+342 |
+343 |     def setup(self, extra_flags: list[str] | None = None) -> bool:
+    |                     ^^^^^^^^^^^
+344 |         """
+345 |         @brief Настройка Python PEP 517 проекта
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:349:26
+    |
+347 |         @return True в случае успеха, иначе False
+348 |         """
+349 |         self.logger.info(f"[BUILD] Настройка Python PEP 517 для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+350 |
+351 |         # Устанавливаем зависимости для сборки
+    |
+help: Convert to lazy `%` formatting
+
+S607 Starting a process with a partial executable path
+   --> engine/build_templates.py:353:28
+    |
+351 |         # Устанавливаем зависимости для сборки
+352 |         try:
+353 |             subprocess.run(['pip', 'install', 'build', 'wheel'], check=True, capture_output=True, text=True)
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+354 |             self.logger.info(f"[BUILD] Зависимости для Python PEP 517 установлены для {self.name}")
+355 |             return True
+    |
+
+E501 Line too long (108 > 88)
+   --> engine/build_templates.py:353:89
+    |
+351 |         # Устанавливаем зависимости для сборки
+352 |         try:
+353 |             subprocess.run(['pip', 'install', 'build', 'wheel'], check=True, capture_output=True, text=True)
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^
+354 |             self.logger.info(f"[BUILD] Зависимости для Python PEP 517 установлены для {self.name}")
+355 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:354:30
+    |
+352 |         try:
+353 |             subprocess.run(['pip', 'install', 'build', 'wheel'], check=True, capture_output=True, text=True)
+354 |             self.logger.info(f"[BUILD] Зависимости для Python PEP 517 установлены для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+355 |             return True
+356 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (99 > 88)
+   --> engine/build_templates.py:354:89
+    |
+352 |         try:
+353 |             subprocess.run(['pip', 'install', 'build', 'wheel'], check=True, capture_output=True, text=True)
+354 |             self.logger.info(f"[BUILD] Зависимости для Python PEP 517 установлены для {self.name}")
+    |                                                                                         ^^^^^^^^^^^
+355 |             return True
+356 |         except subprocess.CalledProcessError as e:
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:355:13
+    |
+353 | …         subprocess.run(['pip', 'install', 'build', 'wheel'], check=True, capture_output=True, text=True)
+354 | …         self.logger.info(f"[BUILD] Зависимости для Python PEP 517 установлены для {self.name}")
+355 | …         return True
+    |           ^^^^^^^^^^^
+356 | …     except subprocess.CalledProcessError as e:
+357 | …         self.logger.exception(f"[BUILD] Ошибка установки зависимостей для Python PEP 517 для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:357:35
+    |
+355 | …         return True
+356 | …     except subprocess.CalledProcessError as e:
+357 | …         self.logger.exception(f"[BUILD] Ошибка установки зависимостей для Python PEP 517 для {self.name}: {e.stderr}")
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+358 | …         return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (122 > 88)
+   --> engine/build_templates.py:357:89
+    |
+355 | …         return True
+356 | …     except subprocess.CalledProcessError as e:
+357 | …         self.logger.exception(f"[BUILD] Ошибка установки зависимостей для Python PEP 517 для {self.name}: {e.stderr}")
+    |                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+358 | …         return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:365:26
+    |
+363 |         @return True в случае успеха, иначе False
+364 |         """
+365 |         self.logger.info(f"[BUILD] Сборка Python PEP 517 для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+366 |
+367 |         cmd = ['python', '-m', 'build', '--wheel', '--outdir', self.build_dir]
+    |
+help: Convert to lazy `%` formatting
+
+F821 Undefined name `extra_flags`
+   --> engine/build_templates.py:369:12
+    |
+367 |         cmd = ['python', '-m', 'build', '--wheel', '--outdir', self.build_dir]
+368 |
+369 |         if extra_flags:
+    |            ^^^^^^^^^^^
+370 |             # Добавляем флаги как параметры конфигурации
+371 |             for flag in extra_flags:
+    |
+
+F821 Undefined name `extra_flags`
+   --> engine/build_templates.py:371:25
+    |
+369 |         if extra_flags:
+370 |             # Добавляем флаги как параметры конфигурации
+371 |             for flag in extra_flags:
+    |                         ^^^^^^^^^^^
+372 |                 if flag.startswith('--config-settings='):
+373 |                     cmd.append(flag)
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:376:13
+    |
+375 |         try:
+376 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+377 |             self.logger.info(f"[BUILD] Сборка Python PEP 517 завершена для {self.name}")
+378 |             return True
+    |
+
+E501 Line too long (96 > 88)
+   --> engine/build_templates.py:376:89
+    |
+375 |         try:
+376 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+    |                                                                                         ^^^^^^^^
+377 |             self.logger.info(f"[BUILD] Сборка Python PEP 517 завершена для {self.name}")
+378 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:377:30
+    |
+375 |         try:
+376 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+377 |             self.logger.info(f"[BUILD] Сборка Python PEP 517 завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+378 |             return True
+379 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:378:13
+    |
+376 |             subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+377 |             self.logger.info(f"[BUILD] Сборка Python PEP 517 завершена для {self.name}")
+378 |             return True
+    |             ^^^^^^^^^^^
+379 |         except subprocess.CalledProcessError as e:
+380 |             self.logger.exception(f"[BUILD] Ошибка сборки Python PEP 517 для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:380:35
+    |
+378 |             return True
+379 |         except subprocess.CalledProcessError as e:
+380 |             self.logger.exception(f"[BUILD] Ошибка сборки Python PEP 517 для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+381 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (102 > 88)
+   --> engine/build_templates.py:380:89
+    |
+378 |             return True
+379 |         except subprocess.CalledProcessError as e:
+380 |             self.logger.exception(f"[BUILD] Ошибка сборки Python PEP 517 для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^^^^^^
+381 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:388:26
+    |
+386 |         @return True в случае успеха, иначе False
+387 |         """
+388 |         self.logger.info(f"[BUILD] Установка Python PEP 517 для {self.name}")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+389 |
+390 |         # Находим собранный wheel файл
+    |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:394:31
+    |
+393 |         if not wheel_files:
+394 |             self.logger.error(f"[BUILD] Не найдено wheel файлов для {self.name}")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+395 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+   --> engine/build_templates.py:394:41
+    |
+393 |         if not wheel_files:
+394 |             self.logger.error(f"[BUILD] Не найдено wheel файлов для {self.name}")
+    |                                         ^
+395 |             return False
+    |
+
+RUF001 String contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+   --> engine/build_templates.py:394:42
+    |
+393 |         if not wheel_files:
+394 |             self.logger.error(f"[BUILD] Не найдено wheel файлов для {self.name}")
+    |                                          ^
+395 |             return False
+    |
+
+RUF003 Comment contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+   --> engine/build_templates.py:402:29
+    |
+400 |             'pip', 'install',
+401 |             '--root', self.install_dir,
+402 |             '--no-deps',  # Не устанавливаем зависимости
+    |                             ^
+403 |             str(wheel_file)
+404 |         ]
+    |
+
+RUF003 Comment contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+   --> engine/build_templates.py:402:30
+    |
+400 |             'pip', 'install',
+401 |             '--root', self.install_dir,
+402 |             '--no-deps',  # Не устанавливаем зависимости
+    |                              ^
+403 |             str(wheel_file)
+404 |         ]
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> engine/build_templates.py:407:13
+    |
+406 |         try:
+407 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+    |             ^^^^^^^^^^^^^^
+408 |             self.logger.info(f"[BUILD] Установка Python PEP 517 завершена для {self.name}")
+409 |             return True
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:408:30
+    |
+406 |         try:
+407 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+408 |             self.logger.info(f"[BUILD] Установка Python PEP 517 завершена для {self.name}")
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+409 |             return True
+410 |         except subprocess.CalledProcessError as e:
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (91 > 88)
+   --> engine/build_templates.py:408:89
+    |
+406 |         try:
+407 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+408 |             self.logger.info(f"[BUILD] Установка Python PEP 517 завершена для {self.name}")
+    |                                                                                         ^^^
+409 |             return True
+410 |         except subprocess.CalledProcessError as e:
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/build_templates.py:409:13
+    |
+407 |             subprocess.run(cmd, check=True, capture_output=True, text=True)
+408 |             self.logger.info(f"[BUILD] Установка Python PEP 517 завершена для {self.name}")
+409 |             return True
+    |             ^^^^^^^^^^^
+410 |         except subprocess.CalledProcessError as e:
+411 |             self.logger.exception(f"[BUILD] Ошибка установки Python PEP 517 для {self.name}: {e.stderr}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:411:35
+    |
+409 |             return True
+410 |         except subprocess.CalledProcessError as e:
+411 |             self.logger.exception(f"[BUILD] Ошибка установки Python PEP 517 для {self.name}: {e.stderr}")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+412 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (105 > 88)
+   --> engine/build_templates.py:411:89
+    |
+409 |             return True
+410 |         except subprocess.CalledProcessError as e:
+411 |             self.logger.exception(f"[BUILD] Ошибка установки Python PEP 517 для {self.name}: {e.stderr}")
+    |                                                                                         ^^^^^^^^^^^^^^^^^
+412 |             return False
+    |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/build_templates.py:420:49
+    |
+418 |     @brief Менеджер для управления процессом сборки
+419 |
+420 |     Класс, управляющий процессом сборки пакетов с использованием
+    |                                                 ^
+421 |     различных шаблонов сборки.
+422 |     """
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:454:37
+    |
+452 |                 return PythonPEP517Template
+453 |             case _:
+454 |                 self.logger.warning(f"Шаблон сборки {template_name} не поддерживается")
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+455 |                 return None
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (107 > 88)
+   --> engine/build_templates.py:457:89
+    |
+455 |                 return None
+456 |
+457 |     def build_package(self, package_info: dict, source_dir: str, build_dir: str, install_dir: str) -> bool:
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^
+458 |         """
+459 |         @brief Выполнение сборки пакета
+    |
+
+RUF002 Docstring contains ambiguous `о` (CYRILLIC SMALL LETTER O). Did you mean `o` (LATIN SMALL LETTER O)?
+   --> engine/build_templates.py:460:40
+    |
+458 |         """
+459 |         @brief Выполнение сборки пакета
+460 |         @param package_info Информация о пакете
+    |                                        ^
+461 |         @param source_dir Директория с исходным кодом
+462 |         @param build_dir Директория для сборки
+    |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/build_templates.py:461:38
+    |
+459 |         @brief Выполнение сборки пакета
+460 |         @param package_info Информация о пакете
+461 |         @param source_dir Директория с исходным кодом
+    |                                      ^
+462 |         @param build_dir Директория для сборки
+463 |         @param install_dir Директория для установки
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:472:31
+    |
+470 |         template_class = self.get_template(template_name)
+471 |         if not template_class:
+472 |             self.logger.error(f"Шаблон сборки {template_name} не поддерживается")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+473 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:494:31
+    |
+492 |         # Выполняем этапы сборки
+493 |         if not builder.setup(extra_flags):
+494 |             self.logger.error(f"Ошибка на этапе setup для {package_info['package']['name']}")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+495 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (93 > 88)
+   --> engine/build_templates.py:494:89
+    |
+492 |         # Выполняем этапы сборки
+493 |         if not builder.setup(extra_flags):
+494 |             self.logger.error(f"Ошибка на этапе setup для {package_info['package']['name']}")
+    |                                                                                         ^^^^^
+495 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:498:31
+    |
+497 |         if not builder.compile():
+498 |             self.logger.error(f"Ошибка на этапе compile для {package_info['package']['name']}")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+499 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (95 > 88)
+   --> engine/build_templates.py:498:89
+    |
+497 |         if not builder.compile():
+498 |             self.logger.error(f"Ошибка на этапе compile для {package_info['package']['name']}")
+    |                                                                                         ^^^^^^^
+499 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:502:31
+    |
+501 |         if not builder.install():
+502 |             self.logger.error(f"Ошибка на этапе install для {package_info['package']['name']}")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+503 |             return False
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (95 > 88)
+   --> engine/build_templates.py:502:89
+    |
+501 |         if not builder.install():
+502 |             self.logger.error(f"Ошибка на этапе install для {package_info['package']['name']}")
+    |                                                                                         ^^^^^^^
+503 |             return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/build_templates.py:505:26
+    |
+503 |             return False
+504 |
+505 |         self.logger.info(f"Сборка пакета {package_info['package']['name']} завершена успешно")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+506 |         return True
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (94 > 88)
+   --> engine/build_templates.py:505:89
+    |
+503 |             return False
+504 |
+505 |         self.logger.info(f"Сборка пакета {package_info['package']['name']} завершена успешно")
+    |                                                                                         ^^^^^^
+506 |         return True
+    |
+
+E501 Line too long (93 > 88)
+  --> engine/flag_translator.py:65:89
+   |
+63 |                 'debug': '--config-settings="--build-option=--debug"',
+64 |                 'release': '--config-settings="--build-option=--release"',
+65 |                 'optimizations': '--config-settings="--global-option=--enable-optimizations"'
+   |                                                                                         ^^^^^
+66 |             }
+67 |         }
+   |
+
+G004 Logging statement uses f-string
+  --> engine/flag_translator.py:88:49
+   |
+86 |                             translated_flags.append(flag_map[flag])
+87 |                         case False:
+88 |                             self.logger.warning(f"Флаг {flag} не поддерживается для системы сборки {system}")
+   |                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+89 |
+90 |                 return translated_flags
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (109 > 88)
+  --> engine/flag_translator.py:88:89
+   |
+86 |                             translated_flags.append(flag_map[flag])
+87 |                         case False:
+88 |                             self.logger.warning(f"Флаг {flag} не поддерживается для системы сборки {system}")
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^
+89 |
+90 |                 return translated_flags
+   |
+
+G004 Logging statement uses f-string
+  --> engine/flag_translator.py:92:37
+   |
+90 |                 return translated_flags
+91 |             case _:
+92 |                 self.logger.warning(f"Система сборки {build_system} не поддерживается в FlagTranslator")
+   |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+93 |                 return []
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (104 > 88)
+  --> engine/flag_translator.py:92:89
+   |
+90 |                 return translated_flags
+91 |             case _:
+92 |                 self.logger.warning(f"Система сборки {build_system} не поддерживается в FlagTranslator")
+   |                                                                                         ^^^^^^^^^^^^^^^^
+93 |                 return []
+   |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+  --> engine/json_parser.py:29:40
+   |
+27 |         """
+28 |         @brief Конструктор класса JSONParser
+29 |         @param repodata_dir Директория с JSON файлами (по умолчанию "repodata")
+   |                                        ^
+30 |         """
+31 |         self.repodata_dir = Path(repodata_dir)
+   |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+  --> engine/json_parser.py:38:33
+   |
+36 |         """
+37 |         @brief Парсит все JSON файлы в папке repodata и возвращает список пакетов
+38 |         @return Список словарей с информацией о пакетах
+   |                                 ^
+39 |         """
+40 |         packages = []
+   |
+
+RUF002 Docstring contains ambiguous `о` (CYRILLIC SMALL LETTER O). Did you mean `o` (LATIN SMALL LETTER O)?
+  --> engine/json_parser.py:38:47
+   |
+36 |         """
+37 |         @brief Парсит все JSON файлы в папке repodata и возвращает список пакетов
+38 |         @return Список словарей с информацией о пакетах
+   |                                               ^
+39 |         """
+40 |         packages = []
+   |
+
+E501 Line too long (107 > 88)
+  --> engine/json_parser.py:49:89
+   |
+47 | …     match len(json_files):
+48 | …         case 0:
+49 | …             error_msg = f"Директория {self.repodata_dir} пуста - нет JSON файлов для обработки"
+   |                                                                               ^^^^^^^^^^^^^^^^^^^
+50 | …             print(error_msg)
+51 | …             raise ValueError(error_msg)
+   |
+
+E501 Line too long (116 > 88)
+  --> engine/json_parser.py:57:89
+   |
+55 | …     # Проверяем структуру JSON файла перед парсингом
+56 | …     if not self._validate_json_structure(json_file):
+57 | …         error_msg = f"JSON файл {json_file.name} не соответствует стандартной структуре"
+   |                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+58 | …         print(error_msg)
+59 | …         raise ValueError(error_msg)
+   |
+
+TRY301 Abstract `raise` to an inner function
+  --> engine/json_parser.py:59:37
+   |
+57 |                                     error_msg = f"JSON файл {json_file.name} не соответствует стандартной структуре"
+58 |                                     print(error_msg)
+59 |                                     raise ValueError(error_msg)
+   |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+60 |
+61 |                                 package_data = self.parse_package(json_file)
+   |
+
+C901 `_validate_json_structure` is too complex (18 > 10)
+  --> engine/json_parser.py:74:9
+   |
+72 |         return packages
+73 |
+74 |     def _validate_json_structure(self, json_file: Path) -> bool:
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+75 |         """
+76 |         @brief Проверяет, соответствует ли JSON файл стандартной структуре
+   |
+
+PLR0911 Too many return statements (14 > 6)
+  --> engine/json_parser.py:74:9
+   |
+72 |         return packages
+73 |
+74 |     def _validate_json_structure(self, json_file: Path) -> bool:
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+75 |         """
+76 |         @brief Проверяет, соответствует ли JSON файл стандартной структуре
+   |
+
+PLR0912 Too many branches (17 > 12)
+  --> engine/json_parser.py:74:9
+   |
+72 |         return packages
+73 |
+74 |     def _validate_json_structure(self, json_file: Path) -> bool:
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+75 |         """
+76 |         @brief Проверяет, соответствует ли JSON файл стандартной структуре
+   |
+
+E501 Line too long (89 > 88)
+  --> engine/json_parser.py:86:89
+   |
+84 |             # Проверяем наличие обязательных секций
+85 |             if 'package' not in data:
+86 |                 print(f"Файл {json_file.name} не содержит обязательной секции 'package'")
+   |                                                                                         ^
+87 |                 return False
+   |
+
+E501 Line too long (111 > 88)
+  --> engine/json_parser.py:95:89
+   |
+93 | …     for field in required_fields:
+94 | …         if field not in package_info:
+95 | …             print(f"Файл {json_file.name} не содержит обязательного поля '{field}' в секции 'package'")
+   |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^
+96 | …             return False
+   |
+
+E501 Line too long (89 > 88)
+   --> engine/json_parser.py:106:89
+    |
+104 |             match isinstance(package_info['version'], str):
+105 |                 case False:
+106 |                     print(f"Поле 'version' в файле {json_file.name} должно быть строкой")
+    |                                                                                         ^
+107 |                     return False
+    |
+
+E501 Line too long (94 > 88)
+   --> engine/json_parser.py:111:89
+    |
+109 |             match isinstance(package_info['architecture'], str):
+110 |                 case False:
+111 |                     print(f"Поле 'architecture' в файле {json_file.name} должно быть строкой")
+    |                                                                                         ^^^^^^
+112 |                     return False
+    |
+
+E501 Line too long (106 > 88)
+   --> engine/json_parser.py:128:89
+    |
+126 | …     # Проверяем наличие обязательного поля template в секции build
+127 | …     if 'template' not in build_info:
+128 | …         print(f"Файл {json_file.name} не содержит обязательного поля 'template' в секции 'build'")
+    |                                                                                   ^^^^^^^^^^^^^^^^^^
+129 | …         return False
+    |
+
+E501 Line too long (90 > 88)
+   --> engine/json_parser.py:133:89
+    |
+131 |             match isinstance(build_info['template'], str):
+132 |                 case False:
+133 |                     print(f"Поле 'template' в файле {json_file.name} должно быть строкой")
+    |                                                                                         ^^
+134 |                     return False
+    |
+
+E501 Line too long (91 > 88)
+   --> engine/json_parser.py:136:89
+    |
+134 |                     return False
+135 |
+136 |             # Проверяем, что build.dependencies является массивом строк (если присутствует)
+    |                                                                                         ^^^
+137 |             if 'dependencies' in build_info:
+138 |                 match isinstance(build_info['dependencies'], list):
+    |
+
+E501 Line too long (114 > 88)
+   --> engine/json_parser.py:140:89
+    |
+138 | …     match isinstance(build_info['dependencies'], list):
+139 | …         case False:
+140 | …             print(f"Поле 'dependencies' в секции 'build' файла {json_file.name} должно быть массивом")
+    |                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+141 | …             return False
+142 | …         case True:
+    |
+
+E501 Line too long (130 > 88)
+   --> engine/json_parser.py:146:89
+    |
+144 | …     match isinstance(dep, str):
+145 | …         case False:
+146 | …             print(f"Каждая зависимость в 'build.dependencies' файла {json_file.name} должна быть строкой")
+    |                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+147 | …             return False
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/json_parser.py:149:13
+    |
+147 |                                     return False
+148 |
+149 |             return True
+    |             ^^^^^^^^^^^
+150 |
+151 |         except json.JSONDecodeError as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> engine/json_parser.py:154:16
+    |
+152 |             print(f"Ошибка синтаксиса JSON в файле {json_file.name}: {e}")
+153 |             return False
+154 |         except Exception as e:
+    |                ^^^^^^^^^
+155 |             print(f"Ошибка при проверке структуры JSON файла {json_file.name}: {e}")
+156 |             return False
+    |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/json_parser.py:160:59
+    |
+158 |     def parse_package(self, json_file: Path) -> dict[str, Any]:
+159 |         """
+160 |         @brief Парсит один JSON файл и возвращает словарь с данными пакета
+    |                                                           ^
+161 |         @param json_file Путь к JSON файлу
+162 |         @return Словарь с информацией о пакете
+    |
+
+RUF002 Docstring contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/json_parser.py:162:25
+    |
+160 |         @brief Парсит один JSON файл и возвращает словарь с данными пакета
+161 |         @param json_file Путь к JSON файлу
+162 |         @return Словарь с информацией о пакете
+    |                         ^
+163 |         """
+164 |         with open(json_file, encoding='utf-8') as f:
+    |
+
+RUF002 Docstring contains ambiguous `о` (CYRILLIC SMALL LETTER O). Did you mean `o` (LATIN SMALL LETTER O)?
+   --> engine/json_parser.py:162:39
+    |
+160 |         @brief Парсит один JSON файл и возвращает словарь с данными пакета
+161 |         @param json_file Путь к JSON файлу
+162 |         @return Словарь с информацией о пакете
+    |                                       ^
+163 |         """
+164 |         with open(json_file, encoding='utf-8') as f:
+    |
+
+TRY003 Avoid specifying long messages outside the exception class
+   --> engine/json_parser.py:169:19
+    |
+167 |         # Проверяем обязательные поля
+168 |         if 'package' not in data:
+169 |             raise ValueError(f"В файле {json_file} отсутствует секция 'package'")
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+170 |
+171 |         package_info = data['package']
+    |
+
+RUF001 String contains ambiguous `В` (CYRILLIC CAPITAL LETTER VE). Did you mean `B` (LATIN CAPITAL LETTER B)?
+   --> engine/json_parser.py:169:32
+    |
+167 |         # Проверяем обязательные поля
+168 |         if 'package' not in data:
+169 |             raise ValueError(f"В файле {json_file} отсутствует секция 'package'")
+    |                                ^
+170 |
+171 |         package_info = data['package']
+    |
+
+TRY003 Avoid specifying long messages outside the exception class
+   --> engine/json_parser.py:177:23
+    |
+175 |         for field in required_fields:
+176 |             if field not in package_info:
+177 |                 raise ValueError(f"В файле {json_file} отсутствует поле {field} в секции 'package'")
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+178 |
+179 |         # Если версия указана как "latest", определяем актуальную версию
+    |
+
+RUF001 String contains ambiguous `В` (CYRILLIC CAPITAL LETTER VE). Did you mean `B` (LATIN CAPITAL LETTER B)?
+   --> engine/json_parser.py:177:36
+    |
+175 |         for field in required_fields:
+176 |             if field not in package_info:
+177 |                 raise ValueError(f"В файле {json_file} отсутствует поле {field} в секции 'package'")
+    |                                    ^
+178 |
+179 |         # Если версия указана как "latest", определяем актуальную версию
+    |
+
+E501 Line too long (100 > 88)
+   --> engine/json_parser.py:177:89
+    |
+175 |         for field in required_fields:
+176 |             if field not in package_info:
+177 |                 raise ValueError(f"В файле {json_file} отсутствует поле {field} в секции 'package'")
+    |                                                                                         ^^^^^^^^^^^^
+178 |
+179 |         # Если версия указана как "latest", определяем актуальную версию
+    |
+
+E501 Line too long (103 > 88)
+   --> engine/json_parser.py:183:89
+    |
+181 |             case 'latest':
+182 |                 print(f"Определение последней версии для {package_info['name']}")
+183 |                 resolved_version = self.version_resolver.resolve_latest_version(package_info['source'])
+    |                                                                                         ^^^^^^^^^^^^^^^
+184 |                 package_info['version'] = resolved_version
+185 |             case _:
+    |
+
+E501 Line too long (94 > 88)
+   --> engine/json_parser.py:197:89
+    |
+195 |             build_template = build_info.get('template', 'meson')  # По умолчанию meson
+196 |
+197 |             translated_flags = self.flag_translator.translate_flags(build_template, use_flags)
+    |                                                                                         ^^^^^^
+198 |             build_info['translated_flags'] = translated_flags
+    |
+
+G004 Logging statement uses f-string
+  --> engine/source_downloader.py:47:26
+   |
+45 |         @return True в случае успеха, иначе False
+46 |         """
+47 |         self.logger.info(f"[DOWNLOAD] Загрузка исходников из {source_url}")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+48 |
+49 |         urlparse(source_url)
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> engine/source_downloader.py:54:35
+   |
+52 |         match source_url:
+53 |             case url if url.endswith('.git'):
+54 |                 self.logger.debug(f"[DOWNLOAD] Определен Git репозиторий: {url}")
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+55 |                 return self._download_git_repo(url, destination_dir)
+56 |             case url if any(url.endswith(ext) for ext in ['.tar.gz', '.tar.xz', '.tar.bz2', '.zip']):
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (101 > 88)
+  --> engine/source_downloader.py:56:89
+   |
+54 |                 self.logger.debug(f"[DOWNLOAD] Определен Git репозиторий: {url}")
+55 |                 return self._download_git_repo(url, destination_dir)
+56 |             case url if any(url.endswith(ext) for ext in ['.tar.gz', '.tar.xz', '.tar.bz2', '.zip']):
+   |                                                                                         ^^^^^^^^^^^^^
+57 |                 self.logger.debug(f"[DOWNLOAD] Определен архив: {url}")
+58 |                 return self._download_archive(url, destination_dir)
+   |
+
+G004 Logging statement uses f-string
+  --> engine/source_downloader.py:57:35
+   |
+55 |                 return self._download_git_repo(url, destination_dir)
+56 |             case url if any(url.endswith(ext) for ext in ['.tar.gz', '.tar.xz', '.tar.bz2', '.zip']):
+57 |                 self.logger.debug(f"[DOWNLOAD] Определен архив: {url}")
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+58 |                 return self._download_archive(url, destination_dir)
+59 |             case url:
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> engine/source_downloader.py:61:35
+   |
+59 |             case url:
+60 |                 # Для других URL пробуем как обычный архив
+61 |                 self.logger.debug(f"[DOWNLOAD] Пробуем загрузить как архив: {url}")
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+62 |                 return self._download_archive(url, destination_dir)
+   |
+help: Convert to lazy `%` formatting
+
+S603 `subprocess` call: check for execution of untrusted input
+  --> engine/source_downloader.py:72:13
+   |
+70 |         """
+71 |         try:
+72 |             subprocess.run([
+   |             ^^^^^^^^^^^^^^
+73 |                 'git', 'clone', '--depth', '1', git_url, destination_dir
+74 |             ], check=True, capture_output=True, text=True)
+   |
+
+S607 Starting a process with a partial executable path
+  --> engine/source_downloader.py:72:28
+   |
+70 |           """
+71 |           try:
+72 |               subprocess.run([
+   |  ____________________________^
+73 | |                 'git', 'clone', '--depth', '1', git_url, destination_dir
+74 | |             ], check=True, capture_output=True, text=True)
+   | |_____________^
+75 |
+76 |               self.logger.info(f"[DOWNLOAD] Git репозиторий загружен в {destination_dir}")
+   |
+
+G004 Logging statement uses f-string
+  --> engine/source_downloader.py:76:30
+   |
+74 |             ], check=True, capture_output=True, text=True)
+75 |
+76 |             self.logger.info(f"[DOWNLOAD] Git репозиторий загружен в {destination_dir}")
+   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+77 |             return True
+78 |         except subprocess.CalledProcessError as e:
+   |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+  --> engine/source_downloader.py:77:13
+   |
+76 |             self.logger.info(f"[DOWNLOAD] Git репозиторий загружен в {destination_dir}")
+77 |             return True
+   |             ^^^^^^^^^^^
+78 |         except subprocess.CalledProcessError as e:
+79 |             self.logger.exception(f"[DOWNLOAD] Ошибка при клонировании Git репозитория: {e.stderr}")
+   |
+
+G004 Logging statement uses f-string
+  --> engine/source_downloader.py:79:35
+   |
+77 |             return True
+78 |         except subprocess.CalledProcessError as e:
+79 |             self.logger.exception(f"[DOWNLOAD] Ошибка при клонировании Git репозитория: {e.stderr}")
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+80 |             return False
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (100 > 88)
+  --> engine/source_downloader.py:79:89
+   |
+77 |             return True
+78 |         except subprocess.CalledProcessError as e:
+79 |             self.logger.exception(f"[DOWNLOAD] Ошибка при клонировании Git репозитория: {e.stderr}")
+   |                                                                                         ^^^^^^^^^^^^
+80 |             return False
+   |
+
+C901 `_download_archive` is too complex (12 > 10)
+  --> engine/source_downloader.py:82:9
+   |
+80 |             return False
+81 |
+82 |     def _download_archive(self, archive_url: str, destination_dir: str) -> bool:
+   |         ^^^^^^^^^^^^^^^^^
+83 |         """
+84 |         @brief Загружает и распаковывает архив
+   |
+
+PLR0912 Too many branches (13 > 12)
+  --> engine/source_downloader.py:82:9
+   |
+80 |             return False
+81 |
+82 |     def _download_archive(self, archive_url: str, destination_dir: str) -> bool:
+   |         ^^^^^^^^^^^^^^^^^
+83 |         """
+84 |         @brief Загружает и распаковывает архив
+   |
+
+E501 Line too long (99 > 88)
+   --> engine/source_downloader.py:107:89
+    |
+105 |                             if total_size > 0:
+106 |                                 percent = (downloaded_size / total_size) * 100
+107 |                                 print(f"\r[DOWNLOAD] Загрузка: {percent:.1f}%", end='', flush=True)
+    |                                                                                         ^^^^^^^^^^^
+108 |
+109 |                 print()  # Новая строка после прогресса
+    |
+
+S202 Uses of `tarfile.extractall()`
+   --> engine/source_downloader.py:114:25
+    |
+112 |                 if archive_url.endswith('.zip'):
+113 |                     with zipfile.ZipFile(tmp_file.name, 'r') as zip_ref:
+114 |                         zip_ref.extractall(destination_dir)
+    |                         ^^^^^^^^^^^^^^^^^^
+115 |                 elif archive_url.endswith(('.tar.gz', '.tgz')):
+116 |                     with tarfile.open(tmp_file.name, 'r:gz') as tar_ref:
+    |
+
+S202 Uses of `tarfile.extractall()`
+   --> engine/source_downloader.py:117:25
+    |
+115 |                 elif archive_url.endswith(('.tar.gz', '.tgz')):
+116 |                     with tarfile.open(tmp_file.name, 'r:gz') as tar_ref:
+117 |                         tar_ref.extractall(destination_dir)
+    |                         ^^^^^^^^^^^^^^^^^^
+118 |                 elif archive_url.endswith('.tar.xz'):
+119 |                     with tarfile.open(tmp_file.name, 'r:xz') as tar_ref:
+    |
+
+S202 Uses of `tarfile.extractall()`
+   --> engine/source_downloader.py:120:25
+    |
+118 |                 elif archive_url.endswith('.tar.xz'):
+119 |                     with tarfile.open(tmp_file.name, 'r:xz') as tar_ref:
+120 |                         tar_ref.extractall(destination_dir)
+    |                         ^^^^^^^^^^^^^^^^^^
+121 |                 elif archive_url.endswith('.tar.bz2'):
+122 |                     with tarfile.open(tmp_file.name, 'r:bz2') as tar_ref:
+    |
+
+S202 Uses of `tarfile.extractall()`
+   --> engine/source_downloader.py:123:25
+    |
+121 |                 elif archive_url.endswith('.tar.bz2'):
+122 |                     with tarfile.open(tmp_file.name, 'r:bz2') as tar_ref:
+123 |                         tar_ref.extractall(destination_dir)
+    |                         ^^^^^^^^^^^^^^^^^^
+124 |                 else:
+125 |                     # Пробуем определить тип архива автоматически
+    |
+
+S202 Uses of `tarfile.extractall()`
+   --> engine/source_downloader.py:128:29
+    |
+126 |                     try:
+127 |                         with zipfile.ZipFile(tmp_file.name, 'r') as zip_ref:
+128 |                             zip_ref.extractall(destination_dir)
+    |                             ^^^^^^^^^^^^^^^^^^
+129 |                     except zipfile.BadZipFile:
+130 |                         try:
+    |
+
+S202 Uses of `tarfile.extractall()`
+   --> engine/source_downloader.py:132:33
+    |
+130 | …     try:
+131 | …         with tarfile.open(tmp_file.name, 'r:*') as tar_ref:
+132 | …             tar_ref.extractall(destination_dir)
+    |               ^^^^^^^^^^^^^^^^^^
+133 | …     except tarfile.ReadError:
+134 | …         self.logger.exception(f"[DOWNLOAD] Не удалось распознать формат архива: {archive_url}")
+    |
+
+G004 Logging statement uses f-string
+   --> engine/source_downloader.py:134:51
+    |
+132 | …             tar_ref.extractall(destination_dir)
+133 | …     except tarfile.ReadError:
+134 | …         self.logger.exception(f"[DOWNLOAD] Не удалось распознать формат архива: {archive_url}")
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+135 | …         return False
+    |
+help: Convert to lazy `%` formatting
+
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+   --> engine/source_downloader.py:134:64
+    |
+132 | …             tar_ref.extractall(destination_dir)
+133 | …     except tarfile.ReadError:
+134 | …         self.logger.exception(f"[DOWNLOAD] Не удалось распознать формат архива: {archive_url}")
+    |                                              ^
+135 | …         return False
+    |
+
+RUF001 String contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+   --> engine/source_downloader.py:134:65
+    |
+132 | …             tar_ref.extractall(destination_dir)
+133 | …     except tarfile.ReadError:
+134 | …         self.logger.exception(f"[DOWNLOAD] Не удалось распознать формат архива: {archive_url}")
+    |                                               ^
+135 | …         return False
+    |
+
+E501 Line too long (115 > 88)
+   --> engine/source_downloader.py:134:89
+    |
+132 | …             tar_ref.extractall(destination_dir)
+133 | …     except tarfile.ReadError:
+134 | …         self.logger.exception(f"[DOWNLOAD] Не удалось распознать формат архива: {archive_url}")
+    |                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+135 | …         return False
+    |
+
+G004 Logging statement uses f-string
+   --> engine/source_downloader.py:137:34
+    |
+135 |                             return False
+136 |
+137 |                 self.logger.info(f"[DOWNLOAD] Архив распакован в {destination_dir}")
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+138 |                 return True
+    |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+   --> engine/source_downloader.py:138:17
+    |
+137 |                 self.logger.info(f"[DOWNLOAD] Архив распакован в {destination_dir}")
+138 |                 return True
+    |                 ^^^^^^^^^^^
+139 |
+140 |             except requests.RequestException as e:
+    |
+
+G004 Logging statement uses f-string
+   --> engine/source_downloader.py:141:39
+    |
+140 |             except requests.RequestException as e:
+141 |                 self.logger.exception(f"[DOWNLOAD] Ошибка при загрузке архива: {e}")
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+142 |                 return False
+143 |             except Exception as e:
+    |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+   --> engine/source_downloader.py:141:81
+    |
+140 |             except requests.RequestException as e:
+141 |                 self.logger.exception(f"[DOWNLOAD] Ошибка при загрузке архива: {e}")
+    |                                                                                 ^
+142 |                 return False
+143 |             except Exception as e:
+    |
+
+G004 Logging statement uses f-string
+   --> engine/source_downloader.py:144:39
+    |
+142 |                 return False
+143 |             except Exception as e:
+144 |                 self.logger.exception(f"[DOWNLOAD] Ошибка при распаковке архива: {e}")
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+145 |                 return False
+146 |             finally:
+    |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+   --> engine/source_downloader.py:144:83
+    |
+142 |                 return False
+143 |             except Exception as e:
+144 |                 self.logger.exception(f"[DOWNLOAD] Ошибка при распаковке архива: {e}")
+    |                                                                                   ^
+145 |                 return False
+146 |             finally:
+    |
+
+PLR2004 Magic value used in comparison, consider replacing `2` with a constant variable
+  --> engine/version_resolver.py:75:31
+   |
+73 |         # - https://api.github.com/repos/owner/repo/releases/latest
+74 |
+75 |         if len(path_parts) >= 2:
+   |                               ^
+76 |             owner = path_parts[0]
+77 |             repo = path_parts[1]
+   |
+
+G004 Logging statement uses f-string
+  --> engine/version_resolver.py:93:34
+   |
+91 |                     tag_name = tag_name[1:]
+92 |
+93 |                 self.logger.info(f"[RESOLVE LATEST] Найдена версия: {tag_name}")
+   |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+94 |                 return tag_name
+   |
+help: Convert to lazy `%` formatting
+
+TRY300 Consider moving this statement to an `else` block
+  --> engine/version_resolver.py:94:17
+   |
+93 |                 self.logger.info(f"[RESOLVE LATEST] Найдена версия: {tag_name}")
+94 |                 return tag_name
+   |                 ^^^^^^^^^^^^^^^
+95 |
+96 |             except requests.RequestException as e:
+   |
+
+G004 Logging statement uses f-string
+  --> engine/version_resolver.py:97:39
+   |
+96 |             except requests.RequestException as e:
+97 |                 self.logger.exception(f"Ошибка при запросе к GitHub API: {e}")
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+98 |                 # Если API не сработал, пробуем другие методы
+   |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+  --> engine/version_resolver.py:97:75
+   |
+96 |             except requests.RequestException as e:
+97 |                 self.logger.exception(f"Ошибка при запросе к GitHub API: {e}")
+   |                                                                           ^
+98 |                 # Если API не сработал, пробуем другие методы
+   |
+
+PLR2004 Magic value used in comparison, consider replacing `2` with a constant variable
+   --> engine/version_resolver.py:115:31
+    |
+113 |         path_parts = parsed_url.path.strip('/').split('/')
+114 |
+115 |         if len(path_parts) >= 2:
+    |                               ^
+116 |             # Для GitLab URL формата: https://gitlab.com/group/project/-/archive/v1.2.3/project-v1.2.3.tar.gz
+117 |             # или https://gitlab.com/api/v4/projects/group%2Fproject/repository/tags
+    |
+
+G004 Logging statement uses f-string
+   --> engine/version_resolver.py:137:38
+    |
+135 |                         latest_tag = latest_tag[1:]
+136 |
+137 |                     self.logger.info(f"[RESOLVE LATEST] Найдена версия: {latest_tag}")
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+138 |                     return latest_tag
+    |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+   --> engine/version_resolver.py:141:39
+    |
+140 |             except requests.RequestException as e:
+141 |                 self.logger.exception(f"Ошибка при запросе к GitLab API: {e}")
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+142 |
+143 |         # Если не удалось получить через API, пробуем другие методы
+    |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+   --> engine/version_resolver.py:141:75
+    |
+140 |             except requests.RequestException as e:
+141 |                 self.logger.exception(f"Ошибка при запросе к GitLab API: {e}")
+    |                                                                           ^
+142 |
+143 |         # Если не удалось получить через API, пробуем другие методы
+    |
+
+E501 Line too long (103 > 88)
+   --> engine/version_resolver.py:152:89
+    |
+150 |         @return Последняя версия пакета или "unknown"
+151 |         """
+152 |         self.logger.info("[RESOLVE LATEST] Определение последней версии из родительской директории...")
+    |                                                                                         ^^^^^^^^^^^^^^^
+153 |
+154 |         # Пробуем получить список файлов в родительской директории
+    |
+
+RUF003 Comment contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+   --> engine/version_resolver.py:162:42
+    |
+161 |         try:
+162 |             # Пытаемся получить страницу с родительской директорией
+    |                                          ^
+163 |             response = self.session.get(parent_dir_url)
+164 |             response.raise_for_status()
+    |
+
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+   --> engine/version_resolver.py:176:59
+    |
+174 | …     case 0:
+175 | …         # Если ничего не нашли, возвращаем "unknown"
+176 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |                                                 ^
+177 | …         return "unknown"
+178 | …     case _:
+    |
+
+RUF001 String contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+   --> engine/version_resolver.py:176:60
+    |
+174 | …     case 0:
+175 | …         # Если ничего не нашли, возвращаем "unknown"
+176 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |                                                  ^
+177 | …         return "unknown"
+178 | …     case _:
+    |
+
+E501 Line too long (120 > 88)
+   --> engine/version_resolver.py:176:89
+    |
+174 | …     case 0:
+175 | …         # Если ничего не нашли, возвращаем "unknown"
+176 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+177 | …         return "unknown"
+178 | …     case _:
+    |
+
+E501 Line too long (95 > 88)
+   --> engine/version_resolver.py:180:89
+    |
+178 |                 case _:
+179 |                     # Возвращаем последнюю найденную версию
+180 |                     latest_version = max(matches, key=lambda x: [int(i) for i in x.split('.')])
+    |                                                                                         ^^^^^^^
+181 |                     self.logger.info(f"[RESOLVE LATEST] Найдена версия: {latest_version}")
+182 |                     return latest_version
+    |
+
+G004 Logging statement uses f-string
+   --> engine/version_resolver.py:181:38
+    |
+179 |                     # Возвращаем последнюю найденную версию
+180 |                     latest_version = max(matches, key=lambda x: [int(i) for i in x.split('.')])
+181 |                     self.logger.info(f"[RESOLVE LATEST] Найдена версия: {latest_version}")
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+182 |                     return latest_version
+    |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (90 > 88)
+   --> engine/version_resolver.py:181:89
+    |
+179 |                     # Возвращаем последнюю найденную версию
+180 |                     latest_version = max(matches, key=lambda x: [int(i) for i in x.split('.')])
+181 |                     self.logger.info(f"[RESOLVE LATEST] Найдена версия: {latest_version}")
+    |                                                                                         ^^
+182 |                     return latest_version
+    |
+
+G004 Logging statement uses f-string
+   --> engine/version_resolver.py:185:35
+    |
+184 | …     except requests.RequestException as e:
+185 | …         self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+186 | …         # Если ничего не нашли, возвращаем "unknown"
+187 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |
+help: Convert to lazy `%` formatting
+
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+   --> engine/version_resolver.py:185:37
+    |
+184 | …     except requests.RequestException as e:
+185 | …         self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+    |                                   ^
+186 | …         # Если ничего не нашли, возвращаем "unknown"
+187 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |
+
+RUF001 String contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+   --> engine/version_resolver.py:185:38
+    |
+184 | …     except requests.RequestException as e:
+185 | …         self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+    |                                    ^
+186 | …         # Если ничего не нашли, возвращаем "unknown"
+187 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |
+
+TRY401 Redundant exception object included in `logging.exception` call
+   --> engine/version_resolver.py:185:83
+    |
+184 | …     except requests.RequestException as e:
+185 | …         self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+    |                                                                                 ^
+186 | …         # Если ничего не нашли, возвращаем "unknown"
+187 | …         self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |
+
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+   --> engine/version_resolver.py:187:51
+    |
+185 | …     self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+186 | …     # Если ничего не нашли, возвращаем "unknown"
+187 | …     self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |                                             ^
+188 | …     return "unknown"
+    |
+
+RUF001 String contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+   --> engine/version_resolver.py:187:52
+    |
+185 | …     self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+186 | …     # Если ничего не нашли, возвращаем "unknown"
+187 | …     self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |                                              ^
+188 | …     return "unknown"
+    |
+
+E501 Line too long (112 > 88)
+   --> engine/version_resolver.py:187:89
+    |
+185 | …     self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
+186 | …     # Если ничего не нашли, возвращаем "unknown"
+187 | …     self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
+    |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+188 | …     return "unknown"
+    |
+
+EXE001 Shebang is present but file is not executable
+ --> main.py:1:1
+  |
+1 | #!/usr/bin/env python3
+  | ^^^^^^^^^^^^^^^^^^^^^^
+2 | """
+3 | @file main.py
+  |
+
+C901 `main` is too complex (11 > 10)
+  --> main.py:26:5
+   |
+26 | def main() -> None:
+   |     ^^^^
+27 |     """
+28 |     @brief Main function to start APGer Engine
+   |
+
+PLR0915 Too many statements (51 > 50)
+  --> main.py:26:5
+   |
+26 | def main() -> None:
+   |     ^^^^
+27 |     """
+28 |     @brief Main function to start APGer Engine
+   |
+
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN). Did you mean `H` (LATIN CAPITAL LETTER H)?
+  --> main.py:47:30
+   |
+45 |         match len(packages):
+46 |             case 0:
+47 |                 logger.info("Не найдено пакетов для обработки")
+   |                              ^
+48 |             case num_packages:
+49 |                 logger.info(f"Найдено {num_packages} пакетов для обработки")
+   |
+
+RUF001 String contains ambiguous `е` (CYRILLIC SMALL LETTER IE). Did you mean `e` (LATIN SMALL LETTER E)?
+  --> main.py:47:31
+   |
+45 |         match len(packages):
+46 |             case 0:
+47 |                 logger.info("Не найдено пакетов для обработки")
+   |                               ^
+48 |             case num_packages:
+49 |                 logger.info(f"Найдено {num_packages} пакетов для обработки")
+   |
+
+G004 Logging statement uses f-string
+  --> main.py:49:29
+   |
+47 |                 logger.info("Не найдено пакетов для обработки")
+48 |             case num_packages:
+49 |                 logger.info(f"Найдено {num_packages} пакетов для обработки")
+   |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+50 |                 for pkg in packages:
+51 |                     package_name = pkg['package']['name']
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> main.py:54:33
+   |
+52 |                     version = pkg['package']['version']
+53 |
+54 |                     logger.info(f"Обработка пакета: {package_name} версии {version}")
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+55 |
+56 |                     # Создаем временные директории
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (93 > 88)
+  --> main.py:62:89
+   |
+60 |                         build_dir = temp_path / 'build'
+61 |                         install_dir = temp_path / 'install'
+62 |                         output_dir = Path('dist/output')  # Выходная директория в dist/output
+   |                                                                                         ^^^^^
+63 |                         output_dir.mkdir(exist_ok=True)
+   |
+
+G004 Logging statement uses f-string
+  --> main.py:69:46
+   |
+67 |                         match downloader.download_source(source_url, str(source_dir)):
+68 |                             case True:
+69 |                                 logger.debug(f"Исходники успешно загружены для {package_name}")
+   |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+70 |                             case False:
+71 |                                 logger.error(f"Ошибка загрузки исходников для {package_name}")
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (95 > 88)
+  --> main.py:69:89
+   |
+67 |                         match downloader.download_source(source_url, str(source_dir)):
+68 |                             case True:
+69 |                                 logger.debug(f"Исходники успешно загружены для {package_name}")
+   |                                                                                         ^^^^^^^
+70 |                             case False:
+71 |                                 logger.error(f"Ошибка загрузки исходников для {package_name}")
+   |
+
+G004 Logging statement uses f-string
+  --> main.py:71:46
+   |
+69 | …                         logger.debug(f"Исходники успешно загружены для {package_name}")
+70 | …                     case False:
+71 | …                         logger.error(f"Ошибка загрузки исходников для {package_name}")
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+72 | …                         continue
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (94 > 88)
+  --> main.py:71:89
+   |
+69 | …                         logger.debug(f"Исходники успешно загружены для {package_name}")
+70 | …                     case False:
+71 | …                         logger.error(f"Ошибка загрузки исходников для {package_name}")
+   |                                                                                   ^^^^^^
+72 | …                         continue
+   |
+
+E501 Line too long (108 > 88)
+  --> main.py:75:89
+   |
+74 |                         # Выполняем сборку
+75 |                         match builder.build_package(pkg, str(source_dir), str(build_dir), str(install_dir)):
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^
+76 |                             case True:
+77 |                                 logger.debug(f"Пакет {package_name} успешно собран")
+   |
+
+G004 Logging statement uses f-string
+  --> main.py:77:46
+   |
+75 |                         match builder.build_package(pkg, str(source_dir), str(build_dir), str(install_dir)):
+76 |                             case True:
+77 |                                 logger.debug(f"Пакет {package_name} успешно собран")
+   |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+78 |                             case False:
+79 |                                 logger.error(f"Ошибка сборки пакета {package_name}")
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> main.py:79:46
+   |
+77 | …                         logger.debug(f"Пакет {package_name} успешно собран")
+78 | …                     case False:
+79 | …                         logger.error(f"Ошибка сборки пакета {package_name}")
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+80 | …                         continue
+   |
+help: Convert to lazy `%` formatting
+
+E501 Line too long (172 > 88)
+  --> main.py:83:89
+   |
+82 | …
+83 | …ge(pkg, str(install_dir), str(output_dir), "../.ci/filesystem_example.yaml", "../.ci/metadata_example.yaml")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+84 | …
+85 | …
+   |
+
+G004 Logging statement uses f-string
+  --> main.py:88:45
+   |
+86 |                         match signer.sign_package_with_sq(package_path):
+87 |                             case True:
+88 |                                 logger.info(f"Пакет {package_path} успешно подписан")
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+89 |                             case False:
+90 |                                 logger.error(f"Ошибка подписания пакета {package_path}")
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> main.py:90:46
+   |
+88 | …                         logger.info(f"Пакет {package_path} успешно подписан")
+89 | …                     case False:
+90 | …                         logger.error(f"Ошибка подписания пакета {package_path}")
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+91 | …                         continue
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> main.py:93:33
+   |
+91 |                                 continue
+92 |
+93 |                     logger.info(f"Пакет {package_name} успешно обработан")
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+94 |     except ValueError as e:
+95 |         logger.exception(f"Ошибка валидации repodata: {e}")
+   |
+help: Convert to lazy `%` formatting
+
+G004 Logging statement uses f-string
+  --> main.py:95:26
+   |
+93 |                     logger.info(f"Пакет {package_name} успешно обработан")
+94 |     except ValueError as e:
+95 |         logger.exception(f"Ошибка валидации repodata: {e}")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+96 |         return  # Останавливаем выполнение при ошибке валидации
+97 |     except Exception as e:
+   |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+  --> main.py:95:56
+   |
+93 |                     logger.info(f"Пакет {package_name} успешно обработан")
+94 |     except ValueError as e:
+95 |         logger.exception(f"Ошибка валидации repodata: {e}")
+   |                                                        ^
+96 |         return  # Останавливаем выполнение при ошибке валидации
+97 |     except Exception as e:
+   |
+
+G004 Logging statement uses f-string
+  --> main.py:98:26
+   |
+96 |         return  # Останавливаем выполнение при ошибке валидации
+97 |     except Exception as e:
+98 |         logger.exception(f"Неожиданная ошибка при обработке repodata: {e}")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+99 |         return  # Останавливаем выполнение при любой ошибке
+   |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+  --> main.py:98:72
+   |
+96 |         return  # Останавливаем выполнение при ошибке валидации
+97 |     except Exception as e:
+98 |         logger.exception(f"Неожиданная ошибка при обработке repodata: {e}")
+   |                                                                        ^
+99 |         return  # Останавливаем выполнение при любой ошибке
+   |
+
+ANN001 Missing type annotation for function argument `level`
+  --> utils/logging_utils.py:13:19
+   |
+13 | def setup_logging(level=logging.INFO) -> logging.Logger:
+   |                   ^^^^^
+14 |     """
+15 |     @brief Configures logging for the application
+   |
+
+RUF003 Comment contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+  --> utils/pgp_signer.py:36:40
+   |
+34 |         """
+35 |         try:
+36 |             # Создаем detached подпись с помощью sq
+   |                                        ^
+37 |             sign_result = subprocess.run([
+38 |                 'sq', 'sign', '--detached', package_path
+   |
+
+S603 `subprocess` call: check for execution of untrusted input
+  --> utils/pgp_signer.py:37:27
+   |
+35 |         try:
+36 |             # Создаем detached подпись с помощью sq
+37 |             sign_result = subprocess.run([
+   |                           ^^^^^^^^^^^^^^
+38 |                 'sq', 'sign', '--detached', package_path
+39 |             ], capture_output=True, text=True)
+   |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> utils/pgp_signer.py:37:27
+   |
+35 |         try:
+36 |             # Создаем detached подпись с помощью sq
+37 |             sign_result = subprocess.run([
+   |                           ^^^^^^^^^^^^^^
+38 |                 'sq', 'sign', '--detached', package_path
+39 |             ], capture_output=True, text=True)
+   |
+help: Add explicit `check=False`
+
+S607 Starting a process with a partial executable path
+  --> utils/pgp_signer.py:37:42
+   |
+35 |           try:
+36 |               # Создаем detached подпись с помощью sq
+37 |               sign_result = subprocess.run([
+   |  __________________________________________^
+38 | |                 'sq', 'sign', '--detached', package_path
+39 | |             ], capture_output=True, text=True)
+   | |_____________^
+40 |
+41 |               # Используем match-case для обработки результата
+   |
+
+G004 Logging statement uses f-string
+  --> utils/pgp_signer.py:44:38
+   |
+42 |             match sign_result.returncode:
+43 |                 case 0:
+44 |                     self.logger.info(f"Пакет {package_path} успешно подписан с помощью sq")
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+45 |                     return True
+46 |                 case _:
+   |
+help: Convert to lazy `%` formatting
+
+RUF001 String contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+  --> utils/pgp_signer.py:44:78
+   |
+42 |             match sign_result.returncode:
+43 |                 case 0:
+44 |                     self.logger.info(f"Пакет {package_path} успешно подписан с помощью sq")
+   |                                                                              ^
+45 |                     return True
+46 |                 case _:
+   |
+
+E501 Line too long (91 > 88)
+  --> utils/pgp_signer.py:44:89
+   |
+42 |             match sign_result.returncode:
+43 |                 case 0:
+44 |                     self.logger.info(f"Пакет {package_path} успешно подписан с помощью sq")
+   |                                                                                         ^^^
+45 |                     return True
+46 |                 case _:
+   |
+
+G004 Logging statement uses f-string
+  --> utils/pgp_signer.py:47:39
+   |
+45 |                     return True
+46 |                 case _:
+47 |                     self.logger.error(f"Ошибка создания PGP подписи с помощью sq: {sign_result.stderr}")
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+48 |                     return False
+   |
+help: Convert to lazy `%` formatting
+
+RUF001 String contains ambiguous `с` (CYRILLIC SMALL LETTER ES). Did you mean `c` (LATIN SMALL LETTER C)?
+  --> utils/pgp_signer.py:47:69
+   |
+45 |                     return True
+46 |                 case _:
+47 |                     self.logger.error(f"Ошибка создания PGP подписи с помощью sq: {sign_result.stderr}")
+   |                                                                     ^
+48 |                     return False
+   |
+
+E501 Line too long (104 > 88)
+  --> utils/pgp_signer.py:47:89
+   |
+45 |                     return True
+46 |                 case _:
+47 |                     self.logger.error(f"Ошибка создания PGP подписи с помощью sq: {sign_result.stderr}")
+   |                                                                                         ^^^^^^^^^^^^^^^^
+48 |                     return False
+   |
+
+E501 Line too long (97 > 88)
+  --> utils/pgp_signer.py:51:89
+   |
+50 |         except FileNotFoundError:
+51 |             self.logger.exception("Команда sq не найдена. Убедитесь, что установлен Sequoia PGP")
+   |                                                                                         ^^^^^^^^^
+52 |             return False
+53 |         except Exception as e:
+   |
+
+G004 Logging statement uses f-string
+  --> utils/pgp_signer.py:54:35
+   |
+52 |             return False
+53 |         except Exception as e:
+54 |             self.logger.exception(f"Ошибка при подписании пакета: {e}")
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+55 |             return False
+   |
+help: Convert to lazy `%` formatting
+
+TRY401 Redundant exception object included in `logging.exception` call
+  --> utils/pgp_signer.py:54:68
+   |
+52 |             return False
+53 |         except Exception as e:
+54 |             self.logger.exception(f"Ошибка при подписании пакета: {e}")
+   |                                                                    ^
+55 |             return False
+   |
+
+Found 272 errors.
+Error: Process completed with exit code 1.
+0s
+1s
+0s
+Footer
+© 2026 GitHub, Inc.
+Footer navigation
+
+    Terms
+    Privacy
+    Security
+    Status
+    Community
+    Docs
+    Contact
+
+fix: исправление конфигурации ruff и Makefile для кроссплатформенной … · CubicArnament/apger@e31c42c

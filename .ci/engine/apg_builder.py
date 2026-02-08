@@ -9,6 +9,7 @@ APG packages from installed files.
 import json
 import shutil
 import subprocess
+import tarfile
 import tempfile
 import zlib
 from pathlib import Path
@@ -34,7 +35,14 @@ class APGPackageBuilder:
         """
         self.logger = get_logger(self.__class__.__name__)
 
-    def create_apg_package(self, package_info: dict[str, Any], install_dir: str, output_dir: str, filesystem_yaml_path: str = "../.ci/filesystem_example.yaml", metadata_yaml_path: str = "../.ci/metadata_example.yaml") -> str:
+    def create_apg_package(
+        self,
+        package_info: dict[str, Any],
+        install_dir: str,
+        output_dir: str,
+        filesystem_yaml_path: str = "../.ci/filesystem_example.yaml",
+        metadata_yaml_path: str = "../.ci/metadata_example.yaml"
+    ) -> str:
         """
         @brief Creates an APG package from installed files
         @param package_info Information about the package
@@ -49,7 +57,7 @@ class APGPackageBuilder:
         arch = package_info['package']['architecture']
 
         # Создаем имя файла пакета
-        filename = f"{package_name}-{version}-{arch}.apg"
+        filename = "{}-{}-{}.apg".format(package_name, version, arch)
         filepath = Path(output_dir) / filename
 
         # Создаем временную структуру пакета
@@ -86,10 +94,10 @@ class APGPackageBuilder:
             # Создаем архив tar.zst
             self._create_tar_zst(temp_path, filepath)
 
-        self.logger.info(f"APG пакет создан: {filepath}")
+        self.logger.info("APG пакет создан: %s", filepath)
         return str(filepath)
 
-    def _load_metadata_config(self, yaml_path: str) -> Dict[str, Any]:
+    def _load_metadata_config(self, yaml_path: str) -> dict[str, Any]:
         """
         Загружает конфигурацию метаданных из YAML файла
         """
@@ -98,10 +106,10 @@ class APGPackageBuilder:
             with open(yaml_file, encoding='utf-8') as f:
                 return yaml.safe_load(f)
         else:
-            self.logger.warning(f"Файл конфигурации метаданных не найден: {yaml_path}")
+            self.logger.warning("Файл конфигурации метаданных не найден: %s", yaml_path)
             return {}
 
-    def _combine_metadata(self, json_metadata: Dict[str, Any], yaml_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    def _combine_metadata(self, json_metadata: dict[str, Any], yaml_metadata: dict[str, Any]) -> dict[str, Any]:
         """
         @brief Объединяет метаданные из JSON и YAML файлов
         @param json_metadata Метаданные из JSON файла
@@ -129,7 +137,7 @@ class APGPackageBuilder:
 
         return combined
 
-    def _load_filesystem_config(self, yaml_path: str) -> Dict[str, Any]:
+    def _load_filesystem_config(self, yaml_path: str) -> dict[str, Any]:
         """
         Загружает конфигурацию файловой системы из YAML файла
         """
@@ -138,10 +146,10 @@ class APGPackageBuilder:
             with open(yaml_file, encoding='utf-8') as f:
                 return yaml.safe_load(f)
         else:
-            self.logger.warning(f"Файл конфигурации файловой системы не найден: {yaml_path}")
+            self.logger.warning("Файл конфигурации файловой системы не найден: %s", yaml_path)
             return {}
 
-    def _apply_filesystem_config(self, data_dir: Path, filesystem_config: Dict[str, Any]) -> None:
+    def _apply_filesystem_config(self, data_dir: Path, filesystem_config: dict[str, Any]) -> None:
         """
         Применяет конфигурацию файловой системы к директории данных
         """
@@ -184,7 +192,7 @@ class APGPackageBuilder:
                 # Создаем символическую ссылку
                 link_path.symlink_to(target_path)
 
-    def _generate_metadata(self, package_info: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_metadata(self, package_info: dict[str, Any]) -> dict[str, Any]:
         """
         Генерирует метаданные для пакета
         """
@@ -242,7 +250,7 @@ class APGPackageBuilder:
                         crc32_checksum = zlib.crc32(content) & 0xffffffff
                         # Получаем относительный путь от data_dir
                         rel_path = file_path.relative_to(data_dir)
-                        checksums.append(f"{crc32_checksum:08x}  {rel_path}")
+                        checksums.append("{:08x}  {}".format(crc32_checksum, rel_path))
 
         # Записываем контрольные суммы в файл
         with open(checksums_path, 'w', encoding='utf-8') as f:
@@ -254,10 +262,11 @@ class APGPackageBuilder:
         """
         # Проверяем, установлен ли zstd
         try:
+            subprocess.run(['which', 'zstd'], check=True, capture_output=True)
             subprocess.run(['zstd', '--version'], check=True, capture_output=True)
         except (subprocess.CalledProcessError, FileNotFoundError):
             self.logger.exception("Для создания APG пакетов необходим zstd")
-            raise RuntimeError("Для создания APG пакетов необходим zstd")
+            raise RuntimeError("Для создания APG пакетов необходим zstd") from None
 
         # Создаем tar архив
         tar_path = output_path.with_suffix('.tar')
@@ -271,7 +280,7 @@ class APGPackageBuilder:
             'zstd', '-19',  # Максимальное сжатие
             '-f',           # Перезаписать файл если существует
             str(tar_path)
-        ], check=True)
+        ], check=True, shell=False)
 
         # Переименовываем сжатый файл в .apg
         compressed_path = tar_path.with_suffix('.tar.zst')

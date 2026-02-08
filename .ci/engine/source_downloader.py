@@ -44,21 +44,21 @@ class SourceDownloader:
         @param destination_dir Директория назначения
         @return True в случае успеха, иначе False
         """
-        self.logger.info(f"[DOWNLOAD] Загрузка исходников из {source_url}")
+        self.logger.info("[DOWNLOAD] Загрузка исходников из {}".format(source_url))
 
         urlparse(source_url)
 
         # Используем match-case для определения типа источника
         match source_url:
             case url if url.endswith('.git'):
-                self.logger.debug(f"[DOWNLOAD] Определен Git репозиторий: {url}")
+                self.logger.debug("[DOWNLOAD] Определен Git репозиторий: {}".format(url))
                 return self._download_git_repo(url, destination_dir)
             case url if any(url.endswith(ext) for ext in ['.tar.gz', '.tar.xz', '.tar.bz2', '.zip']):
-                self.logger.debug(f"[DOWNLOAD] Определен архив: {url}")
+                self.logger.debug("[DOWNLOAD] Определен архив: {}".format(url))
                 return self._download_archive(url, destination_dir)
             case url:
                 # Для других URL пробуем как обычный архив
-                self.logger.debug(f"[DOWNLOAD] Пробуем загрузить как архив: {url}")
+                self.logger.debug("[DOWNLOAD] Пробуем загрузить как архив: {}".format(url))
                 return self._download_archive(url, destination_dir)
 
     def _download_git_repo(self, git_url: str, destination_dir: str) -> bool:
@@ -73,10 +73,10 @@ class SourceDownloader:
                 'git', 'clone', '--depth', '1', git_url, destination_dir
             ], check=True, capture_output=True, text=True)
 
-            self.logger.info(f"[DOWNLOAD] Git репозиторий загружен в {destination_dir}")
+            self.logger.info("[DOWNLOAD] Git репозиторий загружен в {}".format(destination_dir))
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.exception(f"[DOWNLOAD] Ошибка при клонировании Git репозитория: {e.stderr}")
+            self.logger.exception("[DOWNLOAD] Ошибка при клонировании Git репозитория: {}".format(e.stderr))
             return False
 
     def _download_archive(self, archive_url: str, destination_dir: str) -> bool:
@@ -104,7 +104,7 @@ class SourceDownloader:
 
                             if total_size > 0:
                                 percent = (downloaded_size / total_size) * 100
-                                print(f"\r[DOWNLOAD] Загрузка: {percent:.1f}%", end='', flush=True)
+                                print("\r[DOWNLOAD] Загрузка: {:.1f}%".format(percent), end='', flush=True)
 
                 print()  # Новая строка после прогресса
 
@@ -131,17 +131,17 @@ class SourceDownloader:
                             with tarfile.open(tmp_file.name, 'r:*') as tar_ref:
                                 tar_ref.extractall(destination_dir)
                         except tarfile.ReadError:
-                            self.logger.exception(f"[DOWNLOAD] Не удалось распознать формат архива: {archive_url}")
+                            self.logger.exception("[DOWNLOAD] Не удалось распознать формат архива: {}".format(archive_url))
                             return False
 
-                self.logger.info(f"[DOWNLOAD] Архив распакован в {destination_dir}")
+                self.logger.info("[DOWNLOAD] Архив распакован в {}".format(destination_dir))
                 return True
 
             except requests.RequestException as e:
-                self.logger.exception(f"[DOWNLOAD] Ошибка при загрузке архива: {e}")
+                self.logger.exception("[DOWNLOAD] Ошибка при загрузке архива: {}".format(e))
                 return False
             except Exception as e:
-                self.logger.exception(f"[DOWNLOAD] Ошибка при распаковке архива: {e}")
+                self.logger.exception("[DOWNLOAD] Ошибка при распаковке архива: {}".format(e))
                 return False
             finally:
                 # Удаляем временный файл
