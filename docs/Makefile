@@ -18,11 +18,7 @@ html_docs:
 	@echo "Генерация HTML документации с помощью Doxygen..."
 	@doxygen Doxyfile
 	@echo "HTML документация сгенерирована в docs/html/index.html"
-ifeq ($(OS),Windows_NT)
-	start docs\html\index.html
-else
-	xdg-open docs/html/index.html 2>/dev/null || open docs/html/index.html 2>/dev/null || echo "Could not open browser"
-endif
+	@echo "Документация сгенерирована в docs/html/index.html"
 
 clean:
 	@echo "Очистка сгенерированной документации..."
