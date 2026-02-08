@@ -1,0 +1,90 @@
+\doxysection{.ci.\+engine.\+json\+\_\+parser.\+JSONParser Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser}{}\label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser}\index{.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a818133f3ac685d90efccf09be355d354}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str repodata\+\_\+dir="{}repodata"{})
+\item 
+list\+[dict\+[str, Any]\+]\+ \doxymbox{\hyperlink{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a0126b046852525255f4bdc88065e56ee}{parse\+\_\+all\+\_\+packages}} (self)
+\item 
+dict\+[str, Any]\+ \doxymbox{\hyperlink{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a5a12fbe0d45993f416b7859c6b5479e6}{parse\+\_\+package}} (self, Path json\+\_\+file)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_af67ba35410a9abbcf791c78c8ecbf8e8}\label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_af67ba35410a9abbcf791c78c8ecbf8e8} 
+{\bfseries repodata\+\_\+dir} = Path(repodata\+\_\+dir)
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a0188f5c1750a4c4aac5ac0d47e3598ac}\label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a0188f5c1750a4c4aac5ac0d47e3598ac} 
+{\bfseries version\+\_\+resolver} = \doxymbox{\hyperlink{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver}{Version\+Resolver}}()
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_af35493336b2569e7b5b7896e53c340be}\label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_af35493336b2569e7b5b7896e53c340be} 
+{\bfseries flag\+\_\+translator} = \doxymbox{\hyperlink{class_8ci_1_1engine_1_1flag__translator_1_1_flag_translator}{Flag\+Translator}}()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a1130a92c72b5ecbc946117bfe19c4c06}{\+\_\+validate\+\_\+json\+\_\+structure}} (self, Path json\+\_\+file)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class JSONParser
+@brief Класс для парсинга JSON файлов из папки repodata
+
+Этот класс отвечает за парсинг JSON файлов, валидацию их структуры
+и подготовку данных для дальнейшей обработки.
+\end{DoxyVerb}
+ 
+
+\label{doc-constructors}
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a818133f3ac685d90efccf09be355d354}\index{.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a818133f3ac685d90efccf09be355d354} 
+ None .ci.\+engine.\+json\+\_\+parser.\+JSONParser.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str }]{repodata\+\_\+dir}{ = {\ttfamily "{}repodata"{}}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Конструктор класса JSONParser
+@param repodata_dir Директория с JSON файлами (по умолчанию "repodata")
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a1130a92c72b5ecbc946117bfe19c4c06}\index{.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}!\_validate\_json\_structure@{\_validate\_json\_structure}}
+\index{\_validate\_json\_structure@{\_validate\_json\_structure}!.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}}
+\doxysubsubsection{\texorpdfstring{\_validate\_json\_structure()}{\_validate\_json\_structure()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a1130a92c72b5ecbc946117bfe19c4c06} 
+ bool .ci.\+engine.\+json\+\_\+parser.\+JSONParser.\+\_\+validate\+\_\+json\+\_\+structure (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{Path}]{json\+\_\+file}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Проверяет, соответствует ли JSON файл стандартной структуре
+@param json_file Путь к JSON файлу для проверки
+@return True если структура корректна, иначе False
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a0126b046852525255f4bdc88065e56ee}\index{.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}!parse\_all\_packages@{parse\_all\_packages}}
+\index{parse\_all\_packages@{parse\_all\_packages}!.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}}
+\doxysubsubsection{\texorpdfstring{parse\_all\_packages()}{parse\_all\_packages()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a0126b046852525255f4bdc88065e56ee} 
+ list\+[dict\+[str, Any]\+]\+ .ci.\+engine.\+json\+\_\+parser.\+JSONParser.\+parse\+\_\+all\+\_\+packages (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Парсит все JSON файлы в папке repodata и возвращает список пакетов
+@return Список словарей с информацией о пакетах
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a5a12fbe0d45993f416b7859c6b5479e6}\index{.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}!parse\_package@{parse\_package}}
+\index{parse\_package@{parse\_package}!.ci.engine.json\_parser.JSONParser@{.ci.engine.json\_parser.JSONParser}}
+\doxysubsubsection{\texorpdfstring{parse\_package()}{parse\_package()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1json__parser_1_1_j_s_o_n_parser_a5a12fbe0d45993f416b7859c6b5479e6} 
+ dict\+[str, Any]\+ .ci.\+engine.\+json\+\_\+parser.\+JSONParser.\+parse\+\_\+package (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{Path}]{json\+\_\+file}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Парсит один JSON файл и возвращает словарь с данными пакета
+@param json_file Путь к JSON файлу
+@return Словарь с информацией о пакете
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+json\+\_\+parser.\+py\end{DoxyCompactItemize}

@@ -1,250 +1,245 @@
-/* Custom CSS for APGer documentation in LFS Book style */
+/* Modern CSS for APGer documentation based on NurOS website style */
+
+:root {
+  --primary-color: #426477;
+  --secondary-color: #6a93be;
+  --accent-color: #d23600;
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #dddddd;
+  --header-bg: #426477;
+  --nav-bg: #f8f9fa;
+  --code-bg: #f8f9fa;
+  --section-bg: #f9f9f9;
+}
+
+[data-theme="dark"] {
+  --primary-color: #6a93be;
+  --secondary-color: #a4c2d6;
+  --accent-color: #ff6b35;
+  --background-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --border-color: #555555;
+  --header-bg: #2d4450;
+  --nav-bg: #2d2d2d;
+  --code-bg: #2d2d2d;
+  --section-bg: #2d2d2d;
+}
 
 body {
-    background: #fff;
-    color: #333;
-    font-family: "DejaVu Sans", Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    min-width: 70em;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
 
 div#top {
-    width: 100%;
-    background: #f0f0f0;
-    border-bottom: 1px solid #aaa;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 100%;
+  background: var(--header-bg);
+  color: white;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 div#titlearea {
-    background: #426477;
-    color: white;
-    padding: 0.5em;
-    border-bottom: 1px solid #aaa;
+  background: var(--header-bg);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 div#titlearea table {
-    color: white;
-    margin: 0;
-    padding: 0;
+  color: white;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#projectname {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+#projectbrief {
+  font-size: 1.1rem;
+  color: #d0e0f0;
+  margin-top: 0.5rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "DejaVu Serif", Georgia, serif;
-    color: #426477;
+  color: var(--primary-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 h1 {
-    font-size: 1.6em;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+  font-size: 1.8rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.5rem;
 }
 
 h2 {
-    font-size: 1.4em;
-    margin-top: 1em;
-    margin-bottom: 0.5em;
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
 }
 
 h3 {
-    font-size: 1.2em;
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-}
-
-div.header {
-    background: #f0f0f0;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid #aaa;
-    padding: 0.5em;
-}
-
-div.contents {
-    padding: 1em;
-}
-
-div.toc {
-    border: 1px solid #aaa;
-    background: #f9f9f9;
-    padding: 1em;
-    float: right;
-    margin: 0 0 1em 1em;
-    max-width: 30%;
-}
-
-div.toc h3 {
-    font-size: 1.1em;
-    margin-top: 0;
-    text-align: center;
-}
-
-div.navtab {
-    background: #f0f0f0;
-    border: 1px solid #aaa;
-    padding: 0.25em;
-}
-
-div.navtab table {
-    margin: 0;
-    padding: 0;
+  font-size: 1.3rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0.6rem;
 }
 
 a:link, a:visited {
-    color: #426477;
-    text-decoration: none;
+  color: var(--secondary-color);
+  text-decoration: none;
 }
 
 a:hover, a:active {
-    color: #6a93be;
-    text-decoration: underline;
+  color: var(--accent-color);
+  text-decoration: underline;
 }
 
-div.fragment {
-    border: 1px solid #aaa;
-    background: #f9f9f9;
-    padding: 0.5em;
-    margin: 1em 0;
-    overflow-x: auto;
+div.contents {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-pre.fragment {
-    font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
-    font-size: 0.9em;
-    line-height: 1.3;
-    margin: 0;
-    padding: 0.5em;
-    background: #f9f9f9;
-    overflow-x: auto;
-}
-
-div.line {
-    font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
-    font-size: 0.9em;
-    line-height: 1.3;
-    margin: 0;
-    padding: 0;
-    text-wrap: unrestricted;
-    white-space: -moz-pre-wrap; /* Moz */
-    white-space: -pre-wrap;     /* Opera 4-6 */
-    white-space: -o-pre-wrap;   /* Opera 7 */
-    word-wrap: break-word;      /* IE */
-}
-
-table.doxtable {
-    border-collapse: collapse;
-    margin: 1em 0;
-}
-
-table.doxtable th {
-    background-color: #426477;
-    color: white;
-    padding: 0.5em;
-    text-align: left;
-}
-
-table.doxtable td {
-    border: 1px solid #aaa;
-    padding: 0.5em;
-}
-
-hr {
-    height: 1px;
-    border: none;
-    border-top: 1px solid #aaa;
-}
-
-div#nav-tree {
-    background: #f0f0f0;
-}
-
-#nav-tree .selected {
-    background-image: none;
-    background-color: #426477;
-    color: white;
-}
-
-#nav-tree a {
-    color: #333;
-}
-
-.memdoc {
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
-    border-bottom: 1px solid #aaa;
-    padding: 0.5em;
-    margin-bottom: 1em;
-}
-
-div.summary {
-    display: none;
-}
-
-div.qindex, div.navtab {
-    background-color: #f0f0f0;
-    border: 1px solid #aaa;
-}
-
-a.code, a.code:visited, a.line, a.line:visited {
-    color: #426477;
-}
-
-/* Стили для секций документации */
-.section {
-    margin-bottom: 2em;
-    padding: 0 1em;
-}
-
-.section h1 {
-    border-bottom: 2px solid #426477;
-    padding-bottom: 0.3em;
+div.section {
+  background: var(--section-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .json-container {
-    background-color: #f8f8f8;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 1em;
-    margin: 1em 0;
-    overflow-x: auto;
-    font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
-    font-size: 0.9em;
-}
-
-.nav {
-    margin-top: 2em;
-    padding: 1em;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    text-align: center;
-}
-
-.nav a {
-    margin: 0 0.5em;
-}
-
-/* Стили для списка элементов */
-ul, ol {
-    margin: 0.5em 0 0.5em 2em;
-}
-
-li {
-    margin: 0.3em 0;
-}
-
-/* Стили для кода */
-code {
-    background-color: #f8f8f8;
-    padding: 0.2em 0.4em;
-    border-radius: 3px;
-    font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 pre {
-    background-color: #f8f8f8;
-    padding: 1em;
-    border-radius: 5px;
-    overflow-x: auto;
-    border: 1px solid #ccc;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 1rem 0;
+}
+
+code {
+  background-color: var(--code-bg);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+}
+
+.nav {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: var(--nav-bg);
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.nav a {
+  margin: 0 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.nav a:hover {
+  background-color: var(--secondary-color);
+  text-decoration: none;
+}
+
+ul, ol {
+  padding-left: 1.5rem;
+}
+
+li {
+  margin: 0.5rem 0;
+}
+
+table.doxtable {
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  width: 100%;
+  background-color: var(--section-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+table.doxtable th {
+  background-color: var(--header-bg);
+  color: white;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+table.doxtable td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+}
+
+table.doxtable tr:nth-child(even) {
+  background-color: var(--nav-bg);
+}
+
+#projectlogo img {
+  max-height: 60px;
+  width: auto;
+  border-radius: 4px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  div#titlearea {
+    padding: 1rem;
+  }
+  
+  #projectname {
+    font-size: 1.5rem;
+  }
+  
+  #projectbrief {
+    font-size: 0.9rem;
+  }
+  
+  div.contents {
+    padding: 1rem;
+  }
+  
+  div.section {
+    padding: 1rem;
+  }
+  
+  .nav a {
+    display: block;
+    margin: 0.5rem 0;
+  }
 }

@@ -1,0 +1,99 @@
+\doxysection{.ci.\+engine.\+version\+\_\+resolver.\+Version\+Resolver Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver}{}\label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver}\index{.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a1867cce213d13a011fc348e0e6f4f796}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\item 
+str \doxymbox{\hyperlink{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a07ab04937e7a8f8b508564f2c2d2f7fc}{resolve\+\_\+latest\+\_\+version}} (self, str source\+\_\+url)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_aeec9035c1b32cf22f5fbcb34b95b1d10}\label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_aeec9035c1b32cf22f5fbcb34b95b1d10} 
+{\bfseries session} = requests.\+Session()
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a9a6fa4708e67cedaabc4bc2657435b9c}\label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a9a6fa4708e67cedaabc4bc2657435b9c} 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+str \doxymbox{\hyperlink{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a5d3bc4dee00a1080295651f164844158}{\+\_\+resolve\+\_\+github\+\_\+latest}} (self, str source\+\_\+url)
+\item 
+str \doxymbox{\hyperlink{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_ae6c721933e24c5e2186a90e6dd3c0d4e}{\+\_\+resolve\+\_\+gitlab\+\_\+latest}} (self, str source\+\_\+url)
+\item 
+str \doxymbox{\hyperlink{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a738abcc035bbd8d920864e17bd3cb3cc}{\+\_\+resolve\+\_\+generic\+\_\+latest}} (self, str source\+\_\+url)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class VersionResolver
+@brief Класс для динамического определения версии "latest"
+
+Этот класс отвечает за определение последней версии пакета
+из различных источников (GitHub, GitLab, и др.).
+\end{DoxyVerb}
+ 
+
+\label{doc-constructors}
+\Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a1867cce213d13a011fc348e0e6f4f796}\index{.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a1867cce213d13a011fc348e0e6f4f796} 
+ None .ci.\+engine.\+version\+\_\+resolver.\+Version\+Resolver.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Конструктор класса VersionResolver
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a738abcc035bbd8d920864e17bd3cb3cc}\index{.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}!\_resolve\_generic\_latest@{\_resolve\_generic\_latest}}
+\index{\_resolve\_generic\_latest@{\_resolve\_generic\_latest}!.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}}
+\doxysubsubsection{\texorpdfstring{\_resolve\_generic\_latest()}{\_resolve\_generic\_latest()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a738abcc035bbd8d920864e17bd3cb3cc} 
+ str .ci.\+engine.\+version\+\_\+resolver.\+Version\+Resolver.\+\_\+resolve\+\_\+generic\+\_\+latest (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{source\+\_\+url}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Определяет последнюю версию для общего случая
+@param source_url URL источника для проверки
+@return Последняя версия пакета или "unknown"
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a5d3bc4dee00a1080295651f164844158}\index{.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}!\_resolve\_github\_latest@{\_resolve\_github\_latest}}
+\index{\_resolve\_github\_latest@{\_resolve\_github\_latest}!.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}}
+\doxysubsubsection{\texorpdfstring{\_resolve\_github\_latest()}{\_resolve\_github\_latest()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a5d3bc4dee00a1080295651f164844158} 
+ str .ci.\+engine.\+version\+\_\+resolver.\+Version\+Resolver.\+\_\+resolve\+\_\+github\+\_\+latest (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{source\+\_\+url}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Определяет последнюю версию для GitHub репозитория
+@param source_url URL GitHub репозитория
+@return Последняя версия пакета
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_ae6c721933e24c5e2186a90e6dd3c0d4e}\index{.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}!\_resolve\_gitlab\_latest@{\_resolve\_gitlab\_latest}}
+\index{\_resolve\_gitlab\_latest@{\_resolve\_gitlab\_latest}!.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}}
+\doxysubsubsection{\texorpdfstring{\_resolve\_gitlab\_latest()}{\_resolve\_gitlab\_latest()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_ae6c721933e24c5e2186a90e6dd3c0d4e} 
+ str .ci.\+engine.\+version\+\_\+resolver.\+Version\+Resolver.\+\_\+resolve\+\_\+gitlab\+\_\+latest (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{source\+\_\+url}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Определяет последнюю версию для GitLab репозитория
+@param source_url URL GitLab репозитория
+@return Последняя версия пакета
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a07ab04937e7a8f8b508564f2c2d2f7fc}\index{.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}!resolve\_latest\_version@{resolve\_latest\_version}}
+\index{resolve\_latest\_version@{resolve\_latest\_version}!.ci.engine.version\_resolver.VersionResolver@{.ci.engine.version\_resolver.VersionResolver}}
+\doxysubsubsection{\texorpdfstring{resolve\_latest\_version()}{resolve\_latest\_version()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1version__resolver_1_1_version_resolver_a07ab04937e7a8f8b508564f2c2d2f7fc} 
+ str .ci.\+engine.\+version\+\_\+resolver.\+Version\+Resolver.\+resolve\+\_\+latest\+\_\+version (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{source\+\_\+url}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Определяет последнюю версию по URL источника
+@param source_url URL источника для проверки
+@return Последняя версия пакета
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+version\+\_\+resolver.\+py\end{DoxyCompactItemize}

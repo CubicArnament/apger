@@ -1,0 +1,113 @@
+\doxysection{.ci.\+engine.\+build\+\_\+templates.\+Build\+Template Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template}{}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_template}\index{.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}}
+Inheritance diagram for .ci.\+engine.\+build\+\_\+templates.\+Build\+Template:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=0.614035cm]{class_8ci_1_1engine_1_1build__templates_1_1_build_template}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ac436c5af928c17d4757afa7187ddd784}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str name, str source\+\_\+dir, str build\+\_\+dir, str install\+\_\+dir)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a03d46d5b237e1a467d83454c498ccb8a}{setup}} (self, list\+[str]\+\texorpdfstring{$\vert$}{|}None extra\+\_\+flags=None)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92ba2466827757a91a5710f0b403bbc0}{compile}} (self)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a458552b83ff6c628e4316e0914c74788}{install}} (self)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92c828efe61bae530be0fa55de1df0ac}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92c828efe61bae530be0fa55de1df0ac} 
+{\bfseries name} = name
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a510ed64c1d80315795ff071d2fa23f23}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a510ed64c1d80315795ff071d2fa23f23} 
+{\bfseries source\+\_\+dir} = source\+\_\+dir
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a49659673bfc0a8498c37e05816bf4d43}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a49659673bfc0a8498c37e05816bf4d43} 
+{\bfseries build\+\_\+dir} = build\+\_\+dir
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a240b9fbc145a331b9068ad90388c1d73}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a240b9fbc145a331b9068ad90388c1d73} 
+{\bfseries install\+\_\+dir} = install\+\_\+dir
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ab0c2fb6237af8e4d3be18e931b6dd805}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ab0c2fb6237af8e4d3be18e931b6dd805} 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class BuildTemplate
+@brief Абстрактный класс для шаблонов сборки
+
+Базовый класс для всех шаблонов сборки, определяющий интерфейс
+для настройки, компиляции и установки проектов.
+\end{DoxyVerb}
+ 
+
+\label{doc-constructors}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ac436c5af928c17d4757afa7187ddd784}\index{.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ac436c5af928c17d4757afa7187ddd784} 
+ None .ci.\+engine.\+build\+\_\+templates.\+Build\+Template.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{name}{, }\item[{str}]{source\+\_\+dir}{, }\item[{str}]{build\+\_\+dir}{, }\item[{str     }]{install\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Конструктор класса BuildTemplate
+@param name Имя пакета
+@param source_dir Директория с исходным кодом
+@param build_dir Директория для сборки
+@param install_dir Директория для установки
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92ba2466827757a91a5710f0b403bbc0}\index{.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}!compile@{compile}}
+\index{compile@{compile}!.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}}
+\doxysubsubsection{\texorpdfstring{compile()}{compile()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92ba2466827757a91a5710f0b403bbc0} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Build\+Template.\+compile (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Компиляция проекта
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented in \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_autotools_template_a7403a8d6315da3d5ec0ba93e74f10b72}{.\+ci.\+engine.\+build\+\_\+templates.\+Autotools\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a90e26584c2cb92a4a07c93793b8057a7}{.\+ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a996fab119232b0f2035f1d6d05e1bfa2}{.\+ci.\+engine.\+build\+\_\+templates.\+CMake\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_gradle_template_a09ebf39d36b9129e448f225c767550b4}{.\+ci.\+engine.\+build\+\_\+templates.\+Gradle\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_meson_template_a241f988ec368a8bfcb2ea40b900e5daa}{.\+ci.\+engine.\+build\+\_\+templates.\+Meson\+Template}}, and \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_python_p_e_p517_template_a522c8b1e4486763e62acdebb9ed7f5a9}{.\+ci.\+engine.\+build\+\_\+templates.\+Python\+PEP517\+Template}}.
+
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a458552b83ff6c628e4316e0914c74788}\index{.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}!install@{install}}
+\index{install@{install}!.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}}
+\doxysubsubsection{\texorpdfstring{install()}{install()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a458552b83ff6c628e4316e0914c74788} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Build\+Template.\+install (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Установка в временный каталог
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented in \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_autotools_template_a715bba5d43ee940fdefb5c26754ca444}{.\+ci.\+engine.\+build\+\_\+templates.\+Autotools\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_aba8b64cf4d254a3fbf091e9468a559e4}{.\+ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a46bef3a412075bdef24a8894a5001030}{.\+ci.\+engine.\+build\+\_\+templates.\+CMake\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_gradle_template_afb63318c527e6ce66ad49e9b465e11d0}{.\+ci.\+engine.\+build\+\_\+templates.\+Gradle\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_meson_template_a2511e7ad6b0dbe8fb7d5983c8bbc2ee0}{.\+ci.\+engine.\+build\+\_\+templates.\+Meson\+Template}}, and \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_python_p_e_p517_template_aec38294376741d918461b7da239e826f}{.\+ci.\+engine.\+build\+\_\+templates.\+Python\+PEP517\+Template}}.
+
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a03d46d5b237e1a467d83454c498ccb8a}\index{.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}!setup@{setup}}
+\index{setup@{setup}!.ci.engine.build\_templates.BuildTemplate@{.ci.engine.build\_templates.BuildTemplate}}
+\doxysubsubsection{\texorpdfstring{setup()}{setup()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a03d46d5b237e1a467d83454c498ccb8a} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Build\+Template.\+setup (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{list\+[str]\+ \texorpdfstring{$\vert$}{|} None }]{extra\+\_\+flags}{ = {\ttfamily None}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Настройка перед сборкой
+@param extra_flags Дополнительные флаги для настройки
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented in \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_autotools_template_a2c859b9e49c48b3af634dcdbb93b64fc}{.\+ci.\+engine.\+build\+\_\+templates.\+Autotools\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a5995ceac01639c57a3bd4ea7f9024caa}{.\+ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a1dd4784021446b98ddda88a741a65942}{.\+ci.\+engine.\+build\+\_\+templates.\+CMake\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_gradle_template_ab55f32343152f23c5ed0d85b45bec1df}{.\+ci.\+engine.\+build\+\_\+templates.\+Gradle\+Template}}, \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_meson_template_a58a1ecbf07698a1aa2abb617444395aa}{.\+ci.\+engine.\+build\+\_\+templates.\+Meson\+Template}}, and \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_python_p_e_p517_template_a8006763332260ddad91fc937cd7a27a5}{.\+ci.\+engine.\+build\+\_\+templates.\+Python\+PEP517\+Template}}.
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+build\+\_\+templates.\+py\end{DoxyCompactItemize}

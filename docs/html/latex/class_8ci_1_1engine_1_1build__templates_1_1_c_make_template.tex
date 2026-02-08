@@ -1,0 +1,94 @@
+\doxysection{.ci.\+engine.\+build\+\_\+templates.\+CMake\+Template Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template}{}\label{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template}\index{.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}}
+Inheritance diagram for .ci.\+engine.\+build\+\_\+templates.\+CMake\+Template:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a1dd4784021446b98ddda88a741a65942}{setup}} (self, list\+[str]\+\texorpdfstring{$\vert$}{|}None extra\+\_\+flags=None)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a996fab119232b0f2035f1d6d05e1bfa2}{compile}} (self)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a46bef3a412075bdef24a8894a5001030}{install}} (self)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ac436c5af928c17d4757afa7187ddd784}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str name, str source\+\_\+dir, str build\+\_\+dir, str install\+\_\+dir)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries name} = name
+\item 
+{\bfseries source\+\_\+dir} = source\+\_\+dir
+\item 
+{\bfseries build\+\_\+dir} = build\+\_\+dir
+\item 
+{\bfseries install\+\_\+dir} = install\+\_\+dir
+\item 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class CMakeTemplate
+@brief Шаблон сборки для CMake
+
+Реализация шаблона сборки для системы сборки CMake.
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a996fab119232b0f2035f1d6d05e1bfa2}\index{.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}!compile@{compile}}
+\index{compile@{compile}!.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}}
+\doxysubsubsection{\texorpdfstring{compile()}{compile()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a996fab119232b0f2035f1d6d05e1bfa2} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+CMake\+Template.\+compile (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Компиляция CMake проекта
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92ba2466827757a91a5710f0b403bbc0}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}.
+
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a46bef3a412075bdef24a8894a5001030}\index{.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}!install@{install}}
+\index{install@{install}!.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}}
+\doxysubsubsection{\texorpdfstring{install()}{install()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a46bef3a412075bdef24a8894a5001030} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+CMake\+Template.\+install (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Установка CMake проекта
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a458552b83ff6c628e4316e0914c74788}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}.
+
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a1dd4784021446b98ddda88a741a65942}\index{.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}!setup@{setup}}
+\index{setup@{setup}!.ci.engine.build\_templates.CMakeTemplate@{.ci.engine.build\_templates.CMakeTemplate}}
+\doxysubsubsection{\texorpdfstring{setup()}{setup()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_c_make_template_a1dd4784021446b98ddda88a741a65942} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+CMake\+Template.\+setup (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{list\+[str]\+ \texorpdfstring{$\vert$}{|} None }]{extra\+\_\+flags}{ = {\ttfamily None}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Настройка CMake проекта
+@param extra_flags Дополнительные флаги для настройки
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a03d46d5b237e1a467d83454c498ccb8a}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}.
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+build\+\_\+templates.\+py\end{DoxyCompactItemize}

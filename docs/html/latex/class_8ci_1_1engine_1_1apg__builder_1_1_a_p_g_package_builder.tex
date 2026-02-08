@@ -1,0 +1,147 @@
+\doxysection{.ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder}{}\label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a31f779d736956b7d4ad68c480e46b78b}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\item 
+str \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a8d8b44d68718103941e39dceeb4a2355}{create\+\_\+apg\+\_\+package}} (self, dict\+[str, Any]\+ package\+\_\+info, str install\+\_\+dir, str output\+\_\+dir, str filesystem\+\_\+yaml\+\_\+path="{}../\+.ci/\+filesystem\+\_\+example.\+yaml"{}, str metadata\+\_\+yaml\+\_\+path="{}../\+.ci/\+metadata\+\_\+example.\+yaml"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a5066917d36a09b6728a8a6d061ce6e22}\label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a5066917d36a09b6728a8a6d061ce6e22} 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+dict\+[str, Any]\+ \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a3b7b0c1d92ad5896d228a9e980d1a5ea}{\+\_\+load\+\_\+metadata\+\_\+config}} (self, str yaml\+\_\+path)
+\item 
+dict\+[str, Any]\+ \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_af8f395f468251c40e93cf8119638d76d}{\+\_\+combine\+\_\+metadata}} (self, dict\+[str, Any]\+ json\+\_\+metadata, dict\+[str, Any]\+ yaml\+\_\+metadata)
+\item 
+dict\+[str, Any]\+ \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a6f7ab8b3cae421d6c188f6fef8a30055}{\+\_\+load\+\_\+filesystem\+\_\+config}} (self, str yaml\+\_\+path)
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_acd514f0b603b3f8367373272b55604b3}{\+\_\+apply\+\_\+filesystem\+\_\+config}} (self, Path data\+\_\+dir, dict\+[str, Any]\+ filesystem\+\_\+config)
+\item 
+dict\+[str, Any]\+ \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a32e0936b443597b0f28da9fe8c5a5174}{\+\_\+generate\+\_\+metadata}} (self, dict\+[str, Any]\+ package\+\_\+info)
+\item 
+int \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_aa80165e55d73ea1c643761faeaf5c933}{\+\_\+calculate\+\_\+installed\+\_\+size}} (self, Path install\+\_\+dir)
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_ac9eab729f0ff4090912978f2d1a98180}{\+\_\+generate\+\_\+crc32\+\_\+checksums}} (self, Path data\+\_\+dir, Path checksums\+\_\+path)
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a9e50a2b32389710245d34e55c813e8ae}{\+\_\+create\+\_\+tar\+\_\+zst}} (self, Path source\+\_\+dir, Path output\+\_\+path)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class APGPackageBuilder
+@brief Class for creating APG packages in tar.zst format
+
+This class handles creating APG packages from installed files,
+including generating metadata, checksums, and packaging in an archive.
+\end{DoxyVerb}
+ 
+
+\label{doc-constructors}
+\Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a31f779d736956b7d4ad68c480e46b78b}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a31f779d736956b7d4ad68c480e46b78b} 
+ None .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Constructor of the APGPackageBuilder class
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_acd514f0b603b3f8367373272b55604b3}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_apply\_filesystem\_config@{\_apply\_filesystem\_config}}
+\index{\_apply\_filesystem\_config@{\_apply\_filesystem\_config}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_apply\_filesystem\_config()}{\_apply\_filesystem\_config()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_acd514f0b603b3f8367373272b55604b3} 
+ None .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+apply\+\_\+filesystem\+\_\+config (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{Path}]{data\+\_\+dir}{, }\item[{dict\+[str, Any]\+     }]{filesystem\+\_\+config}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Применяет конфигурацию файловой системы к директории данных
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_aa80165e55d73ea1c643761faeaf5c933}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_calculate\_installed\_size@{\_calculate\_installed\_size}}
+\index{\_calculate\_installed\_size@{\_calculate\_installed\_size}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_calculate\_installed\_size()}{\_calculate\_installed\_size()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_aa80165e55d73ea1c643761faeaf5c933} 
+ int .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+calculate\+\_\+installed\+\_\+size (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{Path}]{install\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Рассчитывает общий размер установленных файлов
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_af8f395f468251c40e93cf8119638d76d}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_combine\_metadata@{\_combine\_metadata}}
+\index{\_combine\_metadata@{\_combine\_metadata}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_combine\_metadata()}{\_combine\_metadata()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_af8f395f468251c40e93cf8119638d76d} 
+ dict\+[str, Any]\+ .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+combine\+\_\+metadata (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{dict\+[str, Any]\+}]{json\+\_\+metadata}{, }\item[{dict\+[str, Any]\+     }]{yaml\+\_\+metadata}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Объединяет метаданные из JSON и YAML файлов
+@param json_metadata Метаданные из JSON файла
+@param yaml_metadata Метаданные из YAML файла
+@return Объединенные метаданные
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a9e50a2b32389710245d34e55c813e8ae}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_create\_tar\_zst@{\_create\_tar\_zst}}
+\index{\_create\_tar\_zst@{\_create\_tar\_zst}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_create\_tar\_zst()}{\_create\_tar\_zst()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a9e50a2b32389710245d34e55c813e8ae} 
+ None .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+create\+\_\+tar\+\_\+zst (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{Path}]{source\+\_\+dir}{, }\item[{Path}]{output\+\_\+path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Создает tar.zst архив
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_ac9eab729f0ff4090912978f2d1a98180}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_generate\_crc32\_checksums@{\_generate\_crc32\_checksums}}
+\index{\_generate\_crc32\_checksums@{\_generate\_crc32\_checksums}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_generate\_crc32\_checksums()}{\_generate\_crc32\_checksums()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_ac9eab729f0ff4090912978f2d1a98180} 
+ None .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+generate\+\_\+crc32\+\_\+checksums (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{Path}]{data\+\_\+dir}{, }\item[{Path}]{checksums\+\_\+path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Генерирует CRC32 контрольные суммы для всех файлов
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a32e0936b443597b0f28da9fe8c5a5174}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_generate\_metadata@{\_generate\_metadata}}
+\index{\_generate\_metadata@{\_generate\_metadata}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_generate\_metadata()}{\_generate\_metadata()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a32e0936b443597b0f28da9fe8c5a5174} 
+ dict\+[str, Any]\+ .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+generate\+\_\+metadata (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{dict\+[str, Any]\+}]{package\+\_\+info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Генерирует метаданные для пакета
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a6f7ab8b3cae421d6c188f6fef8a30055}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_load\_filesystem\_config@{\_load\_filesystem\_config}}
+\index{\_load\_filesystem\_config@{\_load\_filesystem\_config}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_load\_filesystem\_config()}{\_load\_filesystem\_config()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a6f7ab8b3cae421d6c188f6fef8a30055} 
+ dict\+[str, Any]\+ .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+load\+\_\+filesystem\+\_\+config (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{yaml\+\_\+path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Загружает конфигурацию файловой системы из YAML файла
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a3b7b0c1d92ad5896d228a9e980d1a5ea}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!\_load\_metadata\_config@{\_load\_metadata\_config}}
+\index{\_load\_metadata\_config@{\_load\_metadata\_config}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{\_load\_metadata\_config()}{\_load\_metadata\_config()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a3b7b0c1d92ad5896d228a9e980d1a5ea} 
+ dict\+[str, Any]\+ .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+\_\+load\+\_\+metadata\+\_\+config (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{yaml\+\_\+path}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}Загружает конфигурацию метаданных из YAML файла
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a8d8b44d68718103941e39dceeb4a2355}\index{.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}!create\_apg\_package@{create\_apg\_package}}
+\index{create\_apg\_package@{create\_apg\_package}!.ci.engine.apg\_builder.APGPackageBuilder@{.ci.engine.apg\_builder.APGPackageBuilder}}
+\doxysubsubsection{\texorpdfstring{create\_apg\_package()}{create\_apg\_package()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1apg__builder_1_1_a_p_g_package_builder_a8d8b44d68718103941e39dceeb4a2355} 
+ str .ci.\+engine.\+apg\+\_\+builder.\+APGPackage\+Builder.\+create\+\_\+apg\+\_\+package (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{dict\+[str, Any]\+}]{package\+\_\+info}{, }\item[{str}]{install\+\_\+dir}{, }\item[{str}]{output\+\_\+dir}{, }\item[{str }]{filesystem\+\_\+yaml\+\_\+path}{ = {\ttfamily "{}../\+.ci/\+filesystem\+\_\+example.yaml"{}}, }\item[{str }]{metadata\+\_\+yaml\+\_\+path}{ = {\ttfamily "{}../\+.ci/\+metadata\+\_\+example.yaml"{}}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Creates an APG package from installed files
+@param package_info Information about the package
+@param install_dir Directory with installed files
+@param output_dir Output directory for the package
+@param filesystem_yaml_path Path to YAML file with filesystem configuration
+@param metadata_yaml_path Path to YAML file with metadata
+@return Path to the created APG package
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+apg\+\_\+builder.\+py\end{DoxyCompactItemize}

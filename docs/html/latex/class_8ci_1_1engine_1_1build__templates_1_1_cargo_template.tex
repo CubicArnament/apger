@@ -1,0 +1,95 @@
+\doxysection{.ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template}{}\label{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template}\index{.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}}
+Inheritance diagram for .ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a5995ceac01639c57a3bd4ea7f9024caa}{setup}} (self, list\+[str]\+\texorpdfstring{$\vert$}{|}None extra\+\_\+flags=None)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a90e26584c2cb92a4a07c93793b8057a7}{compile}} (self, list\+[str]\+\texorpdfstring{$\vert$}{|}None extra\+\_\+flags=None)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_aba8b64cf4d254a3fbf091e9468a559e4}{install}} (self)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_ac436c5af928c17d4757afa7187ddd784}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str name, str source\+\_\+dir, str build\+\_\+dir, str install\+\_\+dir)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries name} = name
+\item 
+{\bfseries source\+\_\+dir} = source\+\_\+dir
+\item 
+{\bfseries build\+\_\+dir} = build\+\_\+dir
+\item 
+{\bfseries install\+\_\+dir} = install\+\_\+dir
+\item 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class CargoTemplate
+@brief Шаблон сборки для Cargo (Rust)
+
+Реализация шаблона сборки для системы сборки Cargo (Rust).
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a90e26584c2cb92a4a07c93793b8057a7}\index{.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}!compile@{compile}}
+\index{compile@{compile}!.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}}
+\doxysubsubsection{\texorpdfstring{compile()}{compile()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a90e26584c2cb92a4a07c93793b8057a7} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template.\+compile (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{list\+[str]\+ \texorpdfstring{$\vert$}{|} None }]{extra\+\_\+flags}{ = {\ttfamily None}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Компиляция Cargo проекта
+@param extra_flags Дополнительные флаги для компиляции
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a92ba2466827757a91a5710f0b403bbc0}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}.
+
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_aba8b64cf4d254a3fbf091e9468a559e4}\index{.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}!install@{install}}
+\index{install@{install}!.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}}
+\doxysubsubsection{\texorpdfstring{install()}{install()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_aba8b64cf4d254a3fbf091e9468a559e4} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template.\+install (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Установка Cargo проекта
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a458552b83ff6c628e4316e0914c74788}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}.
+
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a5995ceac01639c57a3bd4ea7f9024caa}\index{.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}!setup@{setup}}
+\index{setup@{setup}!.ci.engine.build\_templates.CargoTemplate@{.ci.engine.build\_templates.CargoTemplate}}
+\doxysubsubsection{\texorpdfstring{setup()}{setup()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_cargo_template_a5995ceac01639c57a3bd4ea7f9024caa} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Cargo\+Template.\+setup (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{list\+[str]\+ \texorpdfstring{$\vert$}{|} None }]{extra\+\_\+flags}{ = {\ttfamily None}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Настройка Cargo проекта
+@param extra_flags Дополнительные флаги для настройки
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+Reimplemented from \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_template_a03d46d5b237e1a467d83454c498ccb8a}{.\+ci.\+engine.\+build\+\_\+templates.\+Build\+Template}}.
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+build\+\_\+templates.\+py\end{DoxyCompactItemize}

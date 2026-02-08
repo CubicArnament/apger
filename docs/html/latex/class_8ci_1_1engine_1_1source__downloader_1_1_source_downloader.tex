@@ -1,0 +1,90 @@
+\doxysection{.ci.\+engine.\+source\+\_\+downloader.\+Source\+Downloader Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader}{}\label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader}\index{.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_a73d6160c3e81ae85926d3d4fcb82e74e}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_a2954b65532839cad844bcdc8d358ba58}{download\+\_\+source}} (self, str source\+\_\+url, str destination\+\_\+dir)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_aad05e51b188397002e52785d25147ea4}\label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_aad05e51b188397002e52785d25147ea4} 
+{\bfseries session} = requests.\+Session()
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_aa4010f778dec44106129427a3d0362ee}\label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_aa4010f778dec44106129427a3d0362ee} 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_ae9cdefeb00e4b63ef431856dae8b0a5a}{\+\_\+download\+\_\+git\+\_\+repo}} (self, str git\+\_\+url, str destination\+\_\+dir)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_ae181da31ba9bfbec66e13357c2c654ca}{\+\_\+download\+\_\+archive}} (self, str archive\+\_\+url, str destination\+\_\+dir)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class SourceDownloader
+@brief Класс для загрузки исходных кодов из различных источников
+
+Этот класс отвечает за загрузку исходных кодов из различных источников
+(Git, архивы и др.) и их подготовку для дальнейшей обработки.
+\end{DoxyVerb}
+ 
+
+\label{doc-constructors}
+\Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_a73d6160c3e81ae85926d3d4fcb82e74e}\index{.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_a73d6160c3e81ae85926d3d4fcb82e74e} 
+ None .ci.\+engine.\+source\+\_\+downloader.\+Source\+Downloader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Конструктор класса SourceDownloader
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_ae181da31ba9bfbec66e13357c2c654ca}\index{.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}!\_download\_archive@{\_download\_archive}}
+\index{\_download\_archive@{\_download\_archive}!.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}}
+\doxysubsubsection{\texorpdfstring{\_download\_archive()}{\_download\_archive()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_ae181da31ba9bfbec66e13357c2c654ca} 
+ bool .ci.\+engine.\+source\+\_\+downloader.\+Source\+Downloader.\+\_\+download\+\_\+archive (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{archive\+\_\+url}{, }\item[{str}]{destination\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Загружает и распаковывает архив
+@param archive_url URL архива
+@param destination_dir Директория для сохранения
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_ae9cdefeb00e4b63ef431856dae8b0a5a}\index{.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}!\_download\_git\_repo@{\_download\_git\_repo}}
+\index{\_download\_git\_repo@{\_download\_git\_repo}!.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}}
+\doxysubsubsection{\texorpdfstring{\_download\_git\_repo()}{\_download\_git\_repo()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_ae9cdefeb00e4b63ef431856dae8b0a5a} 
+ bool .ci.\+engine.\+source\+\_\+downloader.\+Source\+Downloader.\+\_\+download\+\_\+git\+\_\+repo (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{git\+\_\+url}{, }\item[{str}]{destination\+\_\+dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}@brief Загружает Git репозиторий
+@param git_url URL Git репозитория
+@param destination_dir Директория для сохранения
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_a2954b65532839cad844bcdc8d358ba58}\index{.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}!download\_source@{download\_source}}
+\index{download\_source@{download\_source}!.ci.engine.source\_downloader.SourceDownloader@{.ci.engine.source\_downloader.SourceDownloader}}
+\doxysubsubsection{\texorpdfstring{download\_source()}{download\_source()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1source__downloader_1_1_source_downloader_a2954b65532839cad844bcdc8d358ba58} 
+ bool .ci.\+engine.\+source\+\_\+downloader.\+Source\+Downloader.\+download\+\_\+source (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{source\+\_\+url}{, }\item[{str}]{destination\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Загружает исходники из указанного URL в директорию назначения
+@param source_url URL источника
+@param destination_dir Директория назначения
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+source\+\_\+downloader.\+py\end{DoxyCompactItemize}

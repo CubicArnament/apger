@@ -1,0 +1,72 @@
+\doxysection{.ci.\+engine.\+build\+\_\+templates.\+Build\+Manager Class Reference}
+\hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager}{}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_manager}\index{.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a186416bdee5f5bd091870a5692446ffd}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\item 
+type\texorpdfstring{$\vert$}{|}None \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a4f662434c97c1c89063825d0a0b61d82}{get\+\_\+template}} (self, str template\+\_\+name)
+\item 
+bool \doxymbox{\hyperlink{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a030739b1111d61932f4c6544d254737a}{build\+\_\+package}} (self, dict package\+\_\+info, str source\+\_\+dir, str build\+\_\+dir, str install\+\_\+dir)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a23d923603fa59f2fe42df6aef0012a02}\label{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a23d923603fa59f2fe42df6aef0012a02} 
+{\bfseries logger} = get\+\_\+logger(self.\+\_\+\+\_\+class\+\_\+\+\_\+.\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@class BuildManager
+@brief Менеджер для управления процессом сборки
+
+Класс, управляющий процессом сборки пакетов с использованием
+различных шаблонов сборки.
+\end{DoxyVerb}
+ 
+
+\label{doc-constructors}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a186416bdee5f5bd091870a5692446ffd}\index{.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a186416bdee5f5bd091870a5692446ffd} 
+ None .ci.\+engine.\+build\+\_\+templates.\+Build\+Manager.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Конструктор класса BuildManager
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a030739b1111d61932f4c6544d254737a}\index{.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}!build\_package@{build\_package}}
+\index{build\_package@{build\_package}!.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}}
+\doxysubsubsection{\texorpdfstring{build\_package()}{build\_package()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a030739b1111d61932f4c6544d254737a} 
+ bool .ci.\+engine.\+build\+\_\+templates.\+Build\+Manager.\+build\+\_\+package (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{dict}]{package\+\_\+info}{, }\item[{str}]{source\+\_\+dir}{, }\item[{str}]{build\+\_\+dir}{, }\item[{str     }]{install\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Выполнение сборки пакета
+@param package_info Информация о пакете
+@param source_dir Директория с исходным кодом
+@param build_dir Директория для сборки
+@param install_dir Директория для установки
+@return True в случае успеха, иначе False
+\end{DoxyVerb}
+ \Hypertarget{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a4f662434c97c1c89063825d0a0b61d82}\index{.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}!get\_template@{get\_template}}
+\index{get\_template@{get\_template}!.ci.engine.build\_templates.BuildManager@{.ci.engine.build\_templates.BuildManager}}
+\doxysubsubsection{\texorpdfstring{get\_template()}{get\_template()}}
+{\footnotesize\ttfamily \label{class_8ci_1_1engine_1_1build__templates_1_1_build_manager_a4f662434c97c1c89063825d0a0b61d82} 
+ type \texorpdfstring{$\vert$}{|} None .ci.\+engine.\+build\+\_\+templates.\+Build\+Manager.\+get\+\_\+template (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{str}]{template\+\_\+name}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Получение класса шаблона по имени
+@param template_name Имя шаблона сборки
+@return Класс шаблона или None если не найден
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+E:\+/\+\+GH-\/repos/\+\+Nur\+OS/\+apger/\+.\+ci/\+engine/\+build\+\_\+templates.\+py\end{DoxyCompactItemize}
