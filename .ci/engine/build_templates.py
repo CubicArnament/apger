@@ -333,6 +333,71 @@ class CargoTemplate(BuildTemplate):
         return True
 
 
+class GradleTemplate(BuildTemplate):
+    """
+    @class GradleTemplate
+    @brief Шаблон сборки для Gradle (Java/Kotlin)
+
+    Реализация шаблона сборки для системы сборки Gradle (Java/Kotlin).
+    """
+
+    def setup(self, extra_flags: list[str] | None = None) -> bool:
+        """
+        @brief Настройка Gradle проекта
+        @param extra_flags Дополнительные фlags для настройки
+        @return True в случае успеха, иначе False
+        """
+        self.logger.info("[BUILD] Настройка Gradle для %s", self.name)
+
+        # Для Gradle обычно не требуется специальная настройка
+        self.logger.info("[BUILD] Настройка Gradle не требуется для %s", self.name)
+        return True
+
+    def compile(self, extra_flags: list[str] | None = None) -> bool:
+        """
+        @brief Компиляция Gradle проекта
+        @param extra_flags Дополнительные флаги для компиляции
+        @return True в случае успеха, иначе False
+        """
+        self.logger.info("[BUILD] Компиляция Gradle для %s", self.name)
+
+        cmd = ['./gradlew', 'build'] if (Path(self.source_dir) / 'gradlew').exists() else ['gradle', 'build']
+
+        if extra_flags:
+            cmd.extend(extra_flags)
+
+        try:
+            subprocess.run(cmd, cwd=self.source_dir, check=True, capture_output=True, text=True)
+            self.logger.info("[BUILD] Компиляция Gradle завершена для %s", self.name)
+            return True
+        except subprocess.CalledProcessError as e:
+            self.logger.exception("[BUILD] Ошибка компиляции Gradle для %s: %s", self.name, e.stderr)
+            return False
+
+    def install(self) -> bool:
+        """
+        @brief Установка Gradle проекта
+        @return True в случае успеха, иначе False
+        """
+        self.logger.info("[BUILD] Установка Gradle для %s", self.name)
+
+        # Находим JAR/WAR файлы и копируем их в директорию установки
+        build_dir = Path(self.source_dir) / 'build' / 'libs'
+        install_bin_dir = Path(self.install_dir) / 'usr' / 'share' / 'java'
+        install_bin_dir.mkdir(parents=True, exist_ok=True)
+
+        if build_dir.exists():
+            for jar_file in build_dir.glob('*.jar'):
+                dest_path = install_bin_dir / jar_file.name
+                shutil.copy2(jar_file, dest_path)
+            for war_file in build_dir.glob('*.war'):
+                dest_path = install_bin_dir / war_file.name
+                shutil.copy2(war_file, dest_path)
+
+        self.logger.info("[BUILD] Установка Gradle завершена для %s", self.name)
+        return True
+
+
 class PythonPEP517Template(BuildTemplate):
     """
     @class PythonPEP517Template
@@ -452,6 +517,9 @@ class BuildManager:
             case 'python-pep517':
                 self.logger.debug("Выбран шаблон Python PEP 517 для сборки")
                 return PythonPEP517Template
+            case 'gradle':
+                self.logger.debug("Выбран шаблон Gradle для сборки")
+                return GradleTemplate
             case _:
                 self.logger.warning("Шаблон сборки %s не поддерживается", template_name)
                 return None
