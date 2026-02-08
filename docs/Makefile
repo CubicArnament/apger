@@ -22,5 +22,5 @@ html_docs:
 
 clean:
 	@echo "Очистка сгенерированной документации..."
-	if exist html rmdir /s /q html
+	-rmdir /s /q html 2>nul || rm -rf html
 	@echo "Очистка завершена"
