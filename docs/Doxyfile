@@ -1,14 +1,14 @@
-# Doxyfile 1.9.8
+# Doxyfile Configuration
 
 # Проект
 PROJECT_NAME           = "APGer Engine"
 PROJECT_BRIEF          = "Flexible Python 3.12+ build engine for Arch Linux environments"
-PROJECT_LOGO           =
-INPUT                  = ../.ci/engine ../.ci/utils ../.ci/scripts ./example.json
+PROJECT_LOGO           = custom/logo.png
+INPUT                  = ../.ci/engine ../.ci/utils
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.py *.json
+FILE_PATTERNS          = *.py
 RECURSIVE              = YES
-EXCLUDE_PATTERNS       = */__pycache__/* */tests/*
+EXCLUDE_PATTERNS       = */__pycache__/* */tests/* */__init__.py
 EXTENSION_MAPPING      = py=C
 
 # Выход
