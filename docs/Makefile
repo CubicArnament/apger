@@ -25,13 +25,7 @@ open_docs: html_docs
 ifeq ($(OS),Windows_NT)
 	start html\index.html
 else
-	@if command -v xdg-open >/dev/null 2>&1; then \
-		xdg-open html/index.html; \
-	elif command -v open >/dev/null 2>&1; then \
-		open html/index.html; \
-	else \
-		echo "Could not open browser automatically. Please open html/index.html manually."; \
-	fi
+	@xdg-open html/index.html 2>/dev/null || open html/index.html 2>/dev/null || echo "Could not open browser automatically. Please open html/index.html manually."
 endif
 
 gen_docs:

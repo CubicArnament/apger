@@ -44,7 +44,7 @@ jobs:
       - name: Install system dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm zstd git gnupg sq python-pyyaml python-pip
+          pacman -S --noconfirm zstd git gnupg sequoia-sq python python-pip
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6

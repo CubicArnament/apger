@@ -1,3 +1,62 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apger-engine"
+version = "1.0.0"
+description = "APGer Engine - Flexible Python 3.12+ build engine for Arch Linux environments"
+authors = [{name = "AnmiTaliDev", email = "anmitali198@gmail.com"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "requests>=2.25.0",
+    "PyYAML>=6.0",
+    "sphinx>=4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "black",
+    "flake8",
+    "mypy",
+    "ruff>=0.8.0",
+    "sphinx>=4.0",
+    "sphinx-rtd-theme",
+]
+
+[project.scripts]
+apger-engine = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["apger*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -25,27 +84,33 @@ exclude = [
 ]
 
 # Same as Black.
-line-length = 88
+line-length = 120
 
 # Assume Python 3.12
 target-version = "py312"
 
 [tool.ruff.lint]
-# Enable only critical security and error checking rules
+# Enable specific rules, focusing on security and critical issues
 select = [
-    "E4",     # pycodestyle errors (syntax errors)
-    "E9",     # pycodestyle errors (runtime errors)
+    "E",      # pycodestyle errors
     "F",      # Pyflakes
     "B",      # flake8-bugbear (includes security-related issues)
+    "UP",     # pyupgrade
     "BLE",    # flake8-blind-except
     "FBT",    # flake8-boolean-trap
     "S",      # flake8-bandit security issues
     "RUF",    # Ruff-specific rules
+    "SIM",    # flake8-simplify
+    "ARG",    # flake8-unused-arguments
+    "PGH",    # pygrep-hooks
+    "PIE",    # flake8-pie
+    "PL",     # Design related pylint codes
+    "PYI",    # Missing type annotations
     "TRY",    # Tryceratops
     "EXE",    # flake8-executable
 ]
 
-# Ignore all stylistic issues that are not critical for production
+# Ignore stylistic issues that are not critical for production
 extend-ignore = [
     "E501",  # Line too long (handled by formatter)
     "W",     # pycodestyle warnings (stylistic issues)
@@ -59,7 +124,7 @@ extend-ignore = [
     "ICN",   # Import conventions
     "YTT",   # Flake8-2020
     "ASYNC", # Async checks
-    "ASYNC1",  # Trio checks
+    "TRIO",  # Trio checks
     "UP",    # Upgrades
     "C",     # Comprehension checks
     "I",     # Import ordering
