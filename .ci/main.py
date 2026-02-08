@@ -15,29 +15,29 @@ from pathlib import Path
 # Добавляем путь к модулям
 sys.path.insert(0, str(Path(__file__).parent))
 
-from engine.toml_parser import TOMLParser
-from engine.source_downloader import SourceDownloader
-from engine.build_templates import BuildManager
 from engine.apg_builder import APGPackageBuilder
+from engine.build_templates import BuildManager
+from engine.json_parser import JSONParser
+from engine.source_downloader import SourceDownloader
+from utils.logging_utils import get_logger, setup_logging
 from utils.pgp_signer import PGPSigner
-from utils.logging_utils import setup_logging, get_logger
 
 
-def main():
+def main() -> None:
     """
-    @brief Основная функция запуска APGer Engine
+    @brief Main function to start APGer Engine
     """
     # Настраиваем логирование
     setup_logging()
     logger = get_logger(__name__)
-    
+
     # Создаем экземпляры классов
-    parser = TOMLParser(repodata_dir="../repodata")  # Относительный путь к repodata
+    parser = JSONParser(repodata_dir="../repodata")  # Относительный путь к repodata
     downloader = SourceDownloader()
     builder = BuildManager()
     packager = APGPackageBuilder()
     signer = PGPSigner()
-    
+
     # Парсим пакеты из repodata
     try:
         packages = parser.parse_all_packages()
@@ -45,7 +45,8 @@ def main():
         match len(packages):
             case 0:
                 logger.info("Не найдено пакетов для обработки")
-            case _:
+            case num_packages:
+                logger.info(f"Найдено {num_packages} пакетов для обработки")
                 for pkg in packages:
                     package_name = pkg['package']['name']
                     version = pkg['package']['version']
@@ -63,27 +64,38 @@ def main():
 
                         # Загружаем исходники
                         source_url = pkg['package']['source']
-                        if not downloader.download_source(source_url, str(source_dir)):
-                            logger.error(f"Ошибка загрузки исходников для {package_name}")
-                            continue
+                        match downloader.download_source(source_url, str(source_dir)):
+                            case True:
+                                logger.debug(f"Исходники успешно загружены для {package_name}")
+                            case False:
+                                logger.error(f"Ошибка загрузки исходников для {package_name}")
+                                continue
 
                         # Выполняем сборку
-                        if not builder.build_package(pkg, str(source_dir), str(build_dir), str(install_dir)):
-                            logger.error(f"Ошибка сборки пакета {package_name}")
-                            continue
+                        match builder.build_package(pkg, str(source_dir), str(build_dir), str(install_dir)):
+                            case True:
+                                logger.debug(f"Пакет {package_name} успешно собран")
+                            case False:
+                                logger.error(f"Ошибка сборки пакета {package_name}")
+                                continue
 
                         # Создаем APG пакет
                         package_path = packager.create_apg_package(pkg, str(install_dir), str(output_dir), "../.ci/filesystem_example.yaml", "../.ci/metadata_example.yaml")
 
-                        # Подписывание пакета будет происходить в GitHub Actions с помощью sq
-                        logger.info(f"Пакет {package_path} создан, подпись будет выполнена в GitHub Actions")
+                        # Подписываем пакет
+                        match signer.sign_package_with_sq(package_path):
+                            case True:
+                                logger.info(f"Пакет {package_path} успешно подписан")
+                            case False:
+                                logger.error(f"Ошибка подписания пакета {package_path}")
+                                continue
 
                     logger.info(f"Пакет {package_name} успешно обработан")
     except ValueError as e:
-        logger.error(f"Ошибка валидации repodata: {e}")
+        logger.exception(f"Ошибка валидации repodata: {e}")
         return  # Останавливаем выполнение при ошибке валидации
     except Exception as e:
-        logger.error(f"Неожиданная ошибка при обработке repodata: {e}")
+        logger.exception(f"Неожиданная ошибка при обработке repodata: {e}")
         return  # Останавливаем выполнение при любой ошибке
 
 

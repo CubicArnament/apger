@@ -2,13 +2,14 @@
 
 Automated package build system for NurOS in APGv2 format using GitHub Actions.
 
-APGer is a flexible Python 3.12+ build engine for creating APG packages for NurOS. It parses TOML recipes from the `repodata` directory, downloads sources, builds packages using various build systems (meson, cmake, autotools, cargo, python-pep517), and creates signed APG packages.
+APGer is a flexible Python 3.12+ build engine for creating APG packages for NurOS. It parses JSON recipes from the `repodata` directory, downloads sources, builds packages using various build systems (meson, cmake, autotools, cargo, python-pep517), and creates signed APG packages.
 
 For detailed documentation, see the `docs/` directory.
-- MD5 checksums for all files
+- CRC32 checksums for all files
 - Lifecycle scripts support (pre/post install/remove)
 - Automatic GitHub Releases with `.apg` archives
 - Binary deployment to repository root
+- Secure PGP signing of packages using GitHub Secrets
 
 ## Project Structure
 
@@ -18,6 +19,7 @@ apger/
 │   └── workflows/
 │       ├── apger-engine.yml    # Reusable workflow
 │       └── build.yml            # Build trigger
+│       └── deploy_docs.yml      # Documentation deployment
 ├── .ci/
 │   ├── recipe.yaml              # Package configuration
 │   └── scripts/                 # Lifecycle scripts
@@ -25,54 +27,74 @@ apger/
 │       ├── post-install
 │       ├── pre-remove
 │       └── post-remove
+├── repodata/                    # Package definitions in JSON format
+│   └── package.json             # Example package definition
 └── home/                        # Optional home directory files
 ```
 
 ## Quick Start
 
-### 1. Configure recipe.yaml
+### 1. Configure package.json
 
-Edit `.ci/recipe.yaml` for your package:
+Create a JSON file in the `repodata/` directory for your package:
 
-```yaml
-package:
-  name: "your-package"
-  version: "1.0.0"
-  type: "binary"
-  architecture: "x86_64"
-  description: "Package description"
-  maintainer: "Your Name <email@example.com>"
-  license: "GPL-3.0"
-  homepage: "https://example.com"
-  tags: ["tag1", "tag2"]
-  dependencies: ["dep1", "dep2 >= 1.0"]
-  conflicts: []
-  provides: []
-  replaces: []
-  conf: ["/etc/config.conf"]
-
-source:
-  url: "https://example.com/source-1.0.0.tar.xz"
-
-build:
-  dependencies: ["build-essential", "libncurses-dev"]
-  script: "./configure --prefix=/usr && make"
-
-install:
-  script: "make DESTDIR=\"$DESTDIR\" install"
+```json
+{
+  "package": {
+    "name": "your-package",
+    "version": "1.0.0",
+    "type": "binary",
+    "architecture": "x86_64",
+    "description": "Package description",
+    "maintainer": "Your Name <email@example.com>",
+    "license": "GPL-3.0",
+    "homepage": "https://example.com",
+    "tags": ["tag1", "tag2"],
+    "dependencies": ["dep1", "dep2 >= 1.0"],
+    "conflicts": [],
+    "provides": [],
+    "replaces": [],
+    "conf": ["/etc/config.conf"],
+    "source": "https://example.com/source-1.0.0.tar.xz"
+  },
+  "build": {
+    "template": "meson",
+    "dependencies": [
+      "build-essential",
+      "cmake",
+      "libssl-dev",
+      "meson",
+      "ninja-build"
+    ],
+    "script": "meson setup builddir && meson compile -C builddir",
+    "use": ["debug", "optimizations"]
+  },
+  "install": {
+    "script": "meson install -C builddir --destdir \"$DESTDIR\""
+  }
+}
 ```
 
-### 2. Configure Build Dependencies (Optional)
+### 2. Configure Build Dependencies
 
-If your build requires additional packages (compilers, libraries), add them to `build.dependencies`:
+Specify build dependencies in `build.dependencies` array:
 
-```yaml
-build:
-  dependencies: ["build-essential", "cmake", "libssl-dev"]
-  script: "./configure --prefix=/usr && make"
+```json
+{
+  "build": {
+    "dependencies": [
+      "build-essential",
+      "cmake",
+      "libssl-dev",
+      "python3-dev",
+      "pkg-config"
+    ],
+    "script": "./configure --prefix=/usr && make"
+  }
+}
 ```
 
-APGer will automatically install these packages via `apt-get` before building.
+APGer will automatically install these packages via `pacman` before building in Arch Linux environment.
 
 ### 3. Configure Lifecycle Scripts (Optional)
 
@@ -107,7 +129,7 @@ package-name-version.apg
 ├── home/              # Home directory files (optional)
 ├── scripts/           # Lifecycle scripts
 ├── metadata.json      # Package metadata
-└── md5sums            # File checksums
+└── crc32sums          # File checksums
 ```
 
 ### Example metadata.json
@@ -130,6 +152,14 @@ package-name-version.apg
   "conf": ["/etc/config.conf"]
 }
 ```
+
+## Package Signing
+
+APGer supports secure PGP signing of packages using GitHub Secrets. The private key is stored securely in GitHub Secrets and accessed only during the signing process. The signing is performed using the `sq` utility in the GitHub Actions environment.
+
+To enable package signing:
+1. Add your PGP private key to GitHub Secrets as `PGP_PRIVATE_KEY`
+2. The signing will happen automatically during the build process
 
 ## Binary Deployment
 
@@ -171,7 +201,7 @@ Available during build:
 ## Requirements
 
 - Ubuntu runner (GitHub Actions)
-- `yq` for YAML parsing
+- `zstd` for compression
 - `jq` for JSON processing
 - `bash` for script execution
 - Source code must be accessible via URL

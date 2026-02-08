@@ -6,9 +6,11 @@
 последней версии пакета из различных источников (GitHub, GitLab, и др.).
 """
 
-import requests
-from urllib.parse import urlparse
 import re
+from urllib.parse import urlparse
+
+import requests
+
 from ..utils.logging_utils import get_logger
 
 
@@ -16,12 +18,12 @@ class VersionResolver:
     """
     @class VersionResolver
     @brief Класс для динамического определения версии "latest"
-    
+
     Этот класс отвечает за определение последней версии пакета
     из различных источников (GitHub, GitLab, и др.).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         @brief Конструктор класса VersionResolver
         """
@@ -31,7 +33,7 @@ class VersionResolver:
             'User-Agent': 'APGer-Engine/1.0'
         })
         self.logger = get_logger(self.__class__.__name__)
-    
+
     def resolve_latest_version(self, source_url: str) -> str:
         """
         @brief Определяет последнюю версию по URL источника
@@ -52,7 +54,7 @@ class VersionResolver:
             case _:
                 # Для других случаев пробуем получить родительскую директорию
                 return self._resolve_generic_latest(source_url)
-    
+
     def _resolve_github_latest(self, source_url: str) -> str:
         """
         @brief Определяет последнюю версию для GitHub репозитория
@@ -92,12 +94,12 @@ class VersionResolver:
                 return tag_name
 
             except requests.RequestException as e:
-                self.logger.error(f"Ошибка при запросе к GitHub API: {e}")
+                self.logger.exception(f"Ошибка при запросе к GitHub API: {e}")
                 # Если API не сработал, пробуем другие методы
 
         # Если не удалось получить через API, пробуем другие подходы
         return self._resolve_generic_latest(source_url)
-    
+
     def _resolve_gitlab_latest(self, source_url: str) -> str:
         """
         @brief Определяет последнюю версию для GitLab репозитория
@@ -136,11 +138,11 @@ class VersionResolver:
                     return latest_tag
 
             except requests.RequestException as e:
-                self.logger.error(f"Ошибка при запросе к GitLab API: {e}")
+                self.logger.exception(f"Ошибка при запросе к GitLab API: {e}")
 
         # Если не удалось получить через API, пробуем другие методы
         return self._resolve_generic_latest(source_url)
-    
+
     def _resolve_generic_latest(self, source_url: str) -> str:
         """
         @brief Определяет последнюю версию для общего случая
@@ -180,7 +182,7 @@ class VersionResolver:
                     return latest_version
 
         except requests.RequestException as e:
-            self.logger.error(f"Не удалось получить родительскую директорию: {e}")
+            self.logger.exception(f"Не удалось получить родительскую директорию: {e}")
             # Если ничего не нашли, возвращаем "unknown"
             self.logger.warning("[RESOLVE LATEST] Не удалось определить последнюю версию, используем 'unknown'")
             return "unknown"

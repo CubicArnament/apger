@@ -6,7 +6,6 @@
 общих флагов в аргументы для конкретных систем сборки.
 """
 
-from typing import Dict, List
 from ..utils.logging_utils import get_logger
 
 
@@ -14,12 +13,12 @@ class FlagTranslator:
     """
     @class FlagTranslator
     @brief Класс для преобразования общих флагов в аргументы конкретных систем сборки
-    
+
     Этот класс отвечает за преобразование общих флагов в аргументы
     для конкретных систем сборки (meson, cmake, autotools, и др.).
     """
-    
-    def __init__(self):
+
+    def __init__(self) -> None:
         """
         @brief Конструктор класса FlagTranslator
         """
@@ -67,8 +66,8 @@ class FlagTranslator:
             }
         }
         self.logger = get_logger(self.__class__.__name__)
-    
-    def translate_flags(self, build_system: str, use_flags: List[str]) -> List[str]:
+
+    def translate_flags(self, build_system: str, use_flags: list[str]) -> list[str]:
         """
         @brief Преобразует общие флаги в аргументы для конкретной системы сборки
         @param build_system Система сборки
@@ -80,14 +79,14 @@ class FlagTranslator:
             case system if system in self.flag_mappings:
                 flag_map = self.flag_mappings[system]
                 translated_flags = []
-                
+
                 for flag in use_flags:
                     match flag in flag_map:
                         case True:
                             translated_flags.append(flag_map[flag])
                         case False:
                             self.logger.warning(f"Флаг {flag} не поддерживается для системы сборки {system}")
-                
+
                 return translated_flags
             case _:
                 self.logger.warning(f"Система сборки {build_system} не поддерживается в FlagTranslator")

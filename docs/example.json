@@ -1,0 +1,34 @@
+{
+  "package": {
+    "name": "example-package",
+    "version": "1.0.0",
+    "type": "binary",
+    "architecture": "x86_64",
+    "description": "Example package description",
+    "maintainer": "Your Name <email@example.com>",
+    "license": "GPL-3.0",
+    "homepage": "https://example.com",
+    "tags": ["tag1", "tag2"],
+    "dependencies": ["dep1", "dep2 >= 1.0"],
+    "conflicts": [],
+    "provides": [],
+    "replaces": [],
+    "conf": ["/etc/config.conf"],
+    "source": "https://example.com/source-1.0.0.tar.xz"
+  },
+  "build": {
+    "template": "meson",
+    "dependencies": [
+      "build-essential",
+      "cmake",
+      "libssl-dev",
+      "meson",
+      "ninja-build"
+    ],
+    "script": "./configure --prefix=/usr && make",
+    "use": ["debug", "optimizations"]
+  },
+  "install": {
+    "script": "make DESTDIR=\"$DESTDIR\" install"
+  }
+}

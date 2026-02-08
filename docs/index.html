@@ -37,11 +37,19 @@
             border-radius: 5px;
             overflow-x: auto;
         }
+        .json-container {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
     <h1>APGer Engine - Документация</h1>
-    
+
     <div class="section">
         <h2>Обзор</h2>
         <p>APGer - это гибкий Python 3.12+ движок сборки для Arch Linux сред, предназначенный для автоматического создания пакетов в формате APGv2 с использованием GitHub Actions.</p>
@@ -51,30 +59,24 @@
     <div class="section">
         <h2>Структура проекта</h2>
         <ul>
-            <li><strong>repodata/</strong>: TOML файлы, определяющие пакеты</li>
+            <li><strong>repodata/</strong>: JSON файлы, определяющие пакеты</li>
             <li><strong>.ci/</strong>: Движок сборки и конфигурация</li>
             <li><strong>.github/workflows/</strong>: CI/CD рабочие процессы</li>
         </ul>
     </div>
 
     <div class="section">
-        <h2>Формат TOML рецептов</h2>
-        <pre><code>[package]
-name = "package-name"
-version = "latest" # Должен быть динамически разрешен
-architecture = "x86_64"
-source = "https://git.kernel.org/pub/scm/.../tool.tar.gz"
-
-[build]
-template = "meson" # Опции: cmake, meson, autotools, cargo, python-pep517
-use = ["shared", "lto", "nls"]
-extra_flags = "-Dcustom_option=true"</code></pre>
+        <h2>Формат JSON рецептов</h2>
+        <p>Ниже приведен пример JSON-файла, который используется для описания пакета:</p>
+        <div class="json-container">
+            <pre id="example-json">Загрузка JSON-файла...</pre>
+        </div>
     </div>
 
     <div class="section">
         <h2>Процесс сборки</h2>
         <ol>
-            <li>Парсинг TOML рецептов из repodata/</li>
+            <li>Парсинг JSON рецептов из repodata/</li>
             <li>Загрузка исходного кода</li>
             <li>Сборка с использованием указанного шаблона</li>
             <li>Создание APG пакета</li>
@@ -90,8 +92,20 @@ extra_flags = "-Dcustom_option=true"</code></pre>
     </div>
 
     <div class="nav">
-        <a href="#top">Наверх</a> | 
-        <a href="docs/html/index.html">API Документация</a>
+        <a href="#top">Наверх</a> |
+        <a href="html/index.html">API Документация</a>
     </div>
+
+    <script>
+        // Загрузка и отображение JSON-файла
+        fetch('example.json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('example-json').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('example-json').textContent = 'Ошибка загрузки JSON-файла: ' + error.message;
+            });
+    </script>
 </body>
 </html>

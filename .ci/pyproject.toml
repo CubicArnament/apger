@@ -1,57 +1,96 @@
-[build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "apger-engine"
-version = "1.0.0"
-description = "APGer Engine - Flexible Python 3.12+ build engine for Arch Linux environments"
-authors = [{name = "AnmiTaliDev", email = "anmitali198@gmail.com"}]
-readme = "README.md"
-license = {text = "MIT"}
-requires-python = ">=3.12"
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-]
-dependencies = [
-    "requests>=2.25.0",
-    "toml>=0.10.0",
-    "PyYAML>=6.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=6.0",
-    "black",
-    "flake8",
-    "mypy",
-    "sphinx>=4.0",
-    "sphinx-rtd-theme",
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
 ]
 
-[project.scripts]
-apger-engine = "apger.main:main"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["apger*"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-
-[tool.black]
+# Same as Black.
 line-length = 88
-target-version = ['py311']
 
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+# Assume Python 3.12
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable all built-in rules by default
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+    "YTT",# flake8-2020
+    "ANN",# flake8-annotations
+    "ASYNC",# flake8-async
+    "TRIO",# flake8-trio
+    "BLE",# flake8-blind-except
+    "FBT",# flake8-boolean-trap
+    "S",  # flake8-bandit security issues
+    "PT", # flake8-pytest-style
+    "RUF",# Ruff-specific rules
+    "SIM",# flake8-simplify
+    "ARG",# flake8-unused-arguments
+    "DTZ",# flake8-datetimez
+    "PGH",# pygrep-hooks
+    "PIE",# flake8-pie
+    "PL", # Design related pylint codes
+    "PT", # Pytest rules
+    "PYI",# Missing type annotations
+    "TRY",# Tryceratops
+    "ICN",# flake8-import-conventions
+    "ISC",# flake8-implicit-str-concat
+    "G",  # flake8-logging-format
+    "PGH",# pygrep-hooks
+    "PIE",# flake8-pie
+    "PL", # Design related pylint codes
+    "PT", # Pytest rules
+    "PYI",# Missing type annotations
+    "RUF",# Ruff-specific rules
+    "SIM",# flake8-simplify
+    "UP", # pyupgrade
+    "YTT",# flake8-2020
+    "EXE",# flake8-executable
+    "PGH",# pygrep-hooks
+    "TRY",# Tryceratops
+]
+
+# Allow fix for most rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, use trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Automatically detect the preferred line ending.
+line-ending = "auto"
