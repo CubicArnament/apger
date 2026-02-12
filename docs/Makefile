@@ -1,9 +1,10 @@
-# Makefile для генерации HTML документации с помощью Doxygen
+# Makefile для генерации HTML документации с помощью Doxygen и Sphinx
 
 # Цель по умолчанию
 help:
 	@echo "Доступные цели:"
-	@echo "  html_docs     - генерирует HTML документацию"
+	@echo "  html_docs     - генерирует HTML документацию с помощью Doxygen"
+	@echo "  sphinx_docs   - генерирует HTML документацию с помощью Sphinx"
 	@echo "  open_docs     - открывает HTML документацию в браузере (локально)"
 	@echo "  doxyfile_gen  - генерирует шаблон Doxyfile"
 	@echo "  clean         - удаляет сгенерированную документацию"
