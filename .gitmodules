@@ -1,0 +1,3 @@
+[submodule "src/apgbuild"]
+	path = src/apgbuild
+	url = https://github.com/NurOS-Linux/apgbuild

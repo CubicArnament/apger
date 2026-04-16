@@ -1,3 +1,0 @@
-"""
-APGer Engine - Core modules
-"""

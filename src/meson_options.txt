@@ -1,0 +1,12 @@
+option('output_name',
+  type: 'string',
+  value: '',
+  description: 'Override output binary name (default: apger)'
+)
+
+option('db_backend',
+  type: 'combo',
+  choices: ['auto', 'bbolt', 'sqlite'],
+  value: 'auto',
+  description: 'Package database backend. auto = read from apger.conf'
+)

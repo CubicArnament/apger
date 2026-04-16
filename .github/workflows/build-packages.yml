@@ -1,0 +1,105 @@
+# APGer — Self-Hosted Build Runner
+#
+# Triggered via workflow_dispatch from the TUI (publisher.TriggerWorkflow).
+# Runs on a self-hosted runner co-located with the Kubernetes build farm.
+#
+# Token strategy:
+#   GITHUB_TOKEN  — auto-generated, used for: commit logs, trigger workflow
+#                   permissions: contents:write, actions:write
+#   NUROS_PAT     — fine-grained PAT scoped to NurOS-Packages org only
+#                   required permissions: contents:write (for creating repos + releases)
+#                   Set once in repo Settings → Secrets → Actions
+#
+# Required runner labels: [self-hosted, apger]
+# Required secrets:
+#   NUROS_PAT      — fine-grained PAT for NurOS-Packages org (contents:write)
+#   APGER_PGP_KEY  — armored OpenPGP private key (passphrase-less)
+#   APGER_PGP_PASS — PGP passphrase (leave empty if key has no passphrase)
+
+name: Build Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Comma-separated package names (empty = all)"
+        required: false
+        default: ""
+
+# Grant GITHUB_TOKEN the minimum permissions needed for this repo
+permissions:
+  contents: write   # commit .logs/ back to this repo
+  actions: write    # allow re-triggering workflows
+
+jobs:
+  build:
+    runs-on: [self-hosted, apger]
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout apger
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          # Use GITHUB_TOKEN for checkout — only needs read on this repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up credentials
+        # GITHUB_TOKEN is used for log commits (this repo).
+        # NUROS_PAT is used for publishing to NurOS-Packages org.
+        run: |
+          mkdir -p "$HOME/.credential-manager"
+          cat > "$HOME/.credential-manager/apger.json" <<EOF
+          {
+            "name":            "${{ github.actor }}",
+            "email":           "${{ github.actor }}@users.noreply.github.com",
+            "pat":             "${{ secrets.NUROS_PAT }}",
+            "pgp_private_key": "${{ secrets.APGER_PGP_KEY }}"
+          }
+          EOF
+          chmod 600 "$HOME/.credential-manager/apger.json"
+
+      - name: Apply Kubernetes manifest
+        run: |
+          kubectl apply -f src/k8s-manifest.yaml
+          kubectl wait --for=condition=complete job/apger-build \
+            -n apger --timeout=60m
+
+      - name: Build packages
+        run: |
+          PKGS="${{ github.event.inputs.packages }}"
+          if [ -z "$PKGS" ]; then
+            kubectl exec -it apger-tui -n apger -- apger --cmd build-all
+          else
+            for pkg in $(echo "$PKGS" | tr ',' ' '); do
+              kubectl exec -it apger-tui -n apger -- apger --cmd build --package "$pkg"
+            done
+          fi
+
+      - name: Copy output packages from PVC
+        run: |
+          kubectl run pvc-access --image=fedora:43 --restart=Never \
+            --overrides='{"spec":{"volumes":[{"name":"b","persistentVolumeClaim":{"claimName":"apger-builds"}}],"containers":[{"name":"c","image":"fedora:43","command":["sleep","600"],"volumeMounts":[{"name":"b","mountPath":"/output"}]}]}}' \
+            -n apger
+          sleep 5
+          kubectl cp apger/pvc-access:/output ./packages/
+          kubectl delete pod pvc-access -n apger
+
+      - name: Generate build report
+        run: apger --cmd report --output .logs/
+
+      - name: Commit build logs
+        # Uses GITHUB_TOKEN — only writes to this repo, no extra secret needed
+        run: |
+          git config user.name  "apger-bot"
+          git config user.email "apger-bot@users.noreply.github.com"
+          git add .logs/
+          git diff --cached --quiet || \
+            git commit -m "build: update logs $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]" && \
+            git push
+
+      - name: Cleanup
+        if: always()
+        run: |
+          kubectl delete -f src/k8s-manifest.yaml --ignore-not-found
+          rm -f "$HOME/.credential-manager/apger.json"

@@ -1,3 +1,0 @@
-"""
-APGer - NurOS Package Builder
-"""

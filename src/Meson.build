@@ -1,0 +1,123 @@
+project('apger',
+  version: '1.0.0',
+  default_options: ['warning_level=0'],
+  meson_version: '>= 0.60.0',
+)
+
+# ── Tools ─────────────────────────────────────────────────────────────────────
+
+go     = find_program('go',     required: true)
+python = find_program('python3', required: false)
+if not python.found()
+  python = find_program('python', required: true)
+endif
+
+# ── Output name ───────────────────────────────────────────────────────────────
+
+output_name = get_option('output_name')
+if output_name == ''
+  output_name = meson.project_name()
+endif
+
+# ── Self-build flags ──────────────────────────────────────────────────────────
+# Hardcoded here — apger.conf governs distro package builds, not the tools.
+#
+#   -march=native   optimise for the exact build-farm CPU
+#   -O3             maximum optimisation
+#   -flto=thin      thin LTO (fast link-time optimisation)
+#   -fuse-ld=mold   mold linker
+#   -DNDEBUG        no debug assertions
+
+self_cflags  = '-march=native -O3 -flto=thin -DNDEBUG'
+self_ldflags = '-fuse-ld=mold -flto=thin'
+
+# Strip symbols and disable DWARF in release builds
+go_ldflags_str = '-s -w -extldflags "' + self_ldflags + '"'
+
+# ── Database backend detection ────────────────────────────────────────────────
+# Priority: -Ddb_backend=<value>  >  apger.conf  >  bbolt (default)
+#
+# We read apger.conf with a tiny Python one-liner so Meson doesn't need
+# a TOML parser.  The line we look for is:   type = "sqlite"
+
+db_backend = get_option('db_backend')
+
+if db_backend == 'auto'
+  conf_path = join_paths(meson.project_source_root(), '..', 'apger.conf')
+  result = run_command(
+    python, '-c',
+    'import sys, re; '
+    + 'txt = open(sys.argv[1]).read(); '
+    + 'print("sqlite" if re.search(r\'type\\s*=\\s*"sqlite"\', txt) else "bbolt")',
+    conf_path,
+    check: false,
+  )
+  if result.returncode() == 0
+    db_backend = result.stdout().strip()
+  else
+    db_backend = 'bbolt'
+  endif
+endif
+
+# ── Go environment ────────────────────────────────────────────────────────────
+
+go_env = environment()
+go_env.set('CGO_CFLAGS',  self_cflags)
+go_env.set('CGO_LDFLAGS', self_ldflags)
+go_env.set('GOFLAGS',     '-mod=mod')
+
+# sqlite requires CGO; bbolt is pure Go
+if db_backend == 'sqlite'
+  go_env.set('CGO_ENABLED', '1')
+else
+  go_env.set('CGO_ENABLED', '0')
+endif
+
+# ── go mod download ───────────────────────────────────────────────────────────
+# Fetch all dependencies before building so the build step is offline-safe.
+
+go_mod_dir = join_paths(meson.project_source_root(), '..')
+
+go_mod_download = custom_target('go-mod-download',
+  output: 'go-mod-download.stamp',
+  command: [
+    'sh', '-c',
+    'cd "@0@" && @1@ mod download && touch "@2@/@3@"'.format(
+      go_mod_dir,
+      go.full_path(),
+      meson.current_build_dir(),
+      'go-mod-download.stamp',
+    ),
+  ],
+  env: go_env,
+  build_by_default: true,
+)
+
+# ── Build apger ───────────────────────────────────────────────────────────────
+
+apger_exe = custom_target('apger',
+  output: output_name,
+  depends: [go_mod_download],
+  build_by_default: true,
+  install: true,
+  install_dir: get_option('bindir'),
+  env: go_env,
+  command: [
+    go, 'build',
+    '-tags', db_backend,
+    '-ldflags', go_ldflags_str,
+    '-o', '@OUTPUT@',
+    join_paths(go_mod_dir, 'src', 'cmd', 'apger'),
+  ],
+)
+
+# ── Summary ───────────────────────────────────────────────────────────────────
+
+summary({
+  'Binary'     : output_name,
+  'DB backend' : db_backend,
+  'CGO'        : db_backend == 'sqlite' ? 'enabled' : 'disabled',
+  'CFLAGS'     : self_cflags,
+  'LDFLAGS'    : self_ldflags,
+  'Go'         : go.full_path(),
+}, section: 'APGer build')

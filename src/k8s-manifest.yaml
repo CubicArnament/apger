@@ -1,0 +1,381 @@
+# APGer Kubernetes Manifest
+#
+# Resources:
+#   PVC          apger-builds     — shared storage for source, output, tools
+#   ConfigMap    apger-conf       — apger.conf mounted into pods
+#   Job          apger-build      — builds apgbuild + apger (self-build, runs once)
+#   Pod          apger-tui        — interactive TUI pod, attach with kubectl attach
+#
+# Quick start:
+#   kubectl apply -f src/k8s-manifest.yaml
+#   kubectl wait --for=condition=complete job/apger-build --timeout=30m
+#   kubectl attach -it apger-tui
+#
+# For Kind clusters (local):
+#   kind load docker-image fedora:43
+#   kubectl apply -f src/k8s-manifest.yaml
+#
+# Detach from pod without killing it:
+#   Ctrl+P, Ctrl+Q
+#
+# Re-attach later:
+#   kubectl attach -it apger-tui
+#
+# Build a specific package from inside the pod:
+#   apger --cmd build --package curl
+#
+# View build logs:
+#   kubectl logs -f job/apger-build
+#   kubectl logs -f pod/apger-tui
+#
+# Cleanup:
+#   kubectl delete -f src/k8s-manifest.yaml
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apger-builds
+  namespace: apger
+  labels:
+    app: apger
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# apger.conf is mounted as a ConfigMap so both the build job and TUI pod
+# share the same configuration without baking it into the image.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apger-conf
+  namespace: apger
+  labels:
+    app: apger
+data:
+  apger.conf: |
+    [build.packages]
+    march = "x86_64-v2"
+    mtune = "x86_64-v3"
+    opt_level = "O2"
+    lto = "thin"
+    cc = "gcc"
+    cxx = "g++"
+    ld = "mold"
+    library_glibc_hwcaps = true
+    levels_hwcaps = ["x86_64-v3", "x86_64-v2"]
+
+    [database.pkgs]
+    type = "bbolt"
+    name = "pkgs.db"
+
+    [kubernetes.options]
+    namespace = "apger"
+    base_image = "fedora:43"
+    search_local = true
+    pull_remote = false
+    kind_load = false
+
+    [kubernetes.options.oomkill_limits]
+    cpu = "10"
+    memory = "16Gi"
+
+    [pod.options]
+    stdin = true
+    tty = true
+
+    [save.options]
+    remote = true
+    type = "forgejo:github"
+    github_org_name = "NurOS-Packages"
+    method = "create_or_update"
+    repository = true
+
+    [logging]
+    verbose = false
+
+---
+# Credentials Secret — stores GitHub App credentials and PGP key.
+# Create with:
+#   kubectl create secret generic apger-credentials \
+#     --from-literal=github_app_id=<APP_ID> \
+#     --from-file=github_pem=<path/to/app.private-key.pem> \
+#     --from-literal=pgp_private_key="$(cat private.asc)" \
+#     --from-literal=name="Your Name" \
+#     --from-literal=email="you@example.com" \
+#     -n apger
+#
+# The secret is mounted into the TUI pod at /run/secrets/apger/
+# and read via APGER_CREDS_PATH env var.
+#
+# On Debian WSL with Docker Desktop kubectl:
+#   kubectl config use-context docker-desktop
+#   kubectl create namespace apger
+#   kubectl create secret generic apger-credentials ...
+apiVersion: v1
+kind: Secret
+metadata:
+  name: apger-credentials
+  namespace: apger
+  labels:
+    app: apger
+type: Opaque
+# Populate via kubectl create secret (see comment above).
+# Do NOT commit actual values here.
+stringData: {}
+
+---
+# Self-build flags (-march=native -O3 -flto=thin -fuse-ld=mold) are
+# hardcoded in Meson.build — not in apger.conf.
+# Runs once; TTL 1h after completion.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apger-build
+  namespace: apger
+  labels:
+    app: apger
+    stage: build-tools
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: apger
+        stage: build-tools
+    spec:
+      restartPolicy: OnFailure
+      activeDeadlineSeconds: 3600
+      initContainers:
+        - name: install-deps
+          image: fedora:43
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              dnf install -y --setopt=install_weak_deps=False \
+                gcc gcc-c++ make meson ninja-build cmake pkg-config \
+                git tar curl wget aria2 \
+                golang cargo \
+                python3-devel python3-pip \
+                zstd zstd-devel libzstd-devel \
+                mold binutils sqlite-devel \
+                && dnf clean all
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+            limits:
+              cpu: "4"
+              memory: 4Gi
+          volumeMounts:
+            - name: builds
+              mountPath: /output
+            - name: source
+              mountPath: /src
+
+      containers:
+        - name: builder
+          image: fedora:43
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+
+              echo "=== Stage 1: apgbuild ==="
+              cd /src/apgbuild
+              meson setup build --prefix=/usr --buildtype=release
+              ninja -C build
+              ninja -C build install
+              cp /usr/bin/apgbuild /output/apgbuild
+
+              echo "=== Stage 2: apger ==="
+              cd /src/src
+              meson setup build --prefix=/usr --buildtype=release
+              ninja -C build
+              ninja -C build install
+              cp /usr/bin/apger /output/apger
+
+              echo "=== Build tools ready ==="
+          resources:
+            requests:
+              cpu: "2"
+              memory: 2Gi
+            limits:
+              cpu: "10"
+              memory: 16Gi
+          volumeMounts:
+            - name: builds
+              mountPath: /output
+            - name: source
+              mountPath: /src
+          env:
+            - name: CGO_ENABLED
+              value: "1"
+
+      volumes:
+        - name: builds
+          persistentVolumeClaim:
+            claimName: apger-builds
+        - name: source
+          emptyDir: {}
+
+---
+# Interactive TUI Pod.
+# Waits for apger-build to finish, then runs apger interactively.
+# Attach with: kubectl attach -it apger-tui -n apger
+# Detach without killing: Ctrl+P, Ctrl+Q
+apiVersion: v1
+kind: Pod
+metadata:
+  name: apger-tui
+  namespace: apger
+  labels:
+    app: apger
+    stage: interactive
+spec:
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 10
+
+  initContainers:
+    # Wait for apger-build job to place binaries in PVC
+    - name: wait-for-tools
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Waiting for apger binary in PVC..."
+          until [ -f /output/apger ]; do sleep 5; done
+          cp /output/apger    /usr/local/bin/apger
+          cp /output/apgbuild /usr/local/bin/apgbuild
+          chmod +x /usr/local/bin/apger /usr/local/bin/apgbuild
+          echo "Tools ready: $(apger --version 2>&1 || echo ok)"
+      volumeMounts:
+        - name: builds
+          mountPath: /output
+
+    # Assemble apger.json from individual Secret keys into a shared emptyDir
+    - name: assemble-credentials
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          APP_ID=$(cat /secrets/github_app_id)
+          PEM=$(cat /secrets/github_pem | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
+          PGP=$(cat /secrets/pgp_private_key | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
+          NAME=$(cat /secrets/name)
+          EMAIL=$(cat /secrets/email)
+          cat > /creds/apger.json <<EOF
+          {
+            "name":           "$NAME",
+            "email":          "$EMAIL",
+            "github_app_id":  $APP_ID,
+            "github_pem":     $PEM,
+            "pgp_private_key": $PGP
+          }
+          EOF
+          chmod 600 /creds/apger.json
+          echo "Credentials assembled."
+      volumeMounts:
+        - name: credentials
+          mountPath: /secrets
+          readOnly: true
+        - name: creds-assembled
+          mountPath: /creds
+
+    # Install runtime build dependencies
+    - name: install-runtime-deps
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          dnf install -y --setopt=install_weak_deps=False \
+            gcc gcc-c++ make meson ninja-build cmake pkg-config \
+            git tar curl wget aria2 \
+            golang cargo \
+            python3-devel python3-pip \
+            zstd zstd-devel \
+            mold binutils \
+            && dnf clean all
+      volumeMounts:
+        - name: builds
+          mountPath: /output
+
+  containers:
+    - name: tui
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      # apger TUI — keyboard-driven, no mouse
+      command: ["/usr/local/bin/apger"]
+      args: ["--tui"]
+      stdin: true
+      tty: true
+      env:
+        - name: TERM
+          value: "xterm-256color"
+        - name: COLORTERM
+          value: "truecolor"
+        # Point credential manager to the assembled JSON from init container
+        - name: APGER_CREDS_PATH
+          value: "/run/secrets/apger/apger.json"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: 512Mi
+        limits:
+          cpu: "10"
+          memory: 16Gi
+      volumeMounts:
+        - name: builds
+          mountPath: /output
+        - name: source
+          mountPath: /src
+        - name: repodata
+          mountPath: /repodata
+        - name: conf
+          mountPath: /etc/apger
+          readOnly: true
+        - name: creds-assembled
+          mountPath: /run/secrets/apger
+          readOnly: true
+
+  volumes:
+    - name: builds
+      persistentVolumeClaim:
+        claimName: apger-builds
+    - name: source
+      emptyDir: {}
+    - name: repodata
+      emptyDir: {}
+    - name: conf
+      configMap:
+        name: apger-conf
+    - name: credentials
+      secret:
+        secretName: apger-credentials
+        items:
+          - key: github_app_id
+            path: github_app_id
+          - key: github_pem
+            path: github_pem
+          - key: pgp_private_key
+            path: pgp_private_key
+          - key: name
+            path: name
+          - key: email
+            path: email
+    # Assembled apger.json lives in RAM (never touches disk)
+    - name: creds-assembled
+      emptyDir:
+        medium: Memory

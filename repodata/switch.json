@@ -1,0 +1,31 @@
+{
+  "package": {
+    "name": "switch",
+    "version": "1.0.0",
+    "type": "binary",
+    "architecture": "x86_64",
+    "description": "Switch between different configurations or modes",
+    "maintainer": "NurOS Team <anmitali198@gmail.com>",
+    "license": "GPL-3.0",
+    "homepage": "https://github.com/NurOS-Linux/switch",
+    "tags": ["utility", "configuration"],
+    "dependencies": [],
+    "conflicts": [],
+    "provides": [],
+    "replaces": [],
+    "conf": [],
+    "source": "https://github.com/NurOS-Linux/switch/archive/refs/heads/main.tar.gz"
+  },
+  "build": {
+    "template": "makefile",
+    "dependencies": [
+      "gcc",
+      "make"
+    ],
+    "script": "make",
+    "use": ["release"]
+  },
+  "install": {
+    "script": "DESTDIR=\"$DESTDIR\" make install"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "package": {
+    "name": "package-name",
+    "version": "1.0.0",
+    "type": "binary",
+    "architecture": "x86_64",
+    "description": "Package description",
+    "maintainer": "Your Name <email@example.com>",
+    "license": "GPL-3.0",
+    "homepage": "https://example.com",
+    "tags": ["tag1", "tag2"],
+    "dependencies": [],
+    "conflicts": [],
+    "provides": [],
+    "replaces": [],
+    "conf": []
+  },
+  "structure": {
+    "directories": ["/usr/bin", "/usr/lib", "/etc"],
+    "files": [
+      {
+        "source": "./binary",
+        "destination": "/usr/bin/binary",
+        "permissions": "0755"
+      }
+    ],
+    "symlinks": []
+  }
+}
