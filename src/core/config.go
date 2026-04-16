@@ -315,8 +315,8 @@ func DefaultConfig() Config {
 	cfg.Build.Packages.LevelsHwcaps = []MArch{v3, v2}
 
 	// Default cross profiles
-	aarch64March, _ := ParseMArch("aarch64")
-	riscv64March, _ := ParseMArch("riscv64")
+	aarch64March, _ := ParseMArch("armv8-a")  // -march=armv8-a for AArch64 targets
+	riscv64March, _ := ParseMArch("rv64gc")   // -march=rv64gc for RISC-V 64-bit
 
 	cfg.Build.Cross = map[string]CrossProfile{
 		"aarch64": {

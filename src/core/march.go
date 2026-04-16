@@ -49,7 +49,7 @@ func normalizeArch(s string) string {
 	// ── AArch64 aliases ──────────────────────────────────────────────────────
 	switch s {
 	case "arm64", "aarch64", "armv8", "armv8-a", "arm-v8":
-		return "aarch64"
+		return "armv8-a" // canonical -march= flag for AArch64
 	case "armv8.1-a", "armv8.2-a", "armv8.3-a", "armv8.4-a",
 		"armv8.5-a", "armv8.6-a", "armv8.7-a", "armv9-a":
 		return s // pass through versioned ARM profiles
@@ -58,9 +58,9 @@ func normalizeArch(s string) string {
 	// ── RISC-V aliases ───────────────────────────────────────────────────────
 	switch s {
 	case "riscv64", "riscv-64", "rv64", "rv64gc", "riscv64gc":
-		return "riscv64"
+		return "rv64gc" // canonical -march= flag for RISC-V 64-bit
 	case "riscv32", "riscv-32", "rv32":
-		return "riscv32"
+		return "rv32gc"
 	}
 
 	// ── x86_64 normalization ─────────────────────────────────────────────────
@@ -95,9 +95,9 @@ func (m MArch) IsNative() bool { return m.normalized == "native" }
 // Family returns the ArchFamily for this march.
 func (m MArch) Family() ArchFamily {
 	switch {
-	case m.normalized == "aarch64" || strings.HasPrefix(m.normalized, "armv"):
+	case strings.HasPrefix(m.normalized, "armv") || m.normalized == "aarch64":
 		return FamilyAArch64
-	case strings.HasPrefix(m.normalized, "riscv"):
+	case strings.HasPrefix(m.normalized, "rv") || strings.HasPrefix(m.normalized, "riscv"):
 		return FamilyRISCV64
 	case strings.HasPrefix(m.normalized, "x86_64") || m.normalized == "native":
 		return FamilyX86_64
