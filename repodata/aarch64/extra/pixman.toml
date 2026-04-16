@@ -1,0 +1,23 @@
+[package]
+name = "pixman"
+version = "0.43.4"
+type = "binary"
+architecture = "aarch64"
+description = "Low-level pixel manipulation library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://pixman.org"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://cairographics.org/releases/pixman-0.43.4.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = []
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,23 @@
+[package]
+name = "glib2"
+version = "2.80.0"
+type = "library"
+architecture = "x86_64"
+description = "GLib core library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://gitlab.gnome.org/GNOME/glib"
+dependencies = ["libffi", "pcre2", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://download.gnome.org/sources/glib/2.80/glib-2.80.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["libffi-devel", "pcre2-devel", "zlib-devel"]
+use = []
+
+[install]
+script = ""

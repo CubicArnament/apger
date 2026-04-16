@@ -163,11 +163,8 @@ func (o *Orchestrator) RunMultistage(ctx context.Context) error {
 
 // BuildPackage builds a single package in a Kubernetes Job.
 func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) error {
-	// Find recipe: prefer .toml, fall back to .json
+	// Find recipe: .toml only
 	recipePath := filepath.Join(o.recipeDir, packageName+".toml")
-	if _, err := os.Stat(recipePath); os.IsNotExist(err) {
-		recipePath = filepath.Join(o.recipeDir, packageName+".json")
-	}
 	recipe, err := o.loadRecipe(recipePath)
 	if err != nil {
 		return fmt.Errorf("load recipe: %w", err)
@@ -373,18 +370,10 @@ cp build/apger /output/apger`},
 func (o *Orchestrator) runPackagesStage(ctx context.Context) error {
 	o.log.Println("Building packages...")
 
-	// Collect both .toml and .json recipes, deduplicate by name (.toml wins)
-	seen := make(map[string]bool)
-	var recipes []string
-	for _, pattern := range []string{"*.toml", "*.json"} {
-		matches, _ := filepath.Glob(filepath.Join(o.recipeDir, pattern))
-		for _, p := range matches {
-			name := strings.TrimSuffix(filepath.Base(p), filepath.Ext(p))
-			if !seen[name] {
-				seen[name] = true
-				recipes = append(recipes, p)
-			}
-		}
+	// Collect .toml recipes only
+	recipes, _ := filepath.Glob(filepath.Join(o.recipeDir, "**/*.toml"))
+	if len(recipes) == 0 {
+		recipes, _ = filepath.Glob(filepath.Join(o.recipeDir, "*.toml"))
 	}
 
 	if len(recipes) == 0 {
@@ -394,14 +383,19 @@ func (o *Orchestrator) runPackagesStage(ctx context.Context) error {
 
 	o.log.Printf("Found %d recipes", len(recipes))
 
+	var failed []string
 	for _, recipePath := range recipes {
 		name := strings.TrimSuffix(filepath.Base(recipePath), filepath.Ext(recipePath))
 		if err := o.BuildPackage(ctx, name); err != nil {
-			o.log.Printf("ERROR: Failed to build %s: %v", name, err)
+			o.log.Printf("WARN: Failed to build %s: %v — continuing with remaining packages", name, err)
+			failed = append(failed, name)
 			continue
 		}
 	}
 
+	if len(failed) > 0 {
+		o.log.Printf("Build stage completed with %d failure(s): %s", len(failed), strings.Join(failed, ", "))
+	}
 	return nil
 }
 

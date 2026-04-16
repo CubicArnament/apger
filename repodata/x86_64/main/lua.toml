@@ -1,0 +1,23 @@
+[package]
+name = "lua"
+version = "5.4.6"
+type = "binary"
+architecture = "x86_64"
+description = "Lightweight scripting language"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://www.lua.org"
+dependencies = ["readline", "ncurses"]
+bootstrap = false
+
+[source]
+url = "https://www.lua.org/ftp/lua-5.4.6.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "custom"
+dependencies = ["readline-devel", "ncurses-devel"]
+use = []
+
+[install]
+script = "make INSTALL_TOP=/usr"

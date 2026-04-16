@@ -92,9 +92,10 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 		{Name: "DESTDIR", Value: "/build/root"},
 	}
 	if cfg.BuildFlags != nil {
+		// ResolvedCC/CXX expands "default" to actual compiler (gcc/clang based on arch)
 		envVars = append(envVars,
-			corev1.EnvVar{Name: "CC", Value: cfg.BuildFlags.CC},
-			corev1.EnvVar{Name: "CXX", Value: cfg.BuildFlags.CXX},
+			corev1.EnvVar{Name: "CC", Value: cfg.BuildFlags.ResolvedCC()},
+			corev1.EnvVar{Name: "CXX", Value: cfg.BuildFlags.ResolvedCXX()},
 			corev1.EnvVar{Name: "CFLAGS", Value: cfg.BuildFlags.CFlags()},
 			corev1.EnvVar{Name: "CXXFLAGS", Value: cfg.BuildFlags.CXXFlags()},
 			corev1.EnvVar{Name: "LDFLAGS", Value: cfg.BuildFlags.LDFlags()},
@@ -138,7 +139,7 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 		},
 		Spec: batchv1.JobSpec{
 			TTLSecondsAfterFinished: ptrInt32(3600),
-			BackoffLimit:            ptrInt32(2),
+			BackoffLimit:            ptrInt32(3), // retry up to 3 times before marking failed
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"app": "apger", "package": cfg.PackageName, "version": cfg.PackageVersion},
@@ -196,7 +197,7 @@ echo "=== Stage 2: Building apger ==="
 cd /src && meson setup build --prefix=/usr --buildtype=release && ninja -C build && ninja -C build install
 echo "=== Stage 3: Starting TUI ==="
 exec apger --tui
-`, depInstallCmd, selfFlags.CC, selfFlags.CXX,
+`, depInstallCmd, selfFlags.ResolvedCC(), selfFlags.ResolvedCXX(),
 		selfFlags.CFlags(), selfFlags.CXXFlags(), selfFlags.LDFlags())
 
 	return &batchv1.Job{

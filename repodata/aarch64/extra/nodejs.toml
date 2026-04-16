@@ -1,0 +1,23 @@
+[package]
+name = "nodejs"
+version = "22.2.0"
+type = "binary"
+architecture = "aarch64"
+description = "JavaScript runtime built on Chrome's V8 engine"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://nodejs.org"
+dependencies = ["openssl", "zlib", "libuv"]
+bootstrap = false
+
+[source]
+url = "https://nodejs.org/dist/v22.2.0/node-v22.2.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["openssl-devel", "zlib-devel", "python3"]
+use = []
+
+[install]
+script = "./configure --prefix=/usr --shared-openssl --shared-zlib && make -j$(nproc) && make install"

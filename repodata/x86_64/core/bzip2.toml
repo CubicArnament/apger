@@ -1,0 +1,23 @@
+[package]
+name = "bzip2"
+version = "1.0.8"
+type = "library"
+architecture = "x86_64"
+description = "bzip2 — high-quality block-sorting file compressor and library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD-2-Clause"
+homepage = "https://sourceware.org/bzip2/"
+dependencies = ["glibc"]
+bootstrap = false
+
+[source]
+url = "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["make", "gcc"]
+use = []
+
+[install]
+script = ""

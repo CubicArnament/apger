@@ -26,10 +26,11 @@ type screen int
 
 const (
 	screenDashboard screen = iota
-	screenFM               // file manager — pick recipes to build
-	screenEditor           // TOML editor for new/existing recipe
-	screenBuild            // build log + download progress
-	screenCredentials      // credentials management + self-destroy-pgp
+	screenFM
+	screenEditor
+	screenBuild
+	screenCredentials
+	screenSettings
 )
 
 // ── Styles ────────────────────────────────────────────────────────────────────
@@ -191,6 +192,7 @@ type Model struct {
 	ctx        context.Context
 	err        error
 	credScreen *CredentialsScreen
+	settings   *SettingsScreen
 }
 
 // ── Constructor ───────────────────────────────────────────────────────────────
@@ -338,7 +340,7 @@ func (m *Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "esc":
 		switch m.screen {
-		case screenFM, screenEditor, screenBuild, screenCredentials:
+		case screenFM, screenEditor, screenBuild, screenCredentials, screenSettings:
 			m.screen = screenDashboard
 			return m, nil
 		}
@@ -357,6 +359,12 @@ func (m *Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if m.credScreen != nil {
 			newModel, cmd := m.credScreen.Update(msg)
 			m.credScreen = newModel.(*CredentialsScreen)
+			return m, cmd
+		}
+	case screenSettings:
+		if m.settings != nil {
+			newModel, cmd := m.settings.Update(msg)
+			m.settings = newModel.(*SettingsScreen)
 			return m, cmd
 		}
 	}
@@ -389,6 +397,11 @@ func (m *Model) updateDashboard(key string) (tea.Model, tea.Cmd) {
 			m.credScreen = cs
 			m.screen = screenCredentials
 		}
+	case "s":
+		if m.settings == nil {
+			m.settings = NewSettingsScreen(0)
+		}
+		m.screen = screenSettings
 	case "enter":
 		if m.dashIdx < len(m.dashItems) {
 			m.openEditor(m.dashItems[m.dashIdx].path)
@@ -580,6 +593,10 @@ func (m *Model) View() string {
 		if m.credScreen != nil {
 			return m.credScreen.View()
 		}
+	case screenSettings:
+		if m.settings != nil {
+			return m.settings.View()
+		}
 	}
 	return ""
 }
@@ -596,7 +613,7 @@ func (m *Model) viewDashboard() string {
 		b.WriteString("\n" + styleError.Render(m.err.Error()) + "\n")
 	}
 
-	b.WriteString("\n" + styleHelp.Render("↑/↓ navigate  b build  a add new  enter edit  c credentials  q quit"))
+	b.WriteString("\n" + styleHelp.Render("↑/↓ navigate  b build  a add new  enter edit  c credentials  s settings  q quit"))
 	return b.String()
 }
 

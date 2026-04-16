@@ -1,0 +1,23 @@
+[package]
+name = "udisks2"
+version = "2.10.1"
+type = "binary"
+architecture = "x86_64"
+description = "D-Bus service to access and manipulate storage devices"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://storaged.org"
+dependencies = ["glib2", "dbus", "polkit", "libblockdev"]
+bootstrap = false
+
+[source]
+url = "https://github.com/storaged-project/udisks/releases/download/udisks-2.10.1/udisks-2.10.1.tar.bz2"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["glib2-devel", "dbus-devel", "polkit-devel", "libblockdev-devel", "libgudev-devel"]
+use = []
+
+[install]
+script = ""

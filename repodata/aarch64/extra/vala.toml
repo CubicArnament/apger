@@ -1,0 +1,23 @@
+[package]
+name = "vala"
+version = "0.56.17"
+type = "binary"
+architecture = "aarch64"
+description = "Compiler for the Vala programming language"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://vala.dev"
+dependencies = ["glib2"]
+bootstrap = false
+
+[source]
+url = "https://download.gnome.org/sources/vala/0.56/vala-0.56.17.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["glib2-devel", "flex", "bison"]
+use = []
+
+[install]
+script = ""

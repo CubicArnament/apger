@@ -1,0 +1,23 @@
+[package]
+name = "podman"
+version = "5.1.1"
+type = "binary"
+architecture = "aarch64"
+description = "Daemonless container engine for managing OCI containers"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Apache-2.0"
+homepage = "https://podman.io"
+dependencies = ["conmon", "runc", "cni-plugins", "iptables"]
+bootstrap = false
+
+[source]
+url = "https://github.com/containers/podman/archive/v5.1.1/podman-5.1.1.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["go", "gpgme-devel", "device-mapper-devel", "btrfs-progs-devel", "libassuan-devel"]
+use = []
+
+[install]
+script = "make BUILDTAGS='seccomp selinux' && make install"

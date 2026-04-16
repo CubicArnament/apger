@@ -1,0 +1,22 @@
+[package]
+name = "nano"
+version = "8.0"
+type = "binary"
+architecture = "aarch64"
+description = "Small, friendly text editor"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://www.nano-editor.org"
+dependencies = ["ncurses"]
+
+[source]
+url = "https://www.nano-editor.org/dist/v8/nano-8.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["ncurses-devel"]
+use = []
+
+[install]
+script = ""

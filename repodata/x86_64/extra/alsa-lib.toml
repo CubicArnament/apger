@@ -1,0 +1,23 @@
+[package]
+name = "alsa-lib"
+version = "1.2.12"
+type = "binary"
+architecture = "x86_64"
+description = "Advanced Linux Sound Architecture library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://alsa-project.org"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.12.tar.bz2"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = []
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,22 @@
+[package]
+name = "systemd"
+version = "255"
+type = "binary"
+architecture = "aarch64"
+description = "System and service manager"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://systemd.io"
+dependencies = ["dbus", "pam", "openssl", "xz", "zstd", "libffi"]
+
+[source]
+url = "https://github.com/systemd/systemd/archive/refs/tags/v255.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["dbus-devel", "pam-devel", "openssl-devel", "xz-devel", "zstd-devel", "libffi-devel"]
+use = []
+
+[install]
+script = ""

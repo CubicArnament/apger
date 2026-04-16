@@ -1,0 +1,23 @@
+[package]
+name = "ncurses"
+version = "6.5"
+type = "library"
+architecture = "x86_64"
+description = "ncurses — terminal handling library for text-based UIs"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://invisible-island.net/ncurses/"
+dependencies = ["glibc"]
+bootstrap = false
+
+[source]
+url = "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["make", "gcc"]
+use = []
+
+[install]
+script = ""

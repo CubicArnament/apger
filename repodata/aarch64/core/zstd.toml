@@ -1,0 +1,22 @@
+[package]
+name = "zstd"
+version = "1.5.6"
+type = "binary"
+architecture = "aarch64"
+description = "Zstandard fast real-time compression algorithm"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD-3-Clause"
+homepage = "https://facebook.github.io/zstd/"
+dependencies = ["zlib"]
+
+[source]
+url = "https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "cmake"
+dependencies = ["zlib-devel"]
+use = []
+
+[install]
+script = ""

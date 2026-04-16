@@ -1,0 +1,22 @@
+[package]
+name = "xz"
+version = "5.6.1"
+type = "binary"
+architecture = "aarch64"
+description = "XZ-format compression utilities"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://tukaani.org/xz/"
+dependencies = []
+
+[source]
+url = "https://github.com/tukaani-project/xz/releases/download/v5.6.1/xz-5.6.1.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = []
+use = []
+
+[install]
+script = ""

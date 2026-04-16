@@ -1,0 +1,23 @@
+[package]
+name = "tcl"
+version = "8.6.14"
+type = "binary"
+architecture = "x86_64"
+description = "Tool Command Language scripting language"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "TCL"
+homepage = "https://tcl.tk"
+dependencies = ["zlib"]
+bootstrap = false
+
+[source]
+url = "https://prdownloads.sourceforge.net/tcl/tcl8.6.14-src.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["zlib-devel"]
+use = []
+
+[install]
+script = ""

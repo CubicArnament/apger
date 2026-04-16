@@ -1,0 +1,23 @@
+[package]
+name = "ca-certificates"
+version = "2024.2.2"
+type = "misc"
+architecture = "x86_64"
+description = "Common CA certificates"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MPL-2.0"
+homepage = "https://curl.se/docs/caextract.html"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://curl.se/ca/cacert-2024-02-02.pem"
+type_src = "tarball"
+
+[build]
+template = "custom"
+dependencies = []
+use = []
+
+[install]
+script = "install -Dm644 cacert.pem /usr/share/ca-certificates/ca-bundle.crt"

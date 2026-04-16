@@ -1,0 +1,22 @@
+[package]
+name = "dbus"
+version = "1.15.8"
+type = "binary"
+architecture = "aarch64"
+description = "D-Bus message bus system"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://www.freedesktop.org/wiki/Software/dbus/"
+dependencies = ["libffi", "openssl"]
+
+[source]
+url = "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.8.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["libffi-devel", "openssl-devel"]
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,23 @@
+[package]
+name = "libpng"
+version = "1.6.43"
+type = "binary"
+architecture = "x86_64"
+description = "PNG image format library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Libpng"
+homepage = "http://libpng.org"
+dependencies = ["zlib"]
+bootstrap = false
+
+[source]
+url = "https://download.sourceforge.net/libpng/libpng-1.6.43.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["zlib-devel"]
+use = []
+
+[install]
+script = ""

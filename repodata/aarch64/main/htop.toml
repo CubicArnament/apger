@@ -1,0 +1,23 @@
+[package]
+name = "htop"
+version = "3.3.0"
+type = "binary"
+architecture = "aarch64"
+description = "Interactive process viewer"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://htop.dev"
+dependencies = ["ncurses"]
+bootstrap = false
+
+[source]
+url = "https://github.com/htop-dev/htop/releases/download/3.3.0/htop-3.3.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["ncurses-devel"]
+use = []
+
+[install]
+script = ""

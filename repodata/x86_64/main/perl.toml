@@ -1,0 +1,23 @@
+[package]
+name = "perl"
+version = "5.38.2"
+type = "binary"
+architecture = "x86_64"
+description = "Perl programming language"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-1.0"
+homepage = "https://www.perl.org"
+dependencies = ["zlib", "bzip2"]
+bootstrap = false
+
+[source]
+url = "https://www.cpan.org/src/5.0/perl-5.38.2.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "custom"
+dependencies = ["zlib-devel", "bzip2-devel"]
+use = []
+
+[install]
+script = "./Configure -des -Dprefix=/usr"

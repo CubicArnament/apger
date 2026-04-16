@@ -1,0 +1,23 @@
+[package]
+name = "pango"
+version = "1.52.2"
+type = "binary"
+architecture = "x86_64"
+description = "Text layout and rendering library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://pango.gnome.org"
+dependencies = ["glib2", "harfbuzz", "fontconfig", "freetype2", "cairo"]
+bootstrap = false
+
+[source]
+url = "https://download.gnome.org/sources/pango/1.52/pango-1.52.2.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["glib2-devel", "harfbuzz-devel", "fontconfig-devel", "freetype2-devel", "cairo-devel"]
+use = []
+
+[install]
+script = ""

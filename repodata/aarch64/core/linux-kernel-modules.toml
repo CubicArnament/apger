@@ -1,0 +1,23 @@
+[package]
+name = "linux-kernel-modules"
+version = "6.9.0"
+type = "binary"
+architecture = "aarch64"
+description = "Linux kernel modules"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://kernel.org"
+dependencies = ["linux-kernel"]
+krnl = true
+
+[source]
+url = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "kbuild"
+dependencies = []
+use = ["modules"]
+
+[install]
+script = ""

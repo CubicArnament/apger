@@ -1,0 +1,23 @@
+[package]
+name = "gtk4"
+version = "4.14.4"
+type = "binary"
+architecture = "aarch64"
+description = "GTK 4 graphical user interface toolkit"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://gtk.org"
+dependencies = ["glib2", "pango", "cairo", "gdk-pixbuf2", "harfbuzz", "graphene"]
+bootstrap = false
+
+[source]
+url = "https://download.gnome.org/sources/gtk/4.14/gtk-4.14.4.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["glib2-devel", "pango-devel", "cairo-devel", "gdk-pixbuf2-devel", "harfbuzz-devel", "graphene-devel", "wayland-devel", "libxkbcommon-devel", "vulkan-loader-devel"]
+use = []
+
+[install]
+script = ""

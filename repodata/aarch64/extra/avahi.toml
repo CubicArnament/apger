@@ -1,0 +1,23 @@
+[package]
+name = "avahi"
+version = "0.8"
+type = "binary"
+architecture = "aarch64"
+description = "mDNS/DNS-SD service discovery implementation"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://avahi.org"
+dependencies = ["glib2", "dbus", "libdaemon"]
+bootstrap = false
+
+[source]
+url = "https://github.com/avahi/avahi/releases/download/v0.8/avahi-0.8.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["glib2-devel", "dbus-devel", "libdaemon-devel", "expat-devel"]
+use = []
+
+[install]
+script = ""

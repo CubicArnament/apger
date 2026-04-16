@@ -1,0 +1,23 @@
+[package]
+name = "krb5"
+version = "1.21.3"
+type = "binary"
+architecture = "aarch64"
+description = "MIT Kerberos 5 authentication system"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://web.mit.edu/kerberos"
+dependencies = ["openssl", "libcom_err"]
+bootstrap = false
+
+[source]
+url = "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "e2fsprogs-devel"]
+use = []
+
+[install]
+script = ""

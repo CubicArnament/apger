@@ -1,0 +1,18 @@
+[package]
+name = "switch"
+version = "1.0.0"
+type = "binary"
+architecture = "aarch64"
+description = "Alternatives management tool for NurOS, similar to Gentoo eselect"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://github.com/NurOS-Linux/switch"
+dependencies = []
+
+[source]
+url = "https://github.com/NurOS-Linux/switch/archive/refs/heads/main.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["meson", "ninja-build", "gcc", "clang"]

@@ -1,7 +1,6 @@
 package metadata
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,42 +9,31 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// LoadRecipe loads a Recipe from a .toml or .json file.
-// The format is determined by the file extension.
+// LoadRecipe loads a Recipe from a .toml file.
+// JSON recipes are no longer supported — convert them to TOML.
 func LoadRecipe(path string) (Recipe, error) {
+	if strings.ToLower(filepath.Ext(path)) != ".toml" {
+		return Recipe{}, fmt.Errorf("unsupported recipe format %q: only .toml is supported", filepath.Ext(path))
+	}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return Recipe{}, fmt.Errorf("read recipe %s: %w", path, err)
 	}
-
 	var r Recipe
-	switch strings.ToLower(filepath.Ext(path)) {
-	case ".toml":
-		if _, err := toml.Decode(string(data), &r); err != nil {
-			return Recipe{}, fmt.Errorf("parse toml recipe %s: %w", path, err)
-		}
-	case ".json":
-		if err := json.Unmarshal(data, &r); err != nil {
-			return Recipe{}, fmt.Errorf("parse json recipe %s: %w", path, err)
-		}
-	default:
-		return Recipe{}, fmt.Errorf("unsupported recipe format: %s (use .toml or .json)", filepath.Ext(path))
+	if _, err := toml.Decode(string(data), &r); err != nil {
+		return Recipe{}, fmt.Errorf("parse toml recipe %s: %w", path, err)
 	}
-
 	return r, nil
 }
 
-// FindRecipes scans dir recursively for .toml and .json recipe files.
-// Returns paths grouped by subdirectory relative to dir.
+// FindRecipes scans dir recursively for .toml recipe files.
 func FindRecipes(dir string) (map[string][]string, error) {
 	groups := make(map[string][]string)
-
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return err
 		}
-		ext := strings.ToLower(filepath.Ext(path))
-		if ext != ".toml" && ext != ".json" {
+		if strings.ToLower(filepath.Ext(path)) != ".toml" {
 			return nil
 		}
 		rel, _ := filepath.Rel(dir, path)
@@ -53,7 +41,6 @@ func FindRecipes(dir string) (map[string][]string, error) {
 		groups[subdir] = append(groups[subdir], path)
 		return nil
 	})
-
 	return groups, err
 }
 

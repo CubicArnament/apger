@@ -1,0 +1,22 @@
+[package]
+name = "ca-certificates"
+version = "2024"
+type = "binary"
+architecture = "aarch64"
+description = "Common CA certificates"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MPL-2.0"
+homepage = "https://curl.se/docs/caextract.html"
+dependencies = ["openssl", "python3"]
+
+[source]
+url = "https://curl.se/ca/cacert-2024-03-11.pem"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["openssl", "python3"]
+use = []
+
+[install]
+script = ""

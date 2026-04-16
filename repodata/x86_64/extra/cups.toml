@@ -1,0 +1,23 @@
+[package]
+name = "cups"
+version = "2.4.8"
+type = "binary"
+architecture = "x86_64"
+description = "Common UNIX Printing System"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Apache-2.0"
+homepage = "https://openprinting.github.io/cups"
+dependencies = ["openssl", "avahi", "libusb", "pam"]
+bootstrap = false
+
+[source]
+url = "https://github.com/OpenPrinting/cups/releases/download/v2.4.8/cups-2.4.8-source.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "avahi-devel", "libusb-devel", "pam-devel", "dbus-devel"]
+use = []
+
+[install]
+script = ""

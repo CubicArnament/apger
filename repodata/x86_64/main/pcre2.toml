@@ -1,0 +1,23 @@
+[package]
+name = "pcre2"
+version = "10.43"
+type = "library"
+architecture = "x86_64"
+description = "Perl Compatible Regular Expressions v2"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD"
+homepage = "https://github.com/PCRE2Project/pcre2"
+dependencies = ["bzip2", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.bz2"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["bzip2-devel", "zlib-devel"]
+use = []
+
+[install]
+script = ""

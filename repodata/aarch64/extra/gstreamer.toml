@@ -1,0 +1,23 @@
+[package]
+name = "gstreamer"
+version = "1.24.3"
+type = "binary"
+architecture = "aarch64"
+description = "Pipeline-based multimedia framework"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://gstreamer.freedesktop.org"
+dependencies = ["glib2", "libxml2"]
+bootstrap = false
+
+[source]
+url = "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.24.3.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["glib2-devel", "libxml2-devel"]
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,22 @@
+[package]
+name = "rsync"
+version = "3.3.0"
+type = "binary"
+architecture = "aarch64"
+description = "Fast, versatile file copying tool"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://rsync.samba.org"
+dependencies = ["openssl", "zlib", "popt"]
+
+[source]
+url = "https://download.samba.org/pub/rsync/src/rsync-3.3.0.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "zlib-devel", "popt-devel"]
+use = []
+
+[install]
+script = ""

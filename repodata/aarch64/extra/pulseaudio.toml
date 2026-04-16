@@ -1,0 +1,23 @@
+[package]
+name = "pulseaudio"
+version = "17.0"
+type = "binary"
+architecture = "aarch64"
+description = "Sound server for POSIX and Win32 systems"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://pulseaudio.org"
+dependencies = ["alsa-lib", "glib2", "dbus", "libsndfile"]
+bootstrap = false
+
+[source]
+url = "https://freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["alsa-lib-devel", "glib2-devel", "dbus-devel", "libsndfile-devel", "openssl-devel"]
+use = []
+
+[install]
+script = ""

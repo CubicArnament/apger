@@ -1,0 +1,23 @@
+[package]
+name = "openldap"
+version = "2.6.8"
+type = "binary"
+architecture = "aarch64"
+description = "Open source implementation of the Lightweight Directory Access Protocol"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "OLDAP-2.8"
+homepage = "https://openldap.org"
+dependencies = ["openssl", "cyrus-sasl", "libdb"]
+bootstrap = false
+
+[source]
+url = "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.8.tgz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "cyrus-sasl-devel", "libdb-devel"]
+use = []
+
+[install]
+script = ""

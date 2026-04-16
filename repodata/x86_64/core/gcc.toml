@@ -1,0 +1,23 @@
+[package]
+name = "gcc"
+version = "14.1.0"
+type = "binary"
+architecture = "x86_64"
+description = "GNU Compiler Collection — C, C++, Fortran, and other language compilers"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://gcc.gnu.org/"
+dependencies = []
+bootstrap = true
+
+[source]
+url = "https://ftp.gnu.org/gnu/gcc/gcc-14.1.0/gcc-14.1.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["make", "binutils", "glibc"]
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,23 @@
+[package]
+name = "lsof"
+version = "4.99.3"
+type = "binary"
+architecture = "aarch64"
+description = "List open files utility"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD"
+homepage = "https://github.com/nicowillis/lsof"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://github.com/nicowillis/lsof/releases/download/4.99.3/lsof-4.99.3.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["linux-headers"]
+use = []
+
+[install]
+script = ""

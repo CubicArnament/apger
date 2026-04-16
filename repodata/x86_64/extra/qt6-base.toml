@@ -1,0 +1,23 @@
+[package]
+name = "qt6-base"
+version = "6.7.1"
+type = "binary"
+architecture = "x86_64"
+description = "Qt6 base libraries and tools"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-3.0"
+homepage = "https://qt.io"
+dependencies = ["libpng", "libjpeg-turbo", "freetype2", "fontconfig", "harfbuzz", "openssl", "vulkan-loader"]
+bootstrap = false
+
+[source]
+url = "https://download.qt.io/official_releases/qt/6.7/6.7.1/submodules/qtbase-everywhere-src-6.7.1.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "cmake"
+dependencies = ["libpng-devel", "libjpeg-turbo-devel", "freetype2-devel", "fontconfig-devel", "harfbuzz-devel", "openssl-devel", "vulkan-loader-devel", "wayland-devel", "libxkbcommon-devel", "mesa-devel"]
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,22 @@
+[package]
+name = "util-linux"
+version = "2.40"
+type = "binary"
+architecture = "aarch64"
+description = "Miscellaneous system utilities"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://github.com/util-linux/util-linux"
+dependencies = ["pam", "zlib"]
+
+[source]
+url = "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["pam-devel", "zlib-devel"]
+use = []
+
+[install]
+script = ""

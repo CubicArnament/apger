@@ -1,0 +1,23 @@
+[package]
+name = "ruby"
+version = "3.3.1"
+type = "binary"
+architecture = "aarch64"
+description = "Dynamic, open source programming language with a focus on simplicity"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Ruby"
+homepage = "https://ruby-lang.org"
+dependencies = ["openssl", "zlib", "readline", "libffi", "gdbm"]
+bootstrap = false
+
+[source]
+url = "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.1.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "zlib-devel", "readline-devel", "libffi-devel", "gdbm-devel"]
+use = []
+
+[install]
+script = ""

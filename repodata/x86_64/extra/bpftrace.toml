@@ -1,0 +1,23 @@
+[package]
+name = "bpftrace"
+version = "0.21.1"
+type = "binary"
+architecture = "x86_64"
+description = "High-level tracing language for Linux eBPF"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Apache-2.0"
+homepage = "https://bpftrace.org"
+dependencies = ["llvm", "clang", "elfutils", "bcc"]
+bootstrap = false
+
+[source]
+url = "https://github.com/bpftrace/bpftrace/archive/v0.21.1/bpftrace-0.21.1.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "cmake"
+dependencies = ["llvm-devel", "clang-devel", "elfutils-devel", "bcc-devel", "libbpf-devel", "cereal-devel"]
+use = []
+
+[install]
+script = ""

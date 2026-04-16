@@ -1,0 +1,23 @@
+[package]
+name = "iproute2"
+version = "6.9.0"
+type = "binary"
+architecture = "x86_64"
+description = "IP routing utilities"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://wiki.linuxfoundation.org/networking/iproute2"
+dependencies = ["libmnl", "libcap"]
+bootstrap = false
+
+[source]
+url = "https://mirrors.edge.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.9.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "custom"
+dependencies = ["libmnl-devel", "libcap-devel"]
+use = []
+
+[install]
+script = "make"

@@ -1,0 +1,23 @@
+[package]
+name = "libjpeg-turbo"
+version = "3.0.3"
+type = "binary"
+architecture = "aarch64"
+description = "JPEG image codec with SIMD acceleration"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD-3-Clause"
+homepage = "https://libjpeg-turbo.org"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.3/libjpeg-turbo-3.0.3.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "cmake"
+dependencies = ["nasm"]
+use = []
+
+[install]
+script = ""

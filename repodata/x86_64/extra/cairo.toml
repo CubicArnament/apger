@@ -1,0 +1,23 @@
+[package]
+name = "cairo"
+version = "1.18.0"
+type = "binary"
+architecture = "x86_64"
+description = "2D graphics library with support for multiple output devices"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://cairographics.org"
+dependencies = ["pixman", "fontconfig", "freetype2", "libpng"]
+bootstrap = false
+
+[source]
+url = "https://cairographics.org/releases/cairo-1.18.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["pixman-devel", "fontconfig-devel", "freetype2-devel", "libpng-devel", "glib2-devel"]
+use = []
+
+[install]
+script = ""

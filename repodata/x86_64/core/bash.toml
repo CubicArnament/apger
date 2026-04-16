@@ -1,0 +1,23 @@
+[package]
+name = "bash"
+version = "5.2.21"
+type = "binary"
+architecture = "x86_64"
+description = "GNU Bourne Again Shell — the standard shell for NurOS"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://www.gnu.org/software/bash/"
+dependencies = ["glibc", "readline", "ncurses"]
+bootstrap = false
+
+[source]
+url = "https://ftp.gnu.org/gnu/bash/bash-5.2.21.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["make", "gcc", "readline-devel", "ncurses-devel"]
+use = []
+
+[install]
+script = ""

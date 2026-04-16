@@ -1,0 +1,23 @@
+[package]
+name = "libffi"
+version = "3.4.6"
+type = "library"
+architecture = "x86_64"
+description = "libffi — portable foreign function interface library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://sourceware.org/libffi/"
+dependencies = ["glibc"]
+bootstrap = false
+
+[source]
+url = "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["make", "gcc"]
+use = []
+
+[install]
+script = ""

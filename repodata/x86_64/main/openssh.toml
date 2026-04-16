@@ -1,0 +1,23 @@
+[package]
+name = "openssh"
+version = "9.7p1"
+type = "binary"
+architecture = "x86_64"
+description = "OpenSSH secure shell"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD"
+homepage = "https://www.openssh.com"
+dependencies = ["openssl", "zlib", "pam", "krb5"]
+bootstrap = false
+
+[source]
+url = "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.7p1.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "zlib-devel", "pam-devel", "krb5-devel"]
+use = []
+
+[install]
+script = ""

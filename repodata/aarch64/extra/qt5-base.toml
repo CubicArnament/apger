@@ -1,0 +1,23 @@
+[package]
+name = "qt5-base"
+version = "5.15.13"
+type = "binary"
+architecture = "aarch64"
+description = "Qt5 base libraries and tools"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-3.0"
+homepage = "https://qt.io"
+dependencies = ["libpng", "libjpeg-turbo", "freetype2", "fontconfig", "harfbuzz", "openssl"]
+bootstrap = false
+
+[source]
+url = "https://download.qt.io/official_releases/qt/5.15/5.15.13/submodules/qtbase-everywhere-src-5.15.13.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["libpng-devel", "libjpeg-turbo-devel", "freetype2-devel", "fontconfig-devel", "harfbuzz-devel", "openssl-devel", "wayland-devel", "libxkbcommon-devel", "mesa-devel"]
+use = []
+
+[install]
+script = "./configure -prefix /usr -opensource -confirm-license -release -shared -nomake examples -nomake tests && make -j$(nproc) && make install"

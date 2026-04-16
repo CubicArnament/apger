@@ -1,0 +1,23 @@
+[package]
+name = "nss"
+version = "3.100"
+type = "binary"
+architecture = "aarch64"
+description = "Network Security Services cryptographic library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MPL-2.0"
+homepage = "https://firefox-source-docs.mozilla.org/security/nss"
+dependencies = ["nspr", "sqlite", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_100_RTM/src/nss-3.100-with-nspr-4.35.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["sqlite-devel", "zlib-devel"]
+use = []
+
+[install]
+script = "cd nss && make -j$(nproc) BUILD_OPT=1 NSPR_INCLUDE_DIR=/usr/include/nspr USE_SYSTEM_ZLIB=1 NSS_USE_SYSTEM_SQLITE=1 USE_64=1 && cd ../dist && install -d /usr/lib /usr/include/nss && cp -L lib/*.so /usr/lib && cp -rL public/nss /usr/include/"

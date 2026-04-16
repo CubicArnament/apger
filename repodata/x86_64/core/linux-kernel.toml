@@ -1,0 +1,24 @@
+[package]
+name = "linux-kernel"
+version = "6.9.0"
+type = "binary"
+architecture = "x86_64"
+description = "Linux kernel — core of the NurOS operating system"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://kernel.org/"
+dependencies = []
+bootstrap = false
+krnl = true
+
+[source]
+url = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "kbuild"
+dependencies = ["make", "gcc", "binutils", "bc", "flex", "bison", "openssl-devel", "elfutils-libelf-devel"]
+use = []
+
+[install]
+script = ""

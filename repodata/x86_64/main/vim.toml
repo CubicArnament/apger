@@ -1,0 +1,23 @@
+[package]
+name = "vim"
+version = "9.1.0"
+type = "binary"
+architecture = "x86_64"
+description = "Vi IMproved text editor"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Vim"
+homepage = "https://www.vim.org"
+dependencies = ["ncurses", "python3", "lua", "ruby"]
+bootstrap = false
+
+[source]
+url = "https://github.com/vim/vim/archive/v9.1.0/vim-9.1.0.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["ncurses-devel", "python3-devel", "lua-devel", "ruby-devel"]
+use = []
+
+[install]
+script = ""

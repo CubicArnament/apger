@@ -1,0 +1,23 @@
+[package]
+name = "openssl"
+version = "3.3.0"
+type = "library"
+architecture = "x86_64"
+description = "OpenSSL — TLS/SSL and general-purpose cryptography library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Apache-2.0"
+homepage = "https://www.openssl.org/"
+dependencies = ["glibc", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://www.openssl.org/source/openssl-3.3.0.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["make", "gcc", "perl", "zlib-devel"]
+use = []
+
+[install]
+script = ""

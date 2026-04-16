@@ -1,0 +1,23 @@
+[package]
+name = "wpa_supplicant"
+version = "2.11"
+type = "binary"
+architecture = "aarch64"
+description = "WPA/WPA2/IEEE 802.1X supplicant for wireless networks"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD-3-Clause"
+homepage = "https://w1.fi/wpa_supplicant"
+dependencies = ["openssl", "dbus", "libnl"]
+bootstrap = false
+
+[source]
+url = "https://w1.fi/releases/wpa_supplicant-2.11.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["openssl-devel", "dbus-devel", "libnl3-devel"]
+use = []
+
+[install]
+script = "cd wpa_supplicant && cp defconfig .config && echo 'CONFIG_CTRL_IFACE_DBUS_NEW=y' >> .config && make -j$(nproc) && make install BINDIR=/usr/bin LIBDIR=/usr/lib"

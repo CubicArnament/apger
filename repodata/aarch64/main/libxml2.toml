@@ -1,0 +1,22 @@
+[package]
+name = "libxml2"
+version = "2.12.6"
+type = "binary"
+architecture = "aarch64"
+description = "XML parsing library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://gitlab.gnome.org/GNOME/libxml2"
+dependencies = ["zlib", "xz", "readline"]
+
+[source]
+url = "https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.6.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["zlib-devel", "xz-devel", "readline-devel"]
+use = []
+
+[install]
+script = ""

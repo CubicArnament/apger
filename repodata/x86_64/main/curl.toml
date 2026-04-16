@@ -1,0 +1,23 @@
+[package]
+name = "curl"
+version = "8.7.1"
+type = "binary"
+architecture = "x86_64"
+description = "Command line tool for transferring data with URLs"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://curl.se"
+dependencies = ["openssl", "zlib", "libnghttp2"]
+bootstrap = false
+
+[source]
+url = "https://curl.se/download/curl-8.7.1.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "zlib-devel", "libnghttp2-devel"]
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,23 @@
+[package]
+name = "helm"
+version = "3.15.1"
+type = "binary"
+architecture = "x86_64"
+description = "Kubernetes package manager"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Apache-2.0"
+homepage = "https://helm.sh"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://github.com/helm/helm/archive/v3.15.1/helm-3.15.1.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["go"]
+use = []
+
+[install]
+script = "make build && install -Dm755 bin/helm /usr/bin/helm"

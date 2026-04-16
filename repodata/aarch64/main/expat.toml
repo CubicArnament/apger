@@ -1,0 +1,22 @@
+[package]
+name = "expat"
+version = "2.6.2"
+type = "binary"
+architecture = "aarch64"
+description = "XML parser library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://libexpat.github.io"
+dependencies = []
+
+[source]
+url = "https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = []
+use = []
+
+[install]
+script = ""

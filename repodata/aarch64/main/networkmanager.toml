@@ -1,0 +1,22 @@
+[package]
+name = "networkmanager"
+version = "1.46.0"
+type = "binary"
+architecture = "aarch64"
+description = "Network connection manager"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://networkmanager.dev"
+dependencies = ["glib2", "dbus", "openssl", "pam", "systemd"]
+
+[source]
+url = "https://download.gnome.org/sources/NetworkManager/1.46/NetworkManager-1.46.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["glib2-devel", "dbus-devel", "openssl-devel", "pam-devel", "systemd-devel"]
+use = []
+
+[install]
+script = ""

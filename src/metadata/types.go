@@ -60,6 +60,12 @@ type Recipe struct {
 		// available (libc, gcc, binutils). Bootstrap builds skip dependency
 		// checks and use a pre-stage cross-compiler environment.
 		Bootstrap bool `toml:"bootstrap" json:"bootstrap,omitempty"`
+		// Krnl marks this as a Linux kernel package.
+		// When true, the build produces two sub-packages:
+		//   <name>-image   — vmlinuz, System.map, initrd
+		//   <name>-modules — /lib/modules/<version>/
+		// Use template = "kbuild" with Krnl = true.
+		Krnl bool `toml:"krnl" json:"krnl,omitempty"`
 	} `toml:"package" json:"package"`
 
 	// Source describes where to fetch the package source.

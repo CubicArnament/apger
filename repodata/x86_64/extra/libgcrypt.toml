@@ -1,0 +1,23 @@
+[package]
+name = "libgcrypt"
+version = "1.10.3"
+type = "binary"
+architecture = "x86_64"
+description = "General purpose cryptographic library based on GnuPG code"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://gnupg.org/software/libgcrypt"
+dependencies = ["libgpg-error"]
+bootstrap = false
+
+[source]
+url = "https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["libgpg-error-devel"]
+use = []
+
+[install]
+script = ""

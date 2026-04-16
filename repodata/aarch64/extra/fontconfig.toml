@@ -1,0 +1,23 @@
+[package]
+name = "fontconfig"
+version = "2.15.0"
+type = "binary"
+architecture = "aarch64"
+description = "Font configuration and customization library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://fontconfig.org"
+dependencies = ["freetype2", "expat"]
+bootstrap = false
+
+[source]
+url = "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["freetype2-devel", "expat-devel"]
+use = []
+
+[install]
+script = ""

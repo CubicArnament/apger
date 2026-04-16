@@ -1,0 +1,23 @@
+[package]
+name = "upower"
+version = "1.90.4"
+type = "binary"
+architecture = "x86_64"
+description = "D-Bus service for power management"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://upower.freedesktop.org"
+dependencies = ["glib2", "dbus", "polkit"]
+bootstrap = false
+
+[source]
+url = "https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.4/upower-v1.90.4.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["glib2-devel", "dbus-devel", "polkit-devel", "libgudev-devel"]
+use = []
+
+[install]
+script = ""

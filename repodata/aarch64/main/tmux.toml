@@ -1,0 +1,23 @@
+[package]
+name = "tmux"
+version = "3.4"
+type = "binary"
+architecture = "aarch64"
+description = "Terminal multiplexer"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "ISC"
+homepage = "https://github.com/tmux/tmux"
+dependencies = ["ncurses", "libevent"]
+bootstrap = false
+
+[source]
+url = "https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["ncurses-devel", "libevent-devel"]
+use = []
+
+[install]
+script = ""

@@ -1,0 +1,23 @@
+[package]
+name = "p11-kit"
+version = "0.25.3"
+type = "binary"
+architecture = "aarch64"
+description = "Library for loading and sharing PKCS#11 modules"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD-3-Clause"
+homepage = "https://p11-glue.github.io/p11-glue/p11-kit.html"
+dependencies = ["libffi", "libtasn1"]
+bootstrap = false
+
+[source]
+url = "https://github.com/p11-glue/p11-kit/releases/download/0.25.3/p11-kit-0.25.3.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["libffi-devel", "libtasn1-devel"]
+use = []
+
+[install]
+script = ""

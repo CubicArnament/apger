@@ -1,0 +1,23 @@
+[package]
+name = "freetype2"
+version = "2.13.2"
+type = "binary"
+architecture = "x86_64"
+description = "Font rendering library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "FTL"
+homepage = "https://freetype.org"
+dependencies = ["libpng", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["libpng-devel", "zlib-devel", "bzip2-devel"]
+use = []
+
+[install]
+script = ""

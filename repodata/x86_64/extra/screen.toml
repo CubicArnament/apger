@@ -1,0 +1,23 @@
+[package]
+name = "screen"
+version = "4.9.1"
+type = "binary"
+architecture = "x86_64"
+description = "Full-screen window manager that multiplexes a terminal"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://gnu.org/software/screen"
+dependencies = ["ncurses", "pam"]
+bootstrap = false
+
+[source]
+url = "https://ftp.gnu.org/gnu/screen/screen-4.9.1.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["ncurses-devel", "pam-devel"]
+use = []
+
+[install]
+script = ""

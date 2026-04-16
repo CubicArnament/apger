@@ -1,0 +1,23 @@
+[package]
+name = "polkit"
+version = "124"
+type = "binary"
+architecture = "x86_64"
+description = "Authorization framework for controlling system-wide privileges"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.0"
+homepage = "https://gitlab.freedesktop.org/polkit/polkit"
+dependencies = ["glib2", "dbus", "pam"]
+bootstrap = false
+
+[source]
+url = "https://gitlab.freedesktop.org/polkit/polkit/-/archive/124/polkit-124.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["glib2-devel", "dbus-devel", "pam-devel", "gobject-introspection"]
+use = []
+
+[install]
+script = ""

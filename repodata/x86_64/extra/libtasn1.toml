@@ -1,0 +1,23 @@
+[package]
+name = "libtasn1"
+version = "4.19.0"
+type = "binary"
+architecture = "x86_64"
+description = "ASN.1 library used by GnuTLS"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://www.gnu.org/software/libtasn1"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = []
+use = []
+
+[install]
+script = ""

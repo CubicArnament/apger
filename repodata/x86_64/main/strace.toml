@@ -1,0 +1,23 @@
+[package]
+name = "strace"
+version = "6.9"
+type = "binary"
+architecture = "x86_64"
+description = "System call tracer"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://strace.io"
+dependencies = ["libunwind"]
+bootstrap = false
+
+[source]
+url = "https://github.com/strace/strace/releases/download/v6.9/strace-6.9.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["libunwind-devel"]
+use = []
+
+[install]
+script = ""

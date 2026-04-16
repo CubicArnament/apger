@@ -1,0 +1,23 @@
+[package]
+name = "perf"
+version = "6.9"
+type = "binary"
+architecture = "aarch64"
+description = "Linux kernel performance analysis tool"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-2.0"
+homepage = "https://perf.wiki.kernel.org"
+dependencies = ["elfutils", "python3", "openssl", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["elfutils-devel", "python3-devel", "openssl-devel", "zlib-devel", "binutils-devel", "numactl-devel"]
+use = []
+
+[install]
+script = "cd tools/perf && make -j$(nproc) prefix=/usr && make install prefix=/usr"

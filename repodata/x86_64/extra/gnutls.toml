@@ -1,0 +1,23 @@
+[package]
+name = "gnutls"
+version = "3.8.5"
+type = "binary"
+architecture = "x86_64"
+description = "GNU Transport Layer Security library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "LGPL-2.1"
+homepage = "https://gnutls.org"
+dependencies = ["nettle", "libtasn1", "p11-kit", "libgpg-error"]
+bootstrap = false
+
+[source]
+url = "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.5.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["nettle-devel", "libtasn1-devel", "p11-kit-devel", "libgpg-error-devel", "libunistring-devel"]
+use = []
+
+[install]
+script = ""

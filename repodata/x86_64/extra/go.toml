@@ -1,0 +1,23 @@
+[package]
+name = "go"
+version = "1.22.3"
+type = "binary"
+architecture = "x86_64"
+description = "The Go programming language compiler and tools"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "BSD-3-Clause"
+homepage = "https://go.dev"
+dependencies = []
+bootstrap = false
+
+[source]
+url = "https://go.dev/dl/go1.22.3.src.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["go-bootstrap"]
+use = []
+
+[install]
+script = "cd src && GOROOT_BOOTSTRAP=/usr/lib/go-bootstrap ./make.bash && cd .. && install -d /usr/lib/go && cp -r . /usr/lib/go && ln -s /usr/lib/go/bin/go /usr/bin/go && ln -s /usr/lib/go/bin/gofmt /usr/bin/gofmt"

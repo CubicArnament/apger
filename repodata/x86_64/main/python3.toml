@@ -1,0 +1,23 @@
+[package]
+name = "python3"
+version = "3.12.3"
+type = "binary"
+architecture = "x86_64"
+description = "Python programming language"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "PSF-2.0"
+homepage = "https://www.python.org"
+dependencies = ["openssl", "zlib", "libffi", "sqlite", "expat", "ncurses", "readline"]
+bootstrap = false
+
+[source]
+url = "https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "autotools"
+dependencies = ["openssl-devel", "zlib-devel", "libffi-devel", "sqlite-devel", "expat-devel", "ncurses-devel", "readline-devel"]
+use = []
+
+[install]
+script = ""

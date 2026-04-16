@@ -1,0 +1,23 @@
+[package]
+name = "pipewire"
+version = "1.0.7"
+type = "binary"
+architecture = "aarch64"
+description = "Low-latency audio/video router and processor"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://pipewire.org"
+dependencies = ["alsa-lib", "glib2", "dbus", "pulseaudio"]
+bootstrap = false
+
+[source]
+url = "https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.0.7/pipewire-1.0.7.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["alsa-lib-devel", "glib2-devel", "dbus-devel", "pulseaudio-devel", "libsndfile-devel", "bluez-devel"]
+use = []
+
+[install]
+script = ""

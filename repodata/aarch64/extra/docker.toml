@@ -1,0 +1,23 @@
+[package]
+name = "docker"
+version = "26.1.3"
+type = "binary"
+architecture = "aarch64"
+description = "Container platform for building, shipping and running applications"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "Apache-2.0"
+homepage = "https://docker.com"
+dependencies = ["containerd", "runc", "iptables"]
+bootstrap = false
+
+[source]
+url = "https://github.com/moby/moby/archive/v26.1.3/moby-26.1.3.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["go", "containerd-devel", "btrfs-progs-devel", "device-mapper-devel"]
+use = []
+
+[install]
+script = "GOPATH=/tmp/gobuild go build -o /usr/bin/dockerd ./cmd/dockerd && go build -o /usr/bin/docker-proxy ./cmd/docker-proxy"

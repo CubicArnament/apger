@@ -1,0 +1,23 @@
+[package]
+name = "rust"
+version = "1.78.0"
+type = "binary"
+architecture = "x86_64"
+description = "Systems programming language focused on safety and performance"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://rust-lang.org"
+dependencies = ["llvm", "openssl", "zlib"]
+bootstrap = false
+
+[source]
+url = "https://static.rust-lang.org/dist/rustc-1.78.0-src.tar.gz"
+type_src = "tarball"
+
+[build]
+template = "makefile"
+dependencies = ["llvm-devel", "openssl-devel", "zlib-devel", "python3", "cmake", "ninja"]
+use = []
+
+[install]
+script = "./configure --prefix=/usr --enable-llvm-link-shared --release-channel=stable --enable-optimize && python3 x.py build && python3 x.py install"

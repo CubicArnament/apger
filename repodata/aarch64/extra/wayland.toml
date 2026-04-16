@@ -1,0 +1,23 @@
+[package]
+name = "wayland"
+version = "1.23.0"
+type = "binary"
+architecture = "aarch64"
+description = "Wayland display server protocol and library"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "MIT"
+homepage = "https://wayland.freedesktop.org"
+dependencies = ["expat", "libffi"]
+bootstrap = false
+
+[source]
+url = "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.23.0/downloads/wayland-1.23.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "meson"
+dependencies = ["expat-devel", "libffi-devel", "libxml2-devel"]
+use = []
+
+[install]
+script = ""
