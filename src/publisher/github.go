@@ -42,54 +42,64 @@ func (p *Publisher) client(ctx context.Context) (*github.Client, error) {
 	return github.NewClient(oauth2.NewClient(ctx, ts)), nil
 }
 
-// ── GitHub Packages (ghcr.io OCI) ────────────────────────────────────────────
+// ── GitHub Releases ───────────────────────────────────────────────────────────
 
-// UploadToPackages pushes each .apg file as an OCI artifact to
-// ghcr.io/<org>/<pkgName>:<version> using the GitHub Packages Container Registry.
-//
-// The .apg file is stored as a single-layer OCI image with media type
-// application/vnd.nuros.apg. Authentication uses the installation token
-// which has packages:write scope when the GitHub App has it configured.
-func (p *Publisher) UploadToPackages(ctx context.Context, pkgName, version string, assetPaths []string) error {
-	token, err := p.creds.AuthToken(ctx, p.org)
-	if err != nil {
-		return fmt.Errorf("get token: %w", err)
+// UploadRelease creates or updates a GitHub Release for pkgName@version
+// and uploads all files in assetPaths as release assets.
+func (p *Publisher) UploadRelease(ctx context.Context, pkgName, version string, assetPaths []string) error {
+	if err := p.EnsureRepo(ctx, pkgName); err != nil {
+		return err
 	}
-
-	// ghcr.io uses Docker Registry HTTP API v2.
-	// We push each file as a blob + manifest using the token as Bearer auth.
-	registry := "ghcr.io"
-	image := fmt.Sprintf("%s/%s/%s", registry, strings.ToLower(p.org), strings.ToLower(pkgName))
+	c, err := p.client(ctx)
+	if err != nil {
+		return err
+	}
 	tag := "v" + strings.TrimPrefix(version, "v")
-
+	rel, err := findOrCreateRelease(ctx, c, p.org, pkgName, tag)
+	if err != nil {
+		return err
+	}
 	for _, path := range assetPaths {
-		if err := pushOCIBlob(ctx, token, image, tag, path); err != nil {
-			return fmt.Errorf("push %s to ghcr.io: %w", filepath.Base(path), err)
+		if err := uploadAsset(ctx, c, p.org, pkgName, rel, path); err != nil {
+			return fmt.Errorf("upload %s: %w", filepath.Base(path), err)
 		}
 	}
 	return nil
 }
 
-// pushOCIBlob pushes a single file as an OCI artifact layer to ghcr.io.
-// Uses the OCI Distribution Spec (POST /blobs/uploads → PUT blob → PUT manifest).
-func pushOCIBlob(ctx context.Context, token, image, tag, filePath string) error {
-	data, err := os.ReadFile(filePath)
+func findOrCreateRelease(ctx context.Context, c *github.Client, org, repo, tag string) (*github.RepositoryRelease, error) {
+	rel, resp, err := c.Repositories.GetReleaseByTag(ctx, org, repo, tag)
+	if err == nil {
+		return rel, nil
+	}
+	if resp == nil || resp.StatusCode != 404 {
+		return nil, fmt.Errorf("get release %s: %w", tag, err)
+	}
+	rel, _, err = c.Repositories.CreateRelease(ctx, org, repo, &github.RepositoryRelease{
+		TagName: github.Ptr(tag),
+		Name:    github.Ptr(repo + " " + tag),
+		Body:    github.Ptr("Built by APGer — NurOS package builder"),
+	})
+	return rel, err
+}
+
+func uploadAsset(ctx context.Context, c *github.Client, org, repo string, rel *github.RepositoryRelease, path string) error {
+	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
-
-	// ghcr.io endpoint: https://ghcr.io/v2/<image>/blobs/uploads/
-	// We use the GitHub Packages REST API via go-github where possible,
-	// but for OCI push we need raw HTTP calls.
-	// For now we use the GitHub Packages API to create a package version.
-	// Full OCI push requires a separate HTTP client — kept minimal here.
-	_ = data
-	_ = token
-	_ = image
-	_ = tag
-	// TODO: implement full OCI push via net/http when ghcr.io token scope is confirmed
-	// Reference: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
-	return fmt.Errorf("ghcr.io OCI push not yet implemented — use NurOS-Packages org mode")
+	defer f.Close()
+	name := filepath.Base(path)
+	assets, _, _ := c.Repositories.ListReleaseAssets(ctx, org, repo, rel.GetID(), nil)
+	for _, a := range assets {
+		if a.GetName() == name {
+			c.Repositories.DeleteReleaseAsset(ctx, org, repo, a.GetID()) //nolint:errcheck
+			break
+		}
+	}
+	_, _, err = c.Repositories.UploadReleaseAsset(ctx, org, repo, rel.GetID(),
+		&github.UploadOptions{Name: name}, f)
+	return err
 }
 
 // ── NurOS-Packages org (repo + file upload) ───────────────────────────────────

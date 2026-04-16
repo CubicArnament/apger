@@ -302,9 +302,9 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 				o.log.Printf("[postBuild] upload to org %s: %v", pkgName, err)
 			}
 		}
-		if target&tui.PublishGitHubPackages != 0 {
-			if err := pub.UploadToPackages(ctx, pkgName, ver, assetPaths); err != nil {
-				o.log.Printf("[postBuild] upload to packages %s: %v", pkgName, err)
+		if target&tui.PublishGitHubReleases != 0 {
+			if err := pub.UploadRelease(ctx, pkgName, ver, assetPaths); err != nil {
+				o.log.Printf("[postBuild] upload release %s: %v", pkgName, err)
 			}
 		}
 		if target&tui.PublishLocal != 0 {

@@ -20,8 +20,8 @@ import (
 type PublishTarget uint8
 
 const (
-	PublishGitHubPackages PublishTarget = 1 << iota // GitHub Packages (ghcr.io OCI)
-	PublishNurOSOrg                                 // NurOS-Packages GitHub org repo
+	PublishGitHubReleases PublishTarget = 1 << iota // GitHub Releases in NurOS-Packages/<pkg>
+	PublishNurOSOrg                                 // NurOS-Packages org repo (file commit)
 	PublishLocal                                    // Local only, no remote publish
 )
 
@@ -40,14 +40,14 @@ type settingsItem struct {
 
 var settingsItems = []settingsItem{
 	{
-		label:  "GitHub Packages (ghcr.io)",
-		bit:    PublishGitHubPackages,
-		detail: "Push .apg + .sig as OCI artifact to ghcr.io/NurOS-Packages/<pkg>:<version>",
+		label:  "GitHub Releases",
+		bit:    PublishGitHubReleases,
+		detail: "Upload .apg + .sig as release assets to NurOS-Packages/<pkg> v<version>",
 	},
 	{
-		label:  "NurOS-Packages org",
+		label:  "NurOS-Packages org (file commit)",
 		bit:    PublishNurOSOrg,
-		detail: "Create/update repo in NurOS-Packages org and upload .apg + .sig",
+		detail: "Commit .apg into packages/<version>/ in the org repo",
 	},
 	{
 		label:  "Local only (no publish)",
@@ -59,7 +59,7 @@ var settingsItems = []settingsItem{
 // NewSettingsScreen creates a settings screen with the given initial targets.
 func NewSettingsScreen(targets PublishTarget) *SettingsScreen {
 	if targets == 0 {
-		targets = PublishGitHubPackages // sensible default
+		targets = PublishGitHubReleases
 	}
 	return &SettingsScreen{targets: targets}
 }
