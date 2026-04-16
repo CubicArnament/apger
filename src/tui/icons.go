@@ -16,7 +16,6 @@ var templateIcons = map[string]string{
 	"npm":           "\ue71e ",  // nf-dev-nodejs_small
 	"kbuild":        "\uf17c ",  // nf-fa-linux (kernel)
 	"custom":        "\uf013 ",  // nf-fa-gear
-	"default":       "\uf1b2 ",  // nf-fa-cube
 }
 
 // bootstrapIcon is shown for packages with bootstrap=true (libc, gcc, binutils).
@@ -25,12 +24,10 @@ const bootstrapIcon = "\uf0e7 "
 
 // IconForRecipe returns the Nerd Font icon for a recipe based on its build template.
 // Bootstrap packages always get the bootstrap icon regardless of template.
+// Returns empty string if the template has no icon.
 func IconForRecipe(r metadata.Recipe) string {
 	if r.Package.Bootstrap {
 		return bootstrapIcon
 	}
-	if icon, ok := templateIcons[r.Build.Template]; ok {
-		return icon
-	}
-	return templateIcons["default"]
+	return templateIcons[r.Build.Template]
 }
