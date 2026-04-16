@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://web.mit.edu/kerberos"
 dependencies = ["openssl", "libcom_err"]
-bootstrap = false
 
 [source]
 url = "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"

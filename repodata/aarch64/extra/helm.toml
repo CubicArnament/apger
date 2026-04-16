@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "Apache-2.0"
 homepage = "https://helm.sh"
 dependencies = []
-bootstrap = false
 
 [source]
 url = "https://github.com/helm/helm/archive/v3.15.1/helm-3.15.1.tar.gz"
@@ -20,4 +19,4 @@ dependencies = ["go"]
 use = []
 
 [install]
-script = "make build && install -Dm755 bin/helm /usr/bin/helm"
+script = "GOARCH=arm64 make build && install -Dm755 bin/helm /usr/bin/helm"

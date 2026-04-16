@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://gtk.org"
 dependencies = ["glib2", "pango", "cairo", "gdk-pixbuf2", "harfbuzz", "graphene"]
-bootstrap = false
 
 [source]
 url = "https://download.gnome.org/sources/gtk/4.14/gtk-4.14.4.tar.xz"

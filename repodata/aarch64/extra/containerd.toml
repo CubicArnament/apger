@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "Apache-2.0"
 homepage = "https://containerd.io"
 dependencies = ["runc"]
-bootstrap = false
 
 [source]
 url = "https://github.com/containerd/containerd/archive/v1.7.17/containerd-1.7.17.tar.gz"

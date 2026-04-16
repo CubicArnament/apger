@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://gnupg.org/software/libgpg-error"
 dependencies = []
-bootstrap = false
 
 [source]
 url = "https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.bz2"

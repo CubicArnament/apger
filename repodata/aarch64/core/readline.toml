@@ -1,13 +1,13 @@
 [package]
 name = "readline"
 version = "8.2"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "GNU readline library"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-3.0"
 homepage = "https://tiswww.case.edu/php/chet/readline/rltop.html"
-dependencies = ["ncurses"]
+dependencies = ["glibc", "ncurses"]
 
 [source]
 url = "https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz"

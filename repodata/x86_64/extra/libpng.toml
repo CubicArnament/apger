@@ -6,7 +6,7 @@ architecture = "x86_64"
 description = "PNG image format library"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "Libpng"
-homepage = "http://libpng.org"
+homepage = "https://libpng.org"
 dependencies = ["zlib"]
 bootstrap = false
 

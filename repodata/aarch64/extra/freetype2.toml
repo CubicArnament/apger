@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "FTL"
 homepage = "https://freetype.org"
 dependencies = ["libpng", "zlib"]
-bootstrap = false
 
 [source]
 url = "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz"

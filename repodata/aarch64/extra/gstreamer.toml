@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://gstreamer.freedesktop.org"
 dependencies = ["glib2", "libxml2"]
-bootstrap = false
 
 [source]
 url = "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.24.3.tar.xz"

@@ -1,13 +1,13 @@
 [package]
 name = "pam"
 version = "1.6.1"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "Pluggable Authentication Modules"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-2.0"
 homepage = "https://github.com/linux-pam/linux-pam"
-dependencies = ["libffi", "openssl"]
+dependencies = ["glibc", "libffi", "openssl"]
 
 [source]
 url = "https://github.com/linux-pam/linux-pam/releases/download/v1.6.1/Linux-PAM-1.6.1.tar.xz"

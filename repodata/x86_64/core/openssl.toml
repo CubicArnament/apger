@@ -15,7 +15,7 @@ url = "https://www.openssl.org/source/openssl-3.3.0.tar.gz"
 type_src = "tarball"
 
 [build]
-template = "autotools"
+template = "custom"
 dependencies = ["make", "gcc", "perl", "zlib-devel"]
 use = []
 

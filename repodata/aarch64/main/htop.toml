@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-2.0"
 homepage = "https://htop.dev"
 dependencies = ["ncurses"]
-bootstrap = false
 
 [source]
 url = "https://github.com/htop-dev/htop/releases/download/3.3.0/htop-3.3.0.tar.xz"

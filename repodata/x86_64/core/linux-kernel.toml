@@ -1,6 +1,6 @@
 [package]
 name = "linux-kernel"
-version = "6.9.0"
+version = "6.9"
 type = "binary"
 architecture = "x86_64"
 description = "Linux kernel — core of the NurOS operating system"

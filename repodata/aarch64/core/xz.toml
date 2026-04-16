@@ -1,13 +1,13 @@
 [package]
 name = "xz"
 version = "5.6.1"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "XZ-format compression utilities"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "LGPL-2.1"
+license = "GPL-2.0"
 homepage = "https://tukaani.org/xz/"
-dependencies = []
+dependencies = ["glibc"]
 
 [source]
 url = "https://github.com/tukaani-project/xz/releases/download/v5.6.1/xz-5.6.1.tar.xz"

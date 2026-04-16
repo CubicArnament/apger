@@ -1,7 +1,7 @@
 [package]
 name = "glib2"
 version = "2.80.0"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "Low-level core library for GNOME"
 maintainer = "NurOS Team <team@nuros.org>"

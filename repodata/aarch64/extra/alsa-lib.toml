@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://alsa-project.org"
 dependencies = []
-bootstrap = false
 
 [source]
 url = "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.12.tar.bz2"

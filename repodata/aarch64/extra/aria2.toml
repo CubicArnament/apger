@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-2.0"
 homepage = "https://aria2.github.io"
 dependencies = ["openssl", "libxml2", "sqlite", "zlib"]
-bootstrap = false
 
 [source]
 url = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0.tar.xz"

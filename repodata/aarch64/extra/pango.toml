@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://pango.gnome.org"
 dependencies = ["glib2", "harfbuzz", "fontconfig", "freetype2", "cairo"]
-bootstrap = false
 
 [source]
 url = "https://download.gnome.org/sources/pango/1.52/pango-1.52.2.tar.xz"

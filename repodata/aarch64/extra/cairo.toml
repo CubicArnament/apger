@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://cairographics.org"
 dependencies = ["pixman", "fontconfig", "freetype2", "libpng"]
-bootstrap = false
 
 [source]
 url = "https://cairographics.org/releases/cairo-1.18.0.tar.xz"

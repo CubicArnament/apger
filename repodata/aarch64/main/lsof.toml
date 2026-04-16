@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD"
 homepage = "https://github.com/nicowillis/lsof"
 dependencies = []
-bootstrap = false
 
 [source]
 url = "https://github.com/nicowillis/lsof/releases/download/4.99.3/lsof-4.99.3.tar.gz"

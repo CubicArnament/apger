@@ -7,7 +7,7 @@ description = "Shadow password utilities"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD-3-Clause"
 homepage = "https://github.com/shadow-maint/shadow"
-dependencies = ["pam"]
+dependencies = ["glibc", "pam"]
 
 [source]
 url = "https://github.com/shadow-maint/shadow/releases/download/4.15.1/shadow-4.15.1.tar.xz"

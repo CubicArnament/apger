@@ -18,6 +18,7 @@ type_src = "tarball"
 template = "makefile"
 dependencies = ["elfutils-devel", "python3-devel", "openssl-devel", "zlib-devel", "binutils-devel", "numactl-devel"]
 use = []
+script = "make -C tools/perf"
 
 [install]
-script = "cd tools/perf && make -j$(nproc) prefix=/usr && make install prefix=/usr"
+script = "make -C tools/perf install prefix=/usr"

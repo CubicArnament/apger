@@ -1,13 +1,13 @@
 [package]
 name = "libffi"
 version = "3.4.6"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "Foreign Function Interface library"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://sourceware.org/libffi/"
-dependencies = []
+dependencies = ["glibc"]
 
 [source]
 url = "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"

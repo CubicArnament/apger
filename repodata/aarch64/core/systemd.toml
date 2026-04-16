@@ -7,10 +7,10 @@ description = "System and service manager"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://systemd.io"
-dependencies = ["dbus", "pam", "openssl", "xz", "zstd", "libffi"]
+dependencies = ["glibc", "dbus", "pam", "openssl", "xz", "zstd", "libffi"]
 
 [source]
-url = "https://github.com/systemd/systemd/archive/refs/tags/v255.tar.gz"
+url = "https://github.com/systemd/systemd/archive/v255/systemd-255.tar.gz"
 type_src = "tarball"
 
 [build]

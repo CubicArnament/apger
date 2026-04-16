@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://nodejs.org"
 dependencies = ["openssl", "zlib", "libuv"]
-bootstrap = false
 
 [source]
 url = "https://nodejs.org/dist/v22.2.0/node-v22.2.0.tar.xz"

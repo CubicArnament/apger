@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "OLDAP-2.8"
 homepage = "https://openldap.org"
 dependencies = ["openssl", "cyrus-sasl", "libdb"]
-bootstrap = false
 
 [source]
 url = "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.8.tgz"

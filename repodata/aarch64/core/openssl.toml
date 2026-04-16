@@ -1,13 +1,13 @@
 [package]
 name = "openssl"
 version = "3.3.0"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "TLS/SSL and crypto library"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "Apache-2.0"
 homepage = "https://www.openssl.org"
-dependencies = ["zlib"]
+dependencies = ["glibc", "zlib"]
 
 [source]
 url = "https://www.openssl.org/source/openssl-3.3.0.tar.gz"

@@ -18,6 +18,7 @@ type_src = "tarball"
 template = "custom"
 dependencies = []
 use = []
+script = "install -Dm644 cacert-2024-02-02.pem /usr/share/ca-certificates/ca-bundle.crt"
 
 [install]
-script = "install -Dm644 cacert.pem /usr/share/ca-certificates/ca-bundle.crt"
+script = ""

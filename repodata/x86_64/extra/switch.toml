@@ -8,6 +8,7 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-3.0"
 homepage = "https://github.com/NurOS-Linux/switch"
 dependencies = []
+bootstrap = false
 
 [source]
 url = "https://github.com/NurOS-Linux/switch/archive/refs/heads/main.tar.gz"
@@ -16,3 +17,7 @@ type_src = "tarball"
 [build]
 template = "meson"
 dependencies = ["meson", "ninja-build", "gcc", "clang"]
+use = []
+
+[install]
+script = ""

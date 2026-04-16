@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://harfbuzz.github.io"
 dependencies = ["freetype2", "glib2"]
-bootstrap = false
 
 [source]
 url = "https://github.com/harfbuzz/harfbuzz/releases/download/8.5.0/harfbuzz-8.5.0.tar.xz"

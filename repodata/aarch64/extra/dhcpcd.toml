@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD-2-Clause"
 homepage = "https://github.com/NetworkConfiguration/dhcpcd"
 dependencies = []
-bootstrap = false
 
 [source]
 url = "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.0.8/dhcpcd-10.0.8.tar.xz"

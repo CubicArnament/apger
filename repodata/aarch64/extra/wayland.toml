@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://wayland.freedesktop.org"
 dependencies = ["expat", "libffi"]
-bootstrap = false
 
 [source]
 url = "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.23.0/downloads/wayland-1.23.0.tar.xz"

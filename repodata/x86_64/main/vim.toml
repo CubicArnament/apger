@@ -11,7 +11,7 @@ dependencies = ["ncurses", "python3", "lua", "ruby"]
 bootstrap = false
 
 [source]
-url = "https://github.com/vim/vim/archive/v9.1.0/vim-9.1.0.tar.gz"
+url = "https://github.com/vim/vim/archive/refs/tags/v9.1.0.tar.gz"
 type_src = "tarball"
 
 [build]

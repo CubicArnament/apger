@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://pipewire.org"
 dependencies = ["alsa-lib", "glib2", "dbus", "pulseaudio"]
-bootstrap = false
 
 [source]
 url = "https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.0.7/pipewire-1.0.7.tar.gz"

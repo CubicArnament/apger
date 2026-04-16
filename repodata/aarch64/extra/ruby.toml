@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "Ruby"
 homepage = "https://ruby-lang.org"
 dependencies = ["openssl", "zlib", "readline", "libffi", "gdbm"]
-bootstrap = false
 
 [source]
 url = "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.1.tar.xz"

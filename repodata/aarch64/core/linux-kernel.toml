@@ -16,7 +16,7 @@ type_src = "tarball"
 
 [build]
 template = "kbuild"
-dependencies = []
+dependencies = ["make", "clang", "binutils", "bc", "flex", "bison", "openssl-devel", "elfutils-libelf-devel"]
 use = []
 
 [install]

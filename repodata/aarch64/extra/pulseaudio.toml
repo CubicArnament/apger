@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://pulseaudio.org"
 dependencies = ["alsa-lib", "glib2", "dbus", "libsndfile"]
-bootstrap = false
 
 [source]
 url = "https://freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.xz"

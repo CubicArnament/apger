@@ -1,0 +1,32 @@
+# Example recipe for repodata/ directory
+
+[package]
+name = "your-package"
+version = "1.0.0"
+type = "binary"          # binary | library | meta
+architecture = "x86_64"
+description = "Package description"
+maintainer = "Your Name <email@example.com>"
+license = "GPL-3.0"
+homepage = "https://example.com"
+tags = ["tag1", "tag2"]
+dependencies = ["dep1"]
+conflicts = []
+provides = []
+replaces = []
+conf = ["/etc/config.conf"]
+bootstrap = false
+
+[source]
+url = "https://example.com/source-1.0.0.tar.xz"
+type_src = "tarball"     # tarball | git-repo
+include_submodules = false
+
+[build]
+# template: meson | cmake | autotools | cargo | python-pep517 | gradle | makefile | kbuild | custom
+template = "meson"
+dependencies = ["meson", "ninja-build"]
+use = []
+
+[install]
+script = ""

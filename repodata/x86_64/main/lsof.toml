@@ -6,12 +6,12 @@ architecture = "x86_64"
 description = "List open files"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD"
-homepage = "https://github.com/nicowillis/lsof"
+homepage = "https://github.com/lsof-org/lsof"
 dependencies = []
 bootstrap = false
 
 [source]
-url = "https://github.com/nicowillis/lsof/releases/download/4.99.3/lsof-4.99.3.tar.gz"
+url = "https://github.com/lsof-org/lsof/releases/download/4.99.3/lsof-4.99.3.tar.gz"
 type_src = "tarball"
 
 [build]

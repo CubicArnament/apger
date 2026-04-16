@@ -15,9 +15,10 @@ url = "https://ffmpeg.org/releases/ffmpeg-7.0.tar.xz"
 type_src = "tarball"
 
 [build]
-template = "makefile"
+template = "custom"
 dependencies = ["alsa-lib-devel", "libpng-devel", "libjpeg-turbo-devel", "zlib-devel", "openssl-devel", "nasm", "yasm", "libvorbis-devel", "libopus-devel", "libvpx-devel"]
 use = []
+script = "./configure --prefix=/usr --enable-shared --disable-static --enable-gpl --enable-openssl --enable-libvorbis --enable-libopus --enable-libvpx && make -j$(nproc) && make install"
 
 [install]
-script = "./configure --prefix=/usr --enable-shared --disable-static --enable-gpl --enable-openssl --enable-libvorbis --enable-libopus --enable-libvpx && make -j$(nproc) && make install"
+script = ""

@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "TCL"
 homepage = "https://tcl.tk"
 dependencies = ["zlib"]
-bootstrap = false
 
 [source]
 url = "https://prdownloads.sourceforge.net/tcl/tcl8.6.14-src.tar.gz"

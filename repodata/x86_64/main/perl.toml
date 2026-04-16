@@ -18,6 +18,7 @@ type_src = "tarball"
 template = "custom"
 dependencies = ["zlib-devel", "bzip2-devel"]
 use = []
+script = "./Configure -des -Dprefix=/usr && make && make install"
 
 [install]
-script = "./Configure -des -Dprefix=/usr"
+script = ""

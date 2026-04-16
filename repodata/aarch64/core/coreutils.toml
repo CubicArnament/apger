@@ -7,7 +7,7 @@ description = "GNU core utilities"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-3.0"
 homepage = "https://www.gnu.org/software/coreutils/"
-dependencies = []
+dependencies = ["glibc"]
 
 [source]
 url = "https://ftp.gnu.org/gnu/coreutils/coreutils-9.5.tar.xz"

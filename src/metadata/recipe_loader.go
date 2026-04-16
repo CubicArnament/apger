@@ -76,7 +76,7 @@ type_src = "tarball"     # tarball | git-repo
 include_submodules = false
 
 [build]
-# template: meson | cmake | autotools | cargo | python-pep517 | gradle | custom
+# template: meson | cmake | autotools | cargo | python-pep517 | gradle | makefile | kbuild | custom
 # Use "custom" for conan, bazel, scons, waf, qmake, or any other build system.
 # With "custom", fill in script and [install].script manually.
 template = "meson"

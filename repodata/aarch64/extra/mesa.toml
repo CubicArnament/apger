@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MIT"
 homepage = "https://mesa3d.org"
 dependencies = ["libdrm", "wayland", "libxkbcommon", "llvm", "zlib", "zstd"]
-bootstrap = false
 
 [source]
 url = "https://mesa.freedesktop.org/archive/mesa-24.1.0.tar.xz"

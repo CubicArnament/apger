@@ -16,7 +16,7 @@ type_src = "tarball"
 
 [build]
 template = "kbuild"
-dependencies = []
+dependencies = ["make", "clang", "binutils", "linux-kernel"]
 use = ["modules"]
 
 [install]

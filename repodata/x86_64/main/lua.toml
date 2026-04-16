@@ -18,6 +18,7 @@ type_src = "tarball"
 template = "custom"
 dependencies = ["readline-devel", "ncurses-devel"]
 use = []
+script = "make INSTALL_TOP=/usr && make INSTALL_TOP=/usr install"
 
 [install]
-script = "make INSTALL_TOP=/usr"
+script = ""

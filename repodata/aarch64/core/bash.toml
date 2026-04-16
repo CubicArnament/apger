@@ -7,7 +7,7 @@ description = "GNU Bourne Again shell"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-3.0"
 homepage = "https://www.gnu.org/software/bash/"
-dependencies = ["readline", "ncurses"]
+dependencies = ["glibc", "readline", "ncurses"]
 
 [source]
 url = "https://ftp.gnu.org/gnu/bash/bash-5.2.21.tar.gz"

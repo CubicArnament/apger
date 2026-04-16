@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD-3-Clause"
 homepage = "https://go.dev"
 dependencies = []
-bootstrap = false
 
 [source]
 url = "https://go.dev/dl/go1.22.3.src.tar.gz"

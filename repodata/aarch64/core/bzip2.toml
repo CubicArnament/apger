@@ -1,13 +1,13 @@
 [package]
 name = "bzip2"
 version = "1.0.8"
-type = "binary"
+type = "library"
 architecture = "aarch64"
 description = "High-quality block-sorting file compressor"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD-2-Clause"
 homepage = "https://sourceware.org/bzip2/"
-dependencies = []
+dependencies = ["glibc"]
 
 [source]
 url = "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"

@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://ffmpeg.org"
 dependencies = ["alsa-lib", "libpng", "libjpeg-turbo", "zlib", "openssl", "libvorbis", "libopus"]
-bootstrap = false
 
 [source]
 url = "https://ffmpeg.org/releases/ffmpeg-7.0.tar.xz"

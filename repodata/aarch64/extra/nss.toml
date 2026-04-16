@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "MPL-2.0"
 homepage = "https://firefox-source-docs.mozilla.org/security/nss"
 dependencies = ["nspr", "sqlite", "zlib"]
-bootstrap = false
 
 [source]
 url = "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_100_RTM/src/nss-3.100-with-nspr-4.35.tar.gz"

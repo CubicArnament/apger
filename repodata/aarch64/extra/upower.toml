@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-2.0"
 homepage = "https://upower.freedesktop.org"
 dependencies = ["glib2", "dbus", "polkit"]
-bootstrap = false
 
 [source]
 url = "https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.4/upower-v1.90.4.tar.gz"

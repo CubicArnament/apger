@@ -18,6 +18,7 @@ type_src = "tarball"
 template = "custom"
 dependencies = ["libmnl-devel", "libcap-devel"]
 use = []
+script = "make && make install"
 
 [install]
-script = "make"
+script = ""

@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD-2-Clause"
 homepage = "https://openssh.com"
 dependencies = ["openssl", "pam", "zlib"]
-bootstrap = false
 
 [source]
 url = "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.7p1.tar.gz"

@@ -1,6 +1,6 @@
 [package]
 name = "linux-kernel-modules"
-version = "6.9.0"
+version = "6.9"
 type = "library"
 architecture = "x86_64"
 description = "Linux kernel modules — loadable kernel modules split from the main kernel package"

@@ -16,3 +16,7 @@ type_src = "tarball"
 [build]
 template = "meson"
 dependencies = ["meson", "ninja-build", "gcc", "clang"]
+use = []
+
+[install]
+script = ""

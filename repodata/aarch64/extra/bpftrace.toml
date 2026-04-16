@@ -8,7 +8,6 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "Apache-2.0"
 homepage = "https://bpftrace.org"
 dependencies = ["llvm", "clang", "elfutils", "bcc"]
-bootstrap = false
 
 [source]
 url = "https://github.com/bpftrace/bpftrace/archive/v0.21.1/bpftrace-0.21.1.tar.gz"
