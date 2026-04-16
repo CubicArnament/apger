@@ -14,6 +14,7 @@ var templateIcons = map[string]string{
 	"gradle":        "\ue738 ",  // nf-dev-java
 	"go":            "\ue724 ",  // nf-dev-go
 	"npm":           "\ue71e ",  // nf-dev-nodejs_small
+	"makefile":      "\uf489 ",  // nf-oct-terminal (plain make)
 	"kbuild":        "\uf17c ",  // nf-fa-linux (kernel)
 	"custom":        "\uf013 ",  // nf-fa-gear
 }

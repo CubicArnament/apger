@@ -20,8 +20,11 @@ const (
 	Cargo        BuildSystem = "cargo"
 	PythonPEP517 BuildSystem = "python-pep517"
 	Gradle       BuildSystem = "gradle"
+	// Makefile is for projects that use a plain Makefile without autotools configure.
+	// Examples: bzip2, ffmpeg, nss, wpa_supplicant, qt5 (qmake+make), go, nodejs, perf.
+	// Use [build].script for any pre-make step (e.g. qmake, ./configure --custom).
+	Makefile BuildSystem = "makefile"
 	// KBuild is for Linux kernel and out-of-tree kernel modules.
-	// Requires Krnl=true in the recipe. gen-krnl.go generates the .config.
 	KBuild BuildSystem = "kbuild"
 	// Custom is for any build system not covered above (conan, bazel, scons, waf, etc.).
 	Custom BuildSystem = "custom"
@@ -50,6 +53,8 @@ func NewBuildTemplate(system BuildSystem, sourceDir, buildDir string, buildScrip
 		return &PythonPEP517Template{sourceDir: sourceDir, buildDir: buildDir}, nil
 	case Gradle:
 		return &GradleTemplate{sourceDir: sourceDir, buildDir: buildDir}, nil
+	case Makefile:
+		return &MakefileTemplate{sourceDir: sourceDir, preScript: buildScript, installScript: installScript}, nil
 	case Custom:
 		if buildScript == "" {
 			return nil, fmt.Errorf("custom template requires [build].script in recipe")
@@ -58,7 +63,7 @@ func NewBuildTemplate(system BuildSystem, sourceDir, buildDir string, buildScrip
 	case KBuild:
 		return &KBuildTemplate{sourceDir: sourceDir}, nil
 	default:
-		return nil, fmt.Errorf("unsupported build system: %q (use meson, cmake, autotools, cargo, python-pep517, gradle, or custom)", system)
+		return nil, fmt.Errorf("unsupported build system: %q (use meson, cmake, autotools, cargo, python-pep517, gradle, makefile, kbuild, or custom)", system)
 	}
 }
 
@@ -232,6 +237,36 @@ func (g *GradleTemplate) Install(destDir string) error {
 		}
 	}
 	return nil
+}
+
+// ── Makefile ──────────────────────────────────────────────────────────────────
+
+// MakefileTemplate builds projects that use a plain Makefile without autotools.
+// Examples: bzip2, ffmpeg, nss, wpa_supplicant, qt5 (after qmake), go, nodejs, perf.
+// If [build].script is set it runs before make (e.g. for qmake or ./configure --custom).
+type MakefileTemplate struct {
+	sourceDir   string
+	preScript   string // optional pre-make step from recipe [build].script
+	installScript string
+}
+
+func (m *MakefileTemplate) Setup(_ []string) error {
+	if m.preScript != "" {
+		return runShell(m.preScript, m.sourceDir)
+	}
+	return nil
+}
+
+func (m *MakefileTemplate) Compile(extraFlags []string) error {
+	return run("make", append([]string{"-j$(nproc)"}, extraFlags...), m.sourceDir)
+}
+
+func (m *MakefileTemplate) Install(destDir string) error {
+	if m.installScript != "" {
+		env := append(os.Environ(), "DESTDIR="+destDir)
+		return runShellEnv(m.installScript, m.sourceDir, env)
+	}
+	return run("make", []string{"DESTDIR=" + destDir, "install"}, m.sourceDir)
 }
 
 // ── KBuild ────────────────────────────────────────────────────────────────────
