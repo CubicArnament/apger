@@ -70,6 +70,13 @@ type Recipe struct {
 		Dependencies []string `toml:"dependencies" json:"dependencies,omitempty"`
 		Script       string   `toml:"script"       json:"script,omitempty"`
 		Use          []string `toml:"use"          json:"use,omitempty"`
+		// Override allows per-recipe compiler/flag overrides.
+		// Empty fields fall back to apger.conf values.
+		// Example in TOML:
+		//   [build.override]
+		//   cc = "clang"
+		//   opt_level = "O3"
+		Override *BuildOverride `toml:"override" json:"override,omitempty"`
 	} `toml:"build" json:"build,omitempty"`
 
 	Install struct {
@@ -90,4 +97,23 @@ type FileEntry struct {
 type SymlinkEntry struct {
 	Source      string `toml:"source"      json:"source"`
 	Destination string `toml:"destination" json:"destination"`
+}
+
+// BuildOverride allows a recipe to override compiler/flag settings from apger.conf.
+// Only non-empty fields take effect; empty fields fall back to the config value.
+//
+// TOML example:
+//
+//	[build.override]
+//	cc        = "clang"
+//	cxx       = "clang++"
+//	opt_level = "O3"
+//	lto       = "full"
+//	ld        = "lld"
+type BuildOverride struct {
+	CC       string `toml:"cc"        json:"cc,omitempty"`
+	CXX      string `toml:"cxx"       json:"cxx,omitempty"`
+	LD       string `toml:"ld"        json:"ld,omitempty"`
+	OptLevel string `toml:"opt_level" json:"opt_level,omitempty"`
+	LTO      string `toml:"lto"       json:"lto,omitempty"`
 }

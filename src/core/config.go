@@ -9,8 +9,36 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// BuildProfile holds compiler flags for the [build.packages] profile.
-// march, mtune, and levels_hwcaps are MArch objects — any casing/separator is accepted.
+// defaultCC maps architecture family to default C compiler.
+// "default" in apger.conf resolves to these values.
+var defaultCC = map[ArchFamily]string{
+	FamilyX86_64:  "gcc",
+	FamilyAArch64: "clang",   // clang handles cross-compilation better
+	FamilyRISCV64: "clang",
+	FamilyOther:   "clang",
+}
+
+var defaultCXX = map[ArchFamily]string{
+	FamilyX86_64:  "g++",
+	FamilyAArch64: "clang++",
+	FamilyRISCV64: "clang++",
+	FamilyOther:   "clang++",
+}
+
+// resolveCompiler returns the actual compiler binary for a given "cc" value and target arch.
+// "default" → picks gcc/clang based on arch family.
+func resolveCompiler(cc string, family ArchFamily, defaults map[ArchFamily]string) string {
+	if cc == "" || cc == "default" || cc == "standard" {
+		if v, ok := defaults[family]; ok {
+			return v
+		}
+		return "gcc"
+	}
+	return cc
+}
+
+// BuildProfile holds compiler flags for a build target.
+// CC/CXX = "default" resolves to gcc/g++ for x86_64, clang/clang++ for cross targets.
 type BuildProfile struct {
 	March              MArch   `toml:"march"`
 	Mtune              MArch   `toml:"mtune"`
@@ -21,6 +49,16 @@ type BuildProfile struct {
 	LD                 string  `toml:"ld"`
 	LibraryGlibcHwcaps bool    `toml:"library_glibc_hwcaps"`
 	LevelsHwcaps       []MArch `toml:"levels_hwcaps"`
+}
+
+// ResolvedCC returns the actual CC binary (resolves "default").
+func (p BuildProfile) ResolvedCC() string {
+	return resolveCompiler(p.CC, p.March.Family(), defaultCC)
+}
+
+// ResolvedCXX returns the actual CXX binary (resolves "default").
+func (p BuildProfile) ResolvedCXX() string {
+	return resolveCompiler(p.CXX, p.March.Family(), defaultCXX)
 }
 
 // CFlags returns C compiler flags string.
@@ -63,8 +101,8 @@ func (p BuildProfile) LDFlags() string {
 // EnvVars returns environment variables for this build profile.
 func (p BuildProfile) EnvVars() map[string]string {
 	env := map[string]string{
-		"CC":       p.CC,
-		"CXX":      p.CXX,
+		"CC":       p.ResolvedCC(),
+		"CXX":      p.ResolvedCXX(),
 		"CFLAGS":   p.CFlags(),
 		"CXXFLAGS": p.CXXFlags(),
 		"LDFLAGS":  p.LDFlags(),
@@ -81,6 +119,103 @@ func (p BuildProfile) EnvVars() map[string]string {
 		env["LEVELS_HWCAPS"] = levels
 	}
 	return env
+}
+
+// CrossProfile defines a cross-compilation profile for a specific target architecture.
+// Used in [build.cross.<arch>] sections of apger.conf.
+type CrossProfile struct {
+	BuildProfile
+	// Target is the GNU target triple, e.g. "aarch64-linux-gnu".
+	// Used to set CC/CXX cross-compiler prefix and --target flag.
+	Target string `toml:"target"`
+}
+
+// CrossEnvVars returns environment variables for cross-compilation.
+// Sets CROSS_COMPILE, CC, CXX with the target triple prefix,
+// and adds --target=<triple> to CFLAGS/CXXFLAGS for clang.
+func (c CrossProfile) CrossEnvVars() map[string]string {
+	env := c.BuildProfile.EnvVars()
+
+	if c.Target == "" {
+		return env
+	}
+
+	cc := c.ResolvedCC()
+	cxx := c.ResolvedCXX()
+
+	// For clang: use --target flag (no prefix needed)
+	if cc == "clang" || cc == "clang-cross" {
+		env["CC"] = "clang"
+		env["CXX"] = "clang++"
+		env["CFLAGS"] = "--target=" + c.Target + " " + env["CFLAGS"]
+		env["CXXFLAGS"] = "--target=" + c.Target + " " + env["CXXFLAGS"]
+		env["LDFLAGS"] = "--target=" + c.Target + " " + env["LDFLAGS"]
+	} else {
+		// For gcc: use <triple>-gcc prefix
+		env["CC"] = c.Target + "-" + cc
+		env["CXX"] = c.Target + "-" + cxx
+		env["CROSS_COMPILE"] = c.Target + "-"
+	}
+
+	env["ARCH"] = c.March.String()
+	return env
+}
+
+// RecipeBuildOverride holds per-recipe compiler/flag overrides.
+// Set in [build.override] section of a recipe file.
+// Empty string means "use config default".
+type RecipeBuildOverride struct {
+	CC       string `toml:"cc"        json:"cc,omitempty"`
+	CXX      string `toml:"cxx"       json:"cxx,omitempty"`
+	LD       string `toml:"ld"        json:"ld,omitempty"`
+	OptLevel string `toml:"opt_level" json:"opt_level,omitempty"`
+	LTO      string `toml:"lto"       json:"lto,omitempty"`
+}
+
+// Resolve returns the effective BuildProfile for a given recipe override and target arch.
+// Priority: recipe override > cross profile (if arch != host) > base packages profile.
+func (cfg Config) Resolve(override RecipeBuildOverride, targetArch MArch) BuildProfile {
+	// Start with base packages profile
+	base := cfg.Build.Packages
+
+	// If target arch differs from base arch family, use cross profile
+	if targetArch.String() != "" && !targetArch.IsNative() &&
+		targetArch.Family() != base.March.Family() {
+		if cross, ok := cfg.Build.Cross[targetArch.String()]; ok {
+			base = cross.BuildProfile
+		} else if cross, ok := cfg.crossForFamily(targetArch.Family()); ok {
+			base = cross.BuildProfile
+		}
+	}
+
+	// Apply recipe overrides (non-empty fields win)
+	if override.CC != "" {
+		base.CC = override.CC
+	}
+	if override.CXX != "" {
+		base.CXX = override.CXX
+	}
+	if override.LD != "" {
+		base.LD = override.LD
+	}
+	if override.OptLevel != "" {
+		base.OptLevel = override.OptLevel
+	}
+	if override.LTO != "" {
+		base.LTO = override.LTO
+	}
+
+	return base
+}
+
+// crossForFamily finds the first cross profile matching the given arch family.
+func (cfg Config) crossForFamily(family ArchFamily) (CrossProfile, bool) {
+	for _, cp := range cfg.Build.Cross {
+		if cp.March.Family() == family {
+			return cp, true
+		}
+	}
+	return CrossProfile{}, false
 }
 
 // OOMKillLimits holds resource limits for Kubernetes pods.
@@ -100,7 +235,6 @@ type KubernetesOptions struct {
 }
 
 // ImagePullPolicy returns the Kubernetes imagePullPolicy string.
-// pull_remote=true → Always; search_local=false → Never; default → IfNotPresent.
 func (o KubernetesOptions) ImagePullPolicy() string {
 	if o.PullRemote {
 		return "Always"
@@ -134,16 +268,17 @@ type SaveOptions struct {
 
 // LoggingOptions holds logging/output settings.
 type LoggingOptions struct {
-	// Verbose reduces log filtering — more lines shown, still with highlighting.
-	// Set verbose = true in [logging] section of apger.conf.
 	Verbose bool `toml:"verbose"`
 }
 
 // Config holds the full apger.conf configuration.
-// [build.self] is intentionally absent — self-build flags live in Meson.build.
 type Config struct {
 	Build struct {
-		Packages BuildProfile `toml:"packages"`
+		Packages BuildProfile            `toml:"packages"`
+		// Cross holds per-architecture cross-compilation profiles.
+		// Key is the canonical arch name: "aarch64", "riscv64", etc.
+		// Example: [build.cross.aarch64]
+		Cross    map[string]CrossProfile `toml:"cross"`
 	} `toml:"build"`
 	Database struct {
 		Pkgs DatabaseConfig `toml:"pkgs"`
@@ -173,11 +308,40 @@ func DefaultConfig() Config {
 	cfg.Build.Packages.Mtune = mtune
 	cfg.Build.Packages.OptLevel = "O2"
 	cfg.Build.Packages.LTO = "thin"
-	cfg.Build.Packages.CC = "gcc"
-	cfg.Build.Packages.CXX = "g++"
+	cfg.Build.Packages.CC = "default"
+	cfg.Build.Packages.CXX = "default"
 	cfg.Build.Packages.LD = "mold"
 	cfg.Build.Packages.LibraryGlibcHwcaps = true
 	cfg.Build.Packages.LevelsHwcaps = []MArch{v3, v2}
+
+	// Default cross profiles
+	aarch64March, _ := ParseMArch("aarch64")
+	riscv64March, _ := ParseMArch("riscv64")
+
+	cfg.Build.Cross = map[string]CrossProfile{
+		"aarch64": {
+			BuildProfile: BuildProfile{
+				March:    aarch64March,
+				OptLevel: "O2",
+				LTO:      "thin",
+				CC:       "default", // → clang
+				CXX:      "default", // → clang++
+				LD:       "mold",
+			},
+			Target: "aarch64-linux-gnu",
+		},
+		"riscv64": {
+			BuildProfile: BuildProfile{
+				March:    riscv64March,
+				OptLevel: "O2",
+				LTO:      "thin",
+				CC:       "default", // → clang
+				CXX:      "default", // → clang++
+				LD:       "mold",
+			},
+			Target: "riscv64-linux-gnu",
+		},
+	}
 
 	cfg.Database.Pkgs.Type = "bbolt"
 	cfg.Database.Pkgs.Name = "pkgs.db"
@@ -202,10 +366,8 @@ func DefaultConfig() Config {
 }
 
 // LoadConfig reads apger.conf from the given path.
-// Returns DefaultConfig if the file doesn't exist.
 func LoadConfig(path string) (Config, error) {
 	cfg := DefaultConfig()
-
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -213,15 +375,13 @@ func LoadConfig(path string) (Config, error) {
 		}
 		return cfg, fmt.Errorf("read config: %w", err)
 	}
-
 	if _, err := toml.Decode(string(data), &cfg); err != nil {
 		return cfg, fmt.Errorf("parse config: %w", err)
 	}
-
 	return cfg, nil
 }
 
-// FindConfig looks for apger.conf in: explicit path → ./apger.conf → ../apger.conf → ~/.config/apger/apger.conf.
+// FindConfig looks for apger.conf in standard locations.
 func FindConfig(explicitPath string) Config {
 	paths := []string{}
 	if explicitPath != "" {

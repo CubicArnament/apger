@@ -188,8 +188,19 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		return nil
 	}
 
-	// Use package build flags from config (x86_64-v2, -O2, thin LTO)
-	pkgFlags := o.apgerCfg.Build.Packages
+	// Resolve build profile: base config → cross profile (if arch differs) → recipe override
+	var override config.RecipeBuildOverride
+	if recipe.Build.Override != nil {
+		override = config.RecipeBuildOverride{
+			CC:       recipe.Build.Override.CC,
+			CXX:      recipe.Build.Override.CXX,
+			LD:       recipe.Build.Override.LD,
+			OptLevel: recipe.Build.Override.OptLevel,
+			LTO:      recipe.Build.Override.LTO,
+		}
+	}
+	targetArch, _ := config.ParseMArch(recipe.Package.Architecture)
+	pkgFlags := o.apgerCfg.Resolve(override, targetArch)
 
 	// Get build dependencies
 	buildDeps := k8s.DefaultDependencies()
@@ -445,9 +456,12 @@ curl -fsSL "%s" -o /tmp/source.tar.gz
 mkdir -p /build/src && cd /build/src
 tar xf /tmp/source.tar.gz --strip-components=1
 
-# Base build: march=%s
+# Build flags (resolved: config + cross profile + recipe override)
+export CC="%s" CXX="%s"
+export CFLAGS="%s"
+export CXXFLAGS="$CFLAGS"
+export LDFLAGS="%s"
 export DESTDIR=/build/root
-%s
 make -j$(nproc)
 make DESTDIR="$DESTDIR" install
 %s
@@ -478,8 +492,9 @@ echo "=== Done: %s %s ==="
 `,
 		pkgName, ver,
 		recipe.Package.Homepage,
-		flags.March,
+		flags.ResolvedCC(), flags.ResolvedCXX(),
 		flags.CFlags(),
+		flags.LDFlags(),
 		hwcaps,
 		pkgName,
 		// split-libs meta args
