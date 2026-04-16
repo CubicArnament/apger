@@ -1,12 +1,11 @@
 package tui
 
-// Settings screen — publish target selection via checkboxes.
+// Settings screen — publish target selection.
 //
 // Options:
-//   [x] GitHub Releases (self-hosted runner)
-//   [ ] GitHub Packages (linked artifacts)
-//   [ ] GitHub Org repository
-//   [ ] Local only (no publish)
+//   [x] GitHub Packages  — push .apg as OCI artifact to ghcr.io/NurOS-Packages/<pkg>
+//   [ ] NurOS-Packages   — create/update repo in NurOS-Packages org + upload .apg
+//   [ ] Local only       — keep in PVC, no remote publish
 //
 // Navigation: ↑/↓, space to toggle, ctrl+s to save, esc to go back.
 
@@ -21,9 +20,8 @@ import (
 type PublishTarget uint8
 
 const (
-	PublishGitHubReleases PublishTarget = 1 << iota // GitHub Releases (self-hosted)
-	PublishGitHubPackages                           // GitHub Packages (linked artifacts)
-	PublishGitHubOrg                                // Push to GitHub Org repo
+	PublishGitHubPackages PublishTarget = 1 << iota // GitHub Packages (ghcr.io OCI)
+	PublishNurOSOrg                                 // NurOS-Packages GitHub org repo
 	PublishLocal                                    // Local only, no remote publish
 )
 
@@ -42,19 +40,14 @@ type settingsItem struct {
 
 var settingsItems = []settingsItem{
 	{
-		label:  "GitHub Releases (self-hosted)",
-		bit:    PublishGitHubReleases,
-		detail: "Upload .apg + .sig as release assets to NurOS-Packages/<pkg>",
-	},
-	{
-		label:  "GitHub Packages (linked artifacts)",
+		label:  "GitHub Packages (ghcr.io)",
 		bit:    PublishGitHubPackages,
-		detail: "Attach packages as GitHub Actions artifacts",
+		detail: "Push .apg + .sig as OCI artifact to ghcr.io/NurOS-Packages/<pkg>:<version>",
 	},
 	{
-		label:  "GitHub Org repository",
-		bit:    PublishGitHubOrg,
-		detail: "Push packages to a dedicated repo in the org",
+		label:  "NurOS-Packages org",
+		bit:    PublishNurOSOrg,
+		detail: "Create/update repo in NurOS-Packages org and upload .apg + .sig",
 	},
 	{
 		label:  "Local only (no publish)",
@@ -66,7 +59,7 @@ var settingsItems = []settingsItem{
 // NewSettingsScreen creates a settings screen with the given initial targets.
 func NewSettingsScreen(targets PublishTarget) *SettingsScreen {
 	if targets == 0 {
-		targets = PublishGitHubReleases // sensible default
+		targets = PublishGitHubPackages // sensible default
 	}
 	return &SettingsScreen{targets: targets}
 }
@@ -90,13 +83,12 @@ func (s *SettingsScreen) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ", "enter":
 			bit := settingsItems[s.cursor].bit
 			if s.targets&bit != 0 {
-				s.targets &^= bit // uncheck
+				s.targets &^= bit
 			} else {
-				s.targets |= bit // check
-				// Local and remote are mutually exclusive
+				s.targets |= bit
+				// Local is mutually exclusive with remote targets
 				if bit == PublishLocal {
-					s.targets &^= PublishGitHubReleases | PublishGitHubPackages | PublishGitHubOrg
-					s.targets |= PublishLocal
+					s.targets = PublishLocal
 				} else {
 					s.targets &^= PublishLocal
 				}
@@ -120,8 +112,7 @@ func (s *SettingsScreen) View() string {
 		}
 		line := fmt.Sprintf("  %s %s", checked, item.label)
 		if i == s.cursor {
-			line = styleSelected.Render(line)
-			b.WriteString(line + "\n")
+			b.WriteString(styleSelected.Render(line) + "\n")
 			b.WriteString(styleDim.Render("       "+item.detail) + "\n")
 		} else {
 			b.WriteString(styleNormal.Render(line) + "\n")

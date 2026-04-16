@@ -22,6 +22,7 @@ import (
 	ghpublisher "github.com/NurOS-Linux/apger/src/publisher"
 	"github.com/NurOS-Linux/apger/src/reporter"
 	"github.com/NurOS-Linux/apger/src/storage"
+	"github.com/NurOS-Linux/apger/src/tui"
 )
 
 // Stage represents a stage in the multistage build pipeline.
@@ -48,27 +49,29 @@ func (s Stage) String() string {
 
 // Orchestrator manages the multistage build pipeline.
 type Orchestrator struct {
-	k8sClient   *k8s.Client
-	db          *storage.DB
-	apgerCfg    config.Config
-	repodataDir string
-	recipeDir   string
-	outputDir   string
-	pvcName     string
-	image       string
-	log         *log.Logger
+	k8sClient     *k8s.Client
+	db            *storage.DB
+	apgerCfg      config.Config
+	repodataDir   string
+	recipeDir     string
+	outputDir     string
+	pvcName       string
+	image         string
+	publishTarget tui.PublishTarget
+	log           *log.Logger
 }
 
 // OrchestratorConfig holds configuration for the orchestrator.
 type OrchestratorConfig struct {
-	Kubeconfig  string
-	RepodataDir string
-	RecipeDir   string
-	OutputDir   string
-	PVCName     string
-	Image       string
-	DBPath      string
-	ApgerConfig config.Config // pre-loaded apger.conf
+	Kubeconfig    string
+	RepodataDir   string
+	RecipeDir     string
+	OutputDir     string
+	PVCName       string
+	Image         string
+	DBPath        string
+	ApgerConfig   config.Config
+	PublishTarget tui.PublishTarget // where to publish built packages
 }
 
 // NewOrchestrator creates a new build orchestrator.
@@ -93,15 +96,16 @@ func NewOrchestrator(cfg OrchestratorConfig) (*Orchestrator, error) {
 	}
 
 	return &Orchestrator{
-		k8sClient:   k8sClient,
-		db:          db,
-		apgerCfg:    cfg.ApgerConfig,
-		repodataDir: cfg.RepodataDir,
-		recipeDir:   cfg.RecipeDir,
-		outputDir:   cfg.OutputDir,
-		pvcName:     pvcName,
-		image:       image,
-		log:         log.New(os.Stdout, "[ORCHESTRATOR] ", log.LstdFlags),
+		k8sClient:     k8sClient,
+		db:            db,
+		apgerCfg:      cfg.ApgerConfig,
+		repodataDir:   cfg.RepodataDir,
+		recipeDir:     cfg.RecipeDir,
+		outputDir:     cfg.OutputDir,
+		pvcName:       pvcName,
+		image:         image,
+		publishTarget: cfg.PublishTarget,
+		log:           log.New(os.Stdout, "[ORCHESTRATOR] ", log.LstdFlags),
 	}, nil
 }
 
@@ -288,13 +292,25 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 		assetPaths = append(assetPaths, apgPath)
 	}
 
-	// Publish to GitHub
+	// Publish based on configured target
 	if len(assetPaths) > 0 {
 		pub := ghpublisher.New(creds, o.apgerCfg.Save.Options.GithubOrgName)
-		if err := pub.EnsureRepo(ctx, pkgName); err != nil {
-			o.log.Printf("[postBuild] ensure repo %s: %v", pkgName, err)
-		} else if err := pub.UploadRelease(ctx, pkgName, ver, assetPaths); err != nil {
-			o.log.Printf("[postBuild] upload release %s: %v", pkgName, err)
+		target := o.publishTarget
+
+		if target&tui.PublishNurOSOrg != 0 {
+			if err := pub.UploadToOrg(ctx, pkgName, ver, assetPaths); err != nil {
+				o.log.Printf("[postBuild] upload to org %s: %v", pkgName, err)
+			}
+		}
+		if target&tui.PublishGitHubPackages != 0 {
+			if err := pub.UploadToPackages(ctx, pkgName, ver, assetPaths); err != nil {
+				o.log.Printf("[postBuild] upload to packages %s: %v", pkgName, err)
+			}
+		}
+		if target&tui.PublishLocal != 0 {
+			if err := ghpublisher.CopyToLocal(assetPaths, o.outputDir); err != nil {
+				o.log.Printf("[postBuild] copy local %s: %v", pkgName, err)
+			}
 		}
 	}
 
