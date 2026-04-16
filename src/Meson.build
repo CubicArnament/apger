@@ -93,11 +93,36 @@ go_mod_download = custom_target('go-mod-download',
   build_by_default: true,
 )
 
+# ── Build apgbuild first (libapg C + apgbuild CLI) ───────────────────────────
+# apgbuild must be built before apger so apgbuild is available in the pod.
+
+apgbuild_build = custom_target('apgbuild-subproject',
+  output: 'apgbuild-subproject.stamp',
+  depends: [go_mod_download],
+  build_by_default: true,
+  command: [
+    'sh', '-c',
+    '''set -e
+    APGBUILD_DIR="@0@/apgbuild"
+    BUILD_DIR="@1@/apgbuild-build"
+    mkdir -p "$BUILD_DIR"
+    cd "$APGBUILD_DIR"
+    meson setup "$BUILD_DIR" --prefix=/usr --buildtype=release 2>/dev/null || true
+    ninja -C "$BUILD_DIR"
+    ninja -C "$BUILD_DIR" install
+    touch "@1@/apgbuild-subproject.stamp"
+    '''.format(
+      meson.current_source_dir(),
+      meson.current_build_dir(),
+    ),
+  ],
+)
+
 # ── Build apger ───────────────────────────────────────────────────────────────
 
 apger_exe = custom_target('apger',
   output: output_name,
-  depends: [go_mod_download],
+  depends: [go_mod_download, apgbuild_build],
   build_by_default: true,
   install: true,
   install_dir: get_option('bindir'),

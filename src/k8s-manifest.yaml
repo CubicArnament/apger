@@ -166,6 +166,7 @@ spec:
                 golang cargo \
                 python3-devel python3-pip \
                 zstd zstd-devel libzstd-devel \
+                libarchive-devel \
                 mold binutils sqlite-devel \
                 && dnf clean all
           resources:
@@ -190,14 +191,21 @@ spec:
             - |
               set -e
 
-              echo "=== Stage 1: apgbuild ==="
+              echo "=== Stage 1: libapg (C library) ==="
+              cd /src/apgbuild/libapg
+              meson setup build --prefix=/usr --buildtype=release
+              ninja -C build
+              ninja -C build install
+              ldconfig
+
+              echo "=== Stage 2: apgbuild (Go CLI) ==="
               cd /src/apgbuild
               meson setup build --prefix=/usr --buildtype=release
               ninja -C build
               ninja -C build install
               cp /usr/bin/apgbuild /output/apgbuild
 
-              echo "=== Stage 2: apger ==="
+              echo "=== Stage 3: apger ==="
               cd /src/src
               meson setup build --prefix=/usr --buildtype=release
               ninja -C build
@@ -246,23 +254,6 @@ spec:
   terminationGracePeriodSeconds: 10
 
   initContainers:
-    # Wait for apger-build job to place binaries in PVC
-    - name: wait-for-tools
-      image: fedora:43
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          echo "Waiting for apger binary in PVC..."
-          until [ -f /output/apger ]; do sleep 5; done
-          cp /output/apger    /usr/local/bin/apger
-          cp /output/apgbuild /usr/local/bin/apgbuild
-          chmod +x /usr/local/bin/apger /usr/local/bin/apgbuild
-          echo "Tools ready: $(apger --version 2>&1 || echo ok)"
-      volumeMounts:
-        - name: builds
-          mountPath: /output
-
     # Assemble apger.json from individual Secret keys into a shared emptyDir
     - name: assemble-credentials
       image: fedora:43
@@ -270,17 +261,17 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
-          APP_ID=$(cat /secrets/github_app_id)
-          PEM=$(cat /secrets/github_pem | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
-          PGP=$(cat /secrets/pgp_private_key | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
-          NAME=$(cat /secrets/name)
-          EMAIL=$(cat /secrets/email)
+          APP_ID=$(cat /secrets/github_app_id 2>/dev/null || echo "0")
+          PEM=$(cat /secrets/github_pem 2>/dev/null | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
+          PGP=$(cat /secrets/pgp_private_key 2>/dev/null | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
+          NAME=$(cat /secrets/name 2>/dev/null || echo "apger")
+          EMAIL=$(cat /secrets/email 2>/dev/null || echo "apger@nuros.org")
           cat > /creds/apger.json <<EOF
           {
-            "name":           "$NAME",
-            "email":          "$EMAIL",
-            "github_app_id":  $APP_ID,
-            "github_pem":     $PEM,
+            "name":            "$NAME",
+            "email":           "$EMAIL",
+            "github_app_id":   $APP_ID,
+            "github_pem":      $PEM,
             "pgp_private_key": $PGP
           }
           EOF
@@ -316,9 +307,29 @@ spec:
     - name: tui
       image: fedora:43
       imagePullPolicy: IfNotPresent
-      # apger TUI — keyboard-driven, no mouse
-      command: ["/usr/local/bin/apger"]
-      args: ["--tui"]
+      # Pod starts immediately and is attachable via kubectl attach at any time,
+      # even while apger-build Job is still running.
+      # The script waits for binaries in the background and launches apger when ready.
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          # Install binaries from PVC as soon as they appear (non-blocking for attach)
+          (
+            echo "[apger-tui] Waiting for build tools from apger-build job..."
+            until [ -f /output/apger ] && [ -f /output/apgbuild ]; do
+              sleep 3
+            done
+            cp /output/apger    /usr/local/bin/apger
+            cp /output/apgbuild /usr/local/bin/apgbuild
+            chmod +x /usr/local/bin/apger /usr/local/bin/apgbuild
+            echo "[apger-tui] Build tools ready. Run: apger --tui"
+          ) &
+
+          # Keep pod alive and interactive immediately — attach at any time
+          # with: kubectl attach -it apger-tui -n apger
+          echo "[apger-tui] Pod ready. Attach with: kubectl attach -it apger-tui -n apger"
+          echo "[apger-tui] Waiting for build tools... (run 'apger --tui' once ready)"
+          exec /bin/bash
       stdin: true
       tty: true
       env:
