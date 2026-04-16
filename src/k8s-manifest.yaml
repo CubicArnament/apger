@@ -348,7 +348,6 @@ spec:
           readOnly: true
         - name: creds-assembled
           mountPath: /run/secrets/apger
-          readOnly: true
 
   volumes:
     - name: builds
