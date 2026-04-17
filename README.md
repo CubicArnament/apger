@@ -59,7 +59,6 @@ apger/
 │   │   ├── main.go  # Model, screens: Dashboard/FM/Editor/Build
 │   │   ├── screen_credentials.go  # credentials screen
 │   │   └── screen_settings.go  # settings screen
-│   ├── k8s-manifest.yaml  # Kubernetes PVC + ConfigMap + Job + Pod
 │   ├── Meson.build  # build system
 │   └── meson_options.txt  # meson options
 ├── .gitignore
@@ -67,6 +66,7 @@ apger/
 ├── apger.conf  # build config (single source of truth)
 ├── go.mod  # Go module
 ├── go.sum  # Go checksums
+├── k8s-manifest.yml  # Kubernetes PVC + ConfigMap + Job + Pod
 └── README.md
 ```
 <!-- TREE_END -->
