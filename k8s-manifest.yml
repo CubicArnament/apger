@@ -171,7 +171,7 @@ spec:
                 git aria2 \
                 golang cargo \
                 python3-devel python3-pip \
-                libzstd-devel \
+
                 libarchive-devel \
                 mold binutils \
                 && dnf clean all
@@ -327,7 +327,7 @@ spec:
             git aria2 \
             golang cargo \
             python3-devel python3-pip \
-            libzstd-devel \
+
             mold binutils 2>/dev/null || true
           echo "dep pre-warm done"
       volumeMounts:
@@ -350,7 +350,7 @@ spec:
             git aria2 \
             golang cargo \
             python3-devel python3-pip \
-            libzstd-devel \
+
             mold binutils \
             && dnf clean all
 
