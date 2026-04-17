@@ -296,15 +296,21 @@ type LoggingOptions struct {
 	Verbose bool `toml:"verbose"`
 }
 
+// CompressionConfig holds archive compression settings for .apg packages.
+type CompressionConfig struct {
+	// Type is the compression algorithm: zstd | xz | bz2 | gz | lz4 | lzma
+	Type string `toml:"type"`
+	// Level is the compression level (algorithm-specific).
+	Level int `toml:"level"`
+}
+
 // Config holds the full apger.conf configuration.
 type Config struct {
 	Build struct {
 		Packages BuildProfile            `toml:"packages"`
-		// Cross holds per-architecture cross-compilation profiles.
-		// Key is the canonical arch name: "aarch64", "riscv64", etc.
-		// Example: [build.cross.aarch64]
 		Cross    map[string]CrossProfile `toml:"cross"`
 	} `toml:"build"`
+	Compression CompressionConfig `toml:"compression"`
 	Database struct {
 		Pkgs DatabaseConfig `toml:"pkgs"`
 	} `toml:"database"`
@@ -370,6 +376,9 @@ func DefaultConfig() Config {
 
 	cfg.Database.Pkgs.Type = "bbolt"
 	cfg.Database.Pkgs.Name = "pkgs.db"
+
+	cfg.Compression.Type = "zstd"
+	cfg.Compression.Level = 19
 
 	cfg.Kubernetes.Options.Namespace = "apger"
 	cfg.Kubernetes.Options.BaseImage = "fedora:43"

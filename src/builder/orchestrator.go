@@ -221,7 +221,7 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		OOMKillLimits:   &o.apgerCfg.Kubernetes.Options.OOMKillLimits,
 		Dependencies:    buildDeps,
 		Command:         []string{"/bin/sh"},
-		Args: []string{"-c", buildPackageScript(packageName, recipe, pkgFlags)},
+		Args: []string{"-c", buildPackageScript(packageName, recipe, pkgFlags, o.apgerCfg.Compression)},
 	}
 
 	job := k8s.GenerateBuildJob(cfg)
@@ -460,7 +460,7 @@ func hwcapsInstallCmd(recipe metadata.Recipe) string {
 
 // buildPackageScript generates the full shell script for a package build Job.
 // It includes: source download, template-aware build, hwcaps .so rebuilds, and split packaging.
-func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.BuildProfile) string {
+func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.BuildProfile, comp config.CompressionConfig) string {
 	ver := recipe.Package.Version
 	libName := "lib" + pkgName
 	arch := recipe.Package.Architecture
@@ -518,6 +518,11 @@ fi
 ` + hwcaps
 	}
 
+	compFlags := fmt.Sprintf("--compression %s --level %d", comp.Type, comp.Level)
+	if comp.Type == "" {
+		compFlags = "--compression zstd --level 19"
+	}
+
 	return fmt.Sprintf(`set -e
 echo "=== Building %s %s (template: %s) ==="
 
@@ -530,6 +535,7 @@ export CFLAGS="%s"
 export CXXFLAGS="$CFLAGS"
 export LDFLAGS="%s"
 export DESTDIR=/build/root
+export COMP_FLAGS="%s"
 
 # Build + install using %s template
 %s
@@ -552,7 +558,7 @@ fi
 apgbuild meta --split libs --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   --detect-deps /build/split-libs -o /build/split-libs/metadata.json
-apgbuild build /build/split-libs -o /output/%s-%s.apg
+apgbuild build /build/split-libs $COMP_FLAGS -o /output/%s-%s.apg
 
 # === Split: %s (binaries) ===
 mkdir -p /build/split-bin/usr
@@ -561,7 +567,7 @@ cp -r $DESTDIR/usr/sbin /build/split-bin/usr/ 2>/dev/null || true
 apgbuild meta --split bins --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   --detect-deps /build/split-bin -o /build/split-bin/metadata.json
-apgbuild build /build/split-bin -o /output/%s-%s.apg
+apgbuild build /build/split-bin $COMP_FLAGS -o /output/%s-%s.apg
 
 # === Split: %s-dev (headers + pkgconfig) ===
 mkdir -p /build/split-dev/usr/lib
@@ -571,7 +577,7 @@ cp -r $DESTDIR/usr/lib64/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
 apgbuild meta --split dev --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   -o /build/split-dev/metadata.json
-apgbuild build /build/split-dev -o /output/%s-dev-%s.apg
+apgbuild build /build/split-dev $COMP_FLAGS -o /output/%s-dev-%s.apg
 
 echo "=== Done: %s %s ==="
 `,
@@ -580,6 +586,7 @@ echo "=== Done: %s %s ==="
 		flags.ResolvedCC(), flags.ResolvedCXX(),
 		flags.CFlags(),
 		flags.LDFlags(),
+		compFlags,
 		recipe.Build.Template,
 		buildCmd,
 		hwcaps,
