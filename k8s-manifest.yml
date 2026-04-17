@@ -125,9 +125,15 @@ metadata:
   labels:
     app: apger
 type: Opaque
-# Populate via kubectl create secret (see comment above).
-# Do NOT commit actual values here.
-stringData: {}
+# Keys are populated via TUI (Credentials screen → ctrl+s → ctrl+k).
+# All keys default to empty so the pod starts without pre-configuration.
+stringData:
+  github_app_id: "0"
+  github_pem: ""
+  pat: ""
+  pgp_private_key: ""
+  name: ""
+  email: ""
 
 ---
 # Self-build flags (-march=native -O3 -flto=thin -fuse-ld=mold) are
@@ -162,10 +168,10 @@ spec:
               set -e
               dnf install -y --setopt=install_weak_deps=False \
                 gcc gcc-c++ make meson ninja-build cmake pkg-config \
-                git tar curl wget aria2 \
+                git aria2 \
                 golang cargo \
                 python3-devel python3-pip \
-                zstd zstd-devel libzstd-devel \
+                libzstd-devel \
                 libarchive-devel \
                 mold binutils \
                 && dnf clean all
@@ -318,10 +324,10 @@ spec:
           # Pre-warm the dnf cache into the PVC so the main container can install offline
           dnf install -y --setopt=install_weak_deps=False --downloadonly \
             gcc gcc-c++ make meson ninja-build cmake pkg-config \
-            git tar curl wget aria2 \
+            git aria2 \
             golang cargo \
             python3-devel python3-pip \
-            zstd zstd-devel \
+            libzstd-devel \
             mold binutils 2>/dev/null || true
           echo "dep pre-warm done"
       volumeMounts:
@@ -341,10 +347,10 @@ spec:
           # Install build dependencies (init containers don't share rootfs with main)
           dnf install -y --setopt=install_weak_deps=False \
             gcc gcc-c++ make meson ninja-build cmake pkg-config \
-            git tar curl wget aria2 \
+            git aria2 \
             golang cargo \
             python3-devel python3-pip \
-            zstd zstd-devel \
+            libzstd-devel \
             mold binutils \
             && dnf clean all
 
@@ -407,17 +413,7 @@ spec:
     - name: credentials
       secret:
         secretName: apger-credentials
-        items:
-          - key: github_app_id
-            path: github_app_id
-          - key: github_pem
-            path: github_pem
-          - key: pgp_private_key
-            path: pgp_private_key
-          - key: name
-            path: name
-          - key: email
-            path: email
+        optional: true
     # Assembled apger.json lives in RAM (never touches disk)
     - name: creds-assembled
       emptyDir:

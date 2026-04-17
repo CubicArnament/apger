@@ -1,17 +1,19 @@
 // Package publisher handles publishing built APG packages to GitHub.
-// Authentication uses GitHub App JWT → installation token (no PAT required),
-// with PAT as fallback.
 //
-// Publish modes (matching tui.PublishTarget):
-//   PublishGitHubPackages — push .apg as OCI artifact to ghcr.io/<org>/<pkg>:<version>
-//   PublishNurOSOrg       — create/update repo in org, upload .apg + .sig via Contents API
-//   PublishLocal          — no-op (handled by caller)
+// Authentication priority (per Credentials.AuthToken):
+//   1. GitHub App JWT → installation token
+//   2. PAT
+//   3. gh CLI (`gh auth token`)
+//
+// Each package → separate repo in NurOS-Packages org.
+// Release assets: lib<name>-<ver>.apg, <name>-<ver>.apg, <name>-dev-<ver>.apg + .sig files.
 package publisher
 
 import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -45,23 +47,53 @@ func (p *Publisher) client(ctx context.Context) (*github.Client, error) {
 
 // UploadRelease creates or updates a GitHub Release for pkgName@version
 // and uploads all files in assetPaths as release assets.
+// Tries go-github API first; falls back to gh CLI if API auth fails.
 func (p *Publisher) UploadRelease(ctx context.Context, pkgName, version string, assetPaths []string) error {
 	if err := p.EnsureRepo(ctx, pkgName); err != nil {
 		return err
 	}
-	c, err := p.client(ctx)
-	if err != nil {
-		return err
-	}
 	tag := "v" + strings.TrimPrefix(version, "v")
-	rel, err := findOrCreateRelease(ctx, c, p.org, pkgName, tag)
-	if err != nil {
-		return err
-	}
-	for _, path := range assetPaths {
-		if err := uploadAsset(ctx, c, p.org, pkgName, rel, path); err != nil {
-			return fmt.Errorf("upload %s: %w", filepath.Base(path), err)
+
+	// Try API path
+	c, err := p.client(ctx)
+	if err == nil {
+		rel, err := findOrCreateRelease(ctx, c, p.org, pkgName, tag)
+		if err == nil {
+			for _, path := range assetPaths {
+				if err := uploadAsset(ctx, c, p.org, pkgName, rel, path); err != nil {
+					return fmt.Errorf("upload %s: %w", filepath.Base(path), err)
+				}
+			}
+			return nil
 		}
+	}
+
+	// Fallback: gh CLI
+	return p.uploadReleaseGHCLI(ctx, pkgName, tag, assetPaths)
+}
+
+// uploadReleaseGHCLI uses `gh release create/upload` to publish assets.
+func (p *Publisher) uploadReleaseGHCLI(ctx context.Context, pkgName, tag string, assetPaths []string) error {
+	repo := p.org + "/" + pkgName
+
+	// Create release if it doesn't exist (--notes-start-tag suppresses diff)
+	createArgs := []string{
+		"release", "create", tag,
+		"--repo", repo,
+		"--title", pkgName + " " + tag,
+		"--notes", "Built by APGer — NurOS package builder",
+	}
+	out, err := exec.CommandContext(ctx, "gh", createArgs...).CombinedOutput()
+	// 422 / "already exists" is fine — we'll upload assets anyway
+	if err != nil && !strings.Contains(string(out), "already exists") {
+		return fmt.Errorf("gh release create: %s", strings.TrimSpace(string(out)))
+	}
+
+	// Upload assets
+	uploadArgs := append([]string{"release", "upload", tag, "--repo", repo, "--clobber"}, assetPaths...)
+	out, err = exec.CommandContext(ctx, "gh", uploadArgs...).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("gh release upload: %s", strings.TrimSpace(string(out)))
 	}
 	return nil
 }
@@ -150,7 +182,7 @@ func (p *Publisher) uploadFileToRepo(ctx context.Context, c *github.Client, repo
 func (p *Publisher) EnsureRepo(ctx context.Context, pkgName string) error {
 	c, err := p.client(ctx)
 	if err != nil {
-		return err
+		return p.ensureRepoGHCLI(ctx, pkgName)
 	}
 	return p.ensureRepoWithClient(ctx, c, pkgName)
 }
@@ -161,7 +193,8 @@ func (p *Publisher) ensureRepoWithClient(ctx context.Context, c *github.Client, 
 		return nil
 	}
 	if resp == nil || resp.StatusCode != 404 {
-		return fmt.Errorf("check repo %s/%s: %w", p.org, pkgName, err)
+		// API error — try gh cli
+		return p.ensureRepoGHCLI(ctx, pkgName)
 	}
 	_, _, err = c.Repositories.CreateInOrg(ctx, p.org, &github.Repository{
 		Name:        github.Ptr(pkgName),
@@ -169,7 +202,29 @@ func (p *Publisher) ensureRepoWithClient(ctx context.Context, c *github.Client, 
 		Private:     github.Ptr(false),
 		AutoInit:    github.Ptr(true),
 	})
-	return err
+	if err != nil {
+		return p.ensureRepoGHCLI(ctx, pkgName)
+	}
+	return nil
+}
+
+// ensureRepoGHCLI creates the repo via `gh repo create` if it doesn't exist.
+func (p *Publisher) ensureRepoGHCLI(ctx context.Context, pkgName string) error {
+	repo := p.org + "/" + pkgName
+	// Check existence
+	checkOut, _ := exec.CommandContext(ctx, "gh", "repo", "view", repo).CombinedOutput()
+	if strings.Contains(string(checkOut), pkgName) {
+		return nil // already exists
+	}
+	out, err := exec.CommandContext(ctx, "gh", "repo", "create", repo,
+		"--public",
+		"--description", "NurOS APGv2 package: "+pkgName,
+		"--add-readme",
+	).CombinedOutput()
+	if err != nil && !strings.Contains(string(out), "already exists") {
+		return fmt.Errorf("gh repo create %s: %s", repo, strings.TrimSpace(string(out)))
+	}
+	return nil
 }
 
 // ── Local ─────────────────────────────────────────────────────────────────────
