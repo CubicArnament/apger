@@ -6,7 +6,8 @@ project('apger',
 
 # ── Tools ─────────────────────────────────────────────────────────────────────
 
-go     = find_program('go',     required: true)
+go     = find_program('go',         required: true)
+pkgcfg = find_program('pkg-config', required: false)
 python = find_program('python3', required: false)
 if not python.found()
   python = find_program('python', required: true)
@@ -61,9 +62,15 @@ endif
 
 # ── Go environment ────────────────────────────────────────────────────────────
 
+# Resolve C library flags via pkg-config for CGO (sqlite if enabled)
+sqlite_libs = ''
+if db_backend == 'sqlite' and pkgcfg.found()
+  sqlite_libs = run_command(pkgcfg, '--libs', 'sqlite3', check: false).stdout().strip()
+endif
+
 go_env = environment()
 go_env.set('CGO_CFLAGS',  self_cflags)
-go_env.set('CGO_LDFLAGS', self_ldflags)
+go_env.set('CGO_LDFLAGS', self_ldflags + (sqlite_libs != '' ? ' ' + sqlite_libs : ''))
 go_env.set('GOFLAGS',     '-mod=mod')
 
 # sqlite requires CGO; bbolt is pure Go
