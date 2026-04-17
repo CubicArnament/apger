@@ -48,7 +48,7 @@ ANNOTATIONS: dict[str, str] = {
     "examples/":                           "# example recipe / metadata files",
     "src/Meson.build":                     "# build system",
     "src/meson_options.txt":              "# meson options",
-    "src/k8s-manifest.yaml":              "# Kubernetes PVC + ConfigMap + Job + Pod",
+    "k8s-manifest.yml":                   "# Kubernetes PVC + ConfigMap + Job + Pod",
     "src/cmd/apger/main.go":              "# binary entry point",
     "src/core/config.go":                 "# Config struct, LoadConfig, FindConfig",
     "src/core/main.go":                   "# Run(), CLI flags, apger.conf wiring",

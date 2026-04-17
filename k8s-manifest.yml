@@ -7,13 +7,13 @@
 #   Pod          apger-tui        — interactive TUI pod, attach with kubectl attach
 #
 # Quick start:
-#   kubectl apply -f src/k8s-manifest.yaml
+#   kubectl apply -f k8s-manifest.yml
 #   kubectl wait --for=condition=complete job/apger-build --timeout=30m
 #   kubectl attach -it apger-tui
 #
 # For Kind clusters (local):
 #   kind load docker-image fedora:43
-#   kubectl apply -f src/k8s-manifest.yaml
+#   kubectl apply -f k8s-manifest.yml
 #
 # Detach from pod without killing it:
 #   Ctrl+P, Ctrl+Q
@@ -29,7 +29,7 @@
 #   kubectl logs -f pod/apger-tui
 #
 # Cleanup:
-#   kubectl delete -f src/k8s-manifest.yaml
+#   kubectl delete -f k8s-manifest.yml
 
 ---
 apiVersion: v1

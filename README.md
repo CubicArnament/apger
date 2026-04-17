@@ -155,7 +155,7 @@ Self-build flags for apger/apgbuild (`-march=native -O3 -flto=thin -fuse-ld=mold
 ### 1. Apply the manifest
 
 ```sh
-kubectl apply -f src/k8s-manifest.yaml
+kubectl apply -f k8s-manifest.yml
 ```
 
 This creates:
@@ -244,7 +244,7 @@ kubectl delete pod pvc-access -n apger
 ### 7. Cleanup
 
 ```sh
-kubectl delete -f src/k8s-manifest.yaml
+kubectl delete -f k8s-manifest.yml
 ```
 
 ## Build Tags
