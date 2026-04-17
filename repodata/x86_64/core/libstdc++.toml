@@ -1,0 +1,24 @@
+[package]
+name = "libstdc++"
+version = "14.1.0"
+type = "library"
+architecture = "x86_64"
+description = "GNU C++ standard library runtime (libstdc++.so.6)"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://gcc.gnu.org"
+dependencies = ["libgcc", "glibc"]
+
+# libstdc++ is a split from the gcc package.
+# Contains only the C++ runtime library, not headers or the compiler.
+[source]
+url = "https://ftp.gnu.org/gnu/gcc/gcc-14.1.0/gcc-14.1.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "custom"
+dependencies = ["gcc", "make", "binutils"]
+script = ""
+
+[install]
+script = ""

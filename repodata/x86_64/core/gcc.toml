@@ -3,11 +3,13 @@ name = "gcc"
 version = "14.1.0"
 type = "binary"
 architecture = "x86_64"
-description = "GNU Compiler Collection — C, C++, Fortran, and other language compilers"
+description = "GNU Compiler Collection — C, C++, Fortran compilers"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-3.0"
 homepage = "https://gcc.gnu.org/"
-dependencies = []
+dependencies = ["binutils", "glibc"]
+# gcc build also produces libgcc and libstdc++ as split packages
+provides = ["libgcc", "libstdc++"]
 bootstrap = true
 
 [source]

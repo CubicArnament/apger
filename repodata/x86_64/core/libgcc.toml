@@ -1,0 +1,24 @@
+[package]
+name = "libgcc"
+version = "14.1.0"
+type = "library"
+architecture = "x86_64"
+description = "GCC runtime support library (libgcc_s.so.1)"
+maintainer = "NurOS Team <team@nuros.org>"
+license = "GPL-3.0"
+homepage = "https://gcc.gnu.org"
+dependencies = ["glibc"]
+
+# libgcc is a split from the gcc package — built together with gcc.
+# It contains only the runtime support library, not the compiler.
+[source]
+url = "https://ftp.gnu.org/gnu/gcc/gcc-14.1.0/gcc-14.1.0.tar.xz"
+type_src = "tarball"
+
+[build]
+template = "custom"
+dependencies = ["gcc", "make", "binutils"]
+script = ""
+
+[install]
+script = ""
