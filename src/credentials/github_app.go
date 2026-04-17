@@ -37,17 +37,23 @@ func InstallationToken(ctx context.Context, appID int64, pemKey, org string) (st
 	appClient := github.NewClient(oauth2.NewClient(ctx, ts))
 
 	// Find the installation for the target org
-	installations, _, err := appClient.Apps.ListInstallations(ctx, nil)
-	if err != nil {
-		return "", fmt.Errorf("list installations: %w", err)
-	}
-
 	var installID int64
-	for _, inst := range installations {
-		if inst.GetAccount().GetLogin() == org {
-			installID = inst.GetID()
+	opts := &github.ListOptions{PerPage: 100}
+	for {
+		installations, resp, err := appClient.Apps.ListInstallations(ctx, opts)
+		if err != nil {
+			return "", fmt.Errorf("list installations: %w", err)
+		}
+		for _, inst := range installations {
+			if inst.GetAccount().GetLogin() == org {
+				installID = inst.GetID()
+				break
+			}
+		}
+		if installID != 0 || resp.NextPage == 0 {
 			break
 		}
+		opts.Page = resp.NextPage
 	}
 	if installID == 0 {
 		return "", fmt.Errorf("GitHub App not installed in org %q", org)

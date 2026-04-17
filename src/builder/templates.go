@@ -258,7 +258,7 @@ func (m *MakefileTemplate) Setup(_ []string) error {
 }
 
 func (m *MakefileTemplate) Compile(extraFlags []string) error {
-	return run("make", append([]string{"-j$(nproc)"}, extraFlags...), m.sourceDir)
+	return run("make", append([]string{fmt.Sprintf("-j%d", runtime.NumCPU())}, extraFlags...), m.sourceDir)
 }
 
 func (m *MakefileTemplate) Install(destDir string) error {
@@ -286,7 +286,7 @@ func (k *KBuildTemplate) Setup(_ []string) error {
 }
 
 func (k *KBuildTemplate) Compile(extraFlags []string) error {
-	args := append([]string{"-j$(nproc)"}, extraFlags...)
+	args := append([]string{fmt.Sprintf("-j%d", runtime.NumCPU())}, extraFlags...)
 	return run("make", args, k.sourceDir)
 }
 

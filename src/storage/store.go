@@ -2,7 +2,7 @@
 // The backend is selected at compile time via build tags:
 //
 //	go build -tags bbolt   → bbolt (default, embedded key-value store)
-//	go build -tags sqlite  → SQLite3 via mattn/go-sqlite3 (requires CGO)
+//	go build -tags sqlite  → SQLite3 via modernc.org/sqlite (pure Go, no CGO)
 package storage
 
 import "time"

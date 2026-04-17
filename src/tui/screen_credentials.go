@@ -47,6 +47,7 @@ const (
 
 // CredentialsScreen is the TUI model for the credentials management screen.
 type CredentialsScreen struct {
+	ctx     context.Context
 	mgr     *credentials.Manager
 	pub     *publisher.Publisher // may be nil until PAT is saved
 	org     string               // NurOS-Packages org name
@@ -75,7 +76,7 @@ func NewCredentialsScreen(org string) (*CredentialsScreen, error) {
 		return nil, err
 	}
 
-	s := &CredentialsScreen{mgr: mgr, org: org}
+	s := &CredentialsScreen{ctx: context.Background(), mgr: mgr, org: org}
 
 	for i := range s.fields {
 		f := textinput.New()
@@ -120,6 +121,12 @@ func NewCredentialsScreen(org string) (*CredentialsScreen, error) {
 	}
 
 	return s, nil
+}
+
+// WithContext sets the context used for background operations (e.g. verifyAndDestroy).
+func (s *CredentialsScreen) WithContext(ctx context.Context) *CredentialsScreen {
+	s.ctx = ctx
+	return s
 }
 
 // Init implements tea.Model.
@@ -423,7 +430,7 @@ func (s *CredentialsScreen) verifyAndDestroy() tea.Cmd {
 			if pkgName == "" {
 				pkgName = "apger"
 			}
-			if err := pub.UploadRevocationCert(context.Background(), pkgName, revCert); err != nil {
+			if err := pub.UploadRevocationCert(s.ctx, pkgName, revCert); err != nil {
 				// Non-fatal — still destroy locally
 				_ = err
 			}

@@ -1,11 +1,16 @@
-// Package k8s — gen-krnl.go generates a Linux kernel .config for a given
-// architecture and feature set, then fills remaining options with defaults
-// via `make olddefconfig`.
+// Package k8s — gen-krnl.go generates a minimal Linux kernel .config fragment
+// for a given architecture and feature set, then fills all remaining options
+// with their Kconfig defaults via `make olddefconfig`.
 //
 // Usage (inside a build pod):
 //
-//	gen-krnl --arch x86_64 --features server --output /build/src/.config
-//	make -C /build/src olddefconfig
+//	cfg := k8s.KernelConfig{
+//	    Arch:      "x86_64",
+//	    Features:  k8s.KernelFeatureServer,
+//	    SourceDir: "/build/src",
+//	    OutputPath: "/build/src/.config",
+//	}
+//	err := k8s.GenerateKConfig(cfg)
 package k8s
 
 import (
@@ -19,146 +24,154 @@ import (
 type KernelFeatureSet string
 
 const (
-	KernelFeatureServer   KernelFeatureSet = "server"   // headless, no GUI, optimised for throughput
-	KernelFeatureDesktop  KernelFeatureSet = "desktop"  // GUI, sound, USB, full hardware support
+	KernelFeatureServer   KernelFeatureSet = "server"   // headless, throughput-optimised
+	KernelFeatureDesktop  KernelFeatureSet = "desktop"  // GUI, sound, USB, full hardware
 	KernelFeatureMinimal  KernelFeatureSet = "minimal"  // smallest possible kernel
-	KernelFeatureEmbedded KernelFeatureSet = "embedded" // for SBCs (RPi, etc.)
+	KernelFeatureEmbedded KernelFeatureSet = "embedded" // SBCs (RPi, StarFive, etc.)
 )
 
-// KernelConfig holds the parameters for kernel .config generation.
+// KernelConfig holds parameters for kernel .config generation.
 type KernelConfig struct {
-	Arch       string           // target arch: x86_64, aarch64, riscv64
-	Features   KernelFeatureSet // feature preset
-	Version    string           // kernel version string (informational)
-	SourceDir  string           // path to kernel source tree
-	OutputPath string           // where to write the generated .config
+	// Arch is the target architecture: "x86_64", "aarch64"/"arm64", "riscv64".
+	Arch string
+	// Features selects a predefined option preset.
+	Features KernelFeatureSet
+	// Version is informational only (written as a comment).
+	Version string
+	// SourceDir is the path to the kernel source tree.
+	SourceDir string
+	// OutputPath is where to write the final .config.
+	OutputPath string
+	// CrossCompile overrides the CROSS_COMPILE prefix.
+	// If empty, a default is chosen based on Arch.
+	CrossCompile string
 }
 
-// GenerateKConfig writes a minimal .config fragment for the given KernelConfig,
-// then runs `make olddefconfig` in SourceDir to fill in all remaining options
-// with their Kconfig defaults.
+// GenerateKConfig writes a minimal .config fragment, then runs
+// `make ARCH=<arch> CROSS_COMPILE=<prefix> olddefconfig` to fill in defaults.
 //
-// The generated fragment sets only the most important options; everything else
-// is left to olddefconfig so the config stays valid across kernel versions.
+// The fragment only sets options that differ from kernel defaults or that
+// must be forced for the target arch/feature set. Everything else is left
+// to olddefconfig.
 func GenerateKConfig(cfg KernelConfig) error {
-	fragment := buildFragment(cfg)
-
-	if err := os.WriteFile(cfg.OutputPath, []byte(fragment), 0644); err != nil {
-		return fmt.Errorf("write .config fragment: %w", err)
+	karch := kernelArch(cfg.Arch)
+	cross := cfg.CrossCompile
+	if cross == "" {
+		cross = defaultCrossCompile(karch)
 	}
 
-	// Run make olddefconfig to fill defaults and validate
-	cmd := exec.Command("make",
+	fragment := buildFragment(cfg, karch)
+
+	// Write fragment to a temp file used as KCONFIG_ALLCONFIG
+	fragPath := cfg.SourceDir + "/.config.fragment"
+	if err := os.WriteFile(fragPath, []byte(fragment), 0644); err != nil {
+		return fmt.Errorf("write config fragment: %w", err)
+	}
+	defer os.Remove(fragPath)
+
+	// Run make olddefconfig — fills all unset options with Kconfig defaults.
+	// KCONFIG_ALLCONFIG forces our fragment options; olddefconfig handles the rest.
+	args := []string{
 		"-C", cfg.SourceDir,
-		"KCONFIG_ALLCONFIG="+cfg.OutputPath,
-		"ARCH="+kernelArch(cfg.Arch),
+		fmt.Sprintf("ARCH=%s", karch),
+		fmt.Sprintf("KCONFIG_ALLCONFIG=%s", fragPath),
 		"olddefconfig",
-	)
+	}
+	if cross != "" {
+		args = append(args, fmt.Sprintf("CROSS_COMPILE=%s", cross))
+	}
+
+	cmd := exec.Command("make", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("make olddefconfig: %w", err)
+		return fmt.Errorf("make olddefconfig (ARCH=%s): %w", karch, err)
 	}
 
-	// Copy the final .config back to OutputPath
-	finalConfig := cfg.SourceDir + "/.config"
-	data, err := os.ReadFile(finalConfig)
-	if err != nil {
-		return fmt.Errorf("read final .config: %w", err)
+	// Copy the final .config to OutputPath (may differ from SourceDir/.config)
+	if cfg.OutputPath != cfg.SourceDir+"/.config" {
+		data, err := os.ReadFile(cfg.SourceDir + "/.config")
+		if err != nil {
+			return fmt.Errorf("read final .config: %w", err)
+		}
+		if err := os.WriteFile(cfg.OutputPath, data, 0644); err != nil {
+			return fmt.Errorf("write output .config: %w", err)
+		}
 	}
-	return os.WriteFile(cfg.OutputPath, data, 0644)
+
+	return nil
 }
 
-// buildFragment returns a .config fragment (key=value lines) for the given config.
-func buildFragment(cfg KernelConfig) string {
+// buildFragment returns a minimal .config fragment.
+// Only options that MUST be forced are included; olddefconfig handles defaults.
+func buildFragment(cfg KernelConfig, karch string) string {
 	var b strings.Builder
-
 	w := func(line string) { b.WriteString(line + "\n") }
 
-	w("# Generated by apger gen-krnl — do not edit manually")
-	w(fmt.Sprintf("# Arch: %s  Features: %s  Version: %s", cfg.Arch, cfg.Features, cfg.Version))
+	w(fmt.Sprintf("# apger gen-krnl: arch=%s features=%s version=%s", karch, cfg.Features, cfg.Version))
 	w("")
 
-	// ── Common options ────────────────────────────────────────────────────────
-	w("CONFIG_64BIT=y")
-	w("CONFIG_SMP=y")
+	// ── Arch-specific mandatory options ──────────────────────────────────────
+	// These are required for the kernel to boot on the target arch.
+	switch karch {
+	case "x86_64":
+		w("CONFIG_64BIT=y")
+		w("CONFIG_X86_64=y")
+	case "arm64":
+		// CONFIG_ARM64 is auto-set by ARCH=arm64; no need to force it.
+		// But 64-bit must be explicit.
+		w("CONFIG_64BIT=y")
+	case "riscv":
+		w("CONFIG_64BIT=y")
+		w("CONFIG_RISCV=y")
+	}
+
+	// ── Always-on: modules, proc, sysfs, devtmpfs ────────────────────────────
+	// These are almost always enabled by default but we force them to be safe.
 	w("CONFIG_MODULES=y")
 	w("CONFIG_MODULE_UNLOAD=y")
-	w("CONFIG_MODVERSIONS=y")
-	w("CONFIG_KALLSYMS=y")
 	w("CONFIG_PROC_FS=y")
 	w("CONFIG_SYSFS=y")
-	w("CONFIG_TMPFS=y")
 	w("CONFIG_DEVTMPFS=y")
 	w("CONFIG_DEVTMPFS_MOUNT=y")
-	w("CONFIG_CGROUPS=y")
-	w("CONFIG_NAMESPACES=y")
+	w("CONFIG_TMPFS=y")
+
+	// ── Networking ────────────────────────────────────────────────────────────
 	w("CONFIG_NET=y")
 	w("CONFIG_INET=y")
 	w("CONFIG_IPV6=y")
 	w("CONFIG_UNIX=y")
+
+	// ── Filesystems ───────────────────────────────────────────────────────────
 	w("CONFIG_EXT4_FS=y")
 	w("CONFIG_BTRFS_FS=m")
-	w("CONFIG_XFS_FS=m")
 	w("CONFIG_VFAT_FS=y")
 	w("CONFIG_OVERLAY_FS=y")
-	w("CONFIG_SQUASHFS=y")
-	w("CONFIG_ZSTD_COMPRESS=y")
-	w("CONFIG_LZ4_COMPRESS=y")
-	w("CONFIG_CRYPTO_AES=y")
-	w("CONFIG_CRYPTO_SHA256=y")
-	w("CONFIG_CRYPTO_SHA512=y")
-	w("CONFIG_SECURITY=y")
-	w("CONFIG_SECURITY_SELINUX=y")
-	w("CONFIG_AUDIT=y")
-	w("CONFIG_IKCONFIG=y")
-	w("CONFIG_IKCONFIG_PROC=y")
 
-	// ── Arch-specific ─────────────────────────────────────────────────────────
-	switch kernelArch(cfg.Arch) {
-	case "x86_64":
-		w("CONFIG_X86_64=y")
-		w("CONFIG_X86_MCE=y")
-		w("CONFIG_MICROCODE=y")
-		w("CONFIG_MICROCODE_AMD=y")
-		w("CONFIG_MICROCODE_INTEL=y")
-		w("CONFIG_ACPI=y")
-		w("CONFIG_PCI=y")
-		w("CONFIG_NVME_CORE=y")
-		w("CONFIG_BLK_DEV_NVME=y")
-	case "arm64":
-		w("CONFIG_ARM64=y")
-		w("CONFIG_ACPI=y")
-		w("CONFIG_PCI=y")
-		w("CONFIG_ARM_PSCI_FW=y")
-		w("CONFIG_NVME_CORE=y")
-		w("CONFIG_BLK_DEV_NVME=y")
-	case "riscv":
-		w("CONFIG_RISCV=y")
-		w("CONFIG_64BIT=y")
-		w("CONFIG_RISCV_SBI=y")
-	}
+	// ── Containers / namespaces ───────────────────────────────────────────────
+	w("CONFIG_CGROUPS=y")
+	w("CONFIG_NAMESPACES=y")
+	w("CONFIG_USER_NS=y")
 
 	// ── Feature presets ───────────────────────────────────────────────────────
+	// Only options that differ from kernel defaults are listed here.
 	switch cfg.Features {
 	case KernelFeatureServer:
-		w("# Server: no GUI, optimised for throughput")
-		w("CONFIG_HZ_1000=y")
+		w("# Server: no GUI, KVM, virtio")
 		w("CONFIG_PREEMPT_NONE=y")
+		w("CONFIG_HZ_1000=y")
+		w("CONFIG_KVM=y")
 		w("CONFIG_VIRTIO=y")
 		w("CONFIG_VIRTIO_PCI=y")
 		w("CONFIG_VIRTIO_NET=y")
 		w("CONFIG_VIRTIO_BLK=y")
-		w("CONFIG_KVM=y")
-		w("CONFIG_KVM_INTEL=m")
-		w("CONFIG_KVM_AMD=m")
 		w("# CONFIG_SOUND is not set")
 		w("# CONFIG_DRM is not set")
 
 	case KernelFeatureDesktop:
-		w("# Desktop: GUI, sound, full hardware")
-		w("CONFIG_HZ_250=y")
+		w("# Desktop: GUI, sound, USB, wireless")
 		w("CONFIG_PREEMPT_VOLUNTARY=y")
+		w("CONFIG_HZ_250=y")
 		w("CONFIG_DRM=y")
 		w("CONFIG_DRM_I915=m")
 		w("CONFIG_DRM_AMDGPU=m")
@@ -168,14 +181,13 @@ func buildFragment(cfg KernelConfig) string {
 		w("CONFIG_USB=y")
 		w("CONFIG_USB_XHCI_HCD=y")
 		w("CONFIG_BLUETOOTH=m")
-		w("CONFIG_WIRELESS=y")
 		w("CONFIG_CFG80211=m")
 		w("CONFIG_MAC80211=m")
 
 	case KernelFeatureMinimal:
-		w("# Minimal: smallest possible kernel")
-		w("CONFIG_HZ_100=y")
+		w("# Minimal: smallest kernel")
 		w("CONFIG_PREEMPT_NONE=y")
+		w("CONFIG_HZ_100=y")
 		w("# CONFIG_SOUND is not set")
 		w("# CONFIG_DRM is not set")
 		w("# CONFIG_USB is not set")
@@ -183,33 +195,50 @@ func buildFragment(cfg KernelConfig) string {
 		w("# CONFIG_BLUETOOTH is not set")
 
 	case KernelFeatureEmbedded:
-		w("# Embedded: SBC (RPi, StarFive, etc.)")
-		w("CONFIG_HZ_250=y")
+		w("# Embedded: SBC (RPi, StarFive, Milk-V, etc.)")
 		w("CONFIG_PREEMPT_VOLUNTARY=y")
+		w("CONFIG_HZ_250=y")
 		w("CONFIG_MMC=y")
 		w("CONFIG_MMC_SDHCI=y")
 		w("CONFIG_USB=y")
 		w("CONFIG_USB_XHCI_HCD=y")
 		w("CONFIG_USB_EHCI_HCD=y")
-		w("CONFIG_WIRELESS=y")
 		w("CONFIG_CFG80211=m")
 		w("CONFIG_MAC80211=m")
-		w("# CONFIG_DRM is not set")
+		// Embedded boards typically need device tree
+		w("CONFIG_OF=y")
 	}
 
 	return b.String()
 }
 
-// kernelArch converts apger arch names to Linux ARCH= values.
+// kernelArch converts apger arch names to Linux kernel ARCH= values.
+//
+//	x86_64, amd64       → x86_64
+//	aarch64, arm64, armv8-a → arm64   (kernel uses 'arm64', not 'aarch64')
+//	riscv64, rv64gc     → riscv    (kernel uses 'riscv', not 'riscv64')
 func kernelArch(arch string) string {
-	switch strings.ToLower(arch) {
+	switch strings.ToLower(strings.TrimSpace(arch)) {
 	case "x86_64", "x86-64", "amd64":
 		return "x86_64"
-	case "aarch64", "arm64", "armv8-a":
+	case "aarch64", "arm64", "armv8-a", "armv8", "arm-v8":
 		return "arm64"
-	case "riscv64", "rv64gc":
+	case "riscv64", "riscv-64", "rv64", "rv64gc", "riscv64gc":
 		return "riscv"
 	default:
 		return arch
+	}
+}
+
+// defaultCrossCompile returns the default CROSS_COMPILE prefix for a kernel arch.
+// Returns empty string for native (x86_64) builds.
+func defaultCrossCompile(karch string) string {
+	switch karch {
+	case "arm64":
+		return "aarch64-linux-gnu-"
+	case "riscv":
+		return "riscv64-linux-gnu-"
+	default:
+		return "" // native build, no cross-compiler prefix needed
 	}
 }

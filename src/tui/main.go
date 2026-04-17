@@ -358,13 +358,17 @@ func (m *Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case screenCredentials:
 		if m.credScreen != nil {
 			newModel, cmd := m.credScreen.Update(msg)
-			m.credScreen = newModel.(*CredentialsScreen)
+			if cs, ok := newModel.(*CredentialsScreen); ok {
+				m.credScreen = cs
+			}
 			return m, cmd
 		}
 	case screenSettings:
 		if m.settings != nil {
 			newModel, cmd := m.settings.Update(msg)
-			m.settings = newModel.(*SettingsScreen)
+			if ss, ok := newModel.(*SettingsScreen); ok {
+				m.settings = ss
+			}
 			return m, cmd
 		}
 	}
@@ -394,7 +398,7 @@ func (m *Model) updateDashboard(key string) (tea.Model, tea.Cmd) {
 		if err != nil {
 			m.err = err
 		} else {
-			m.credScreen = cs
+			m.credScreen = cs.WithContext(m.ctx)
 			m.screen = screenCredentials
 		}
 	case "s":

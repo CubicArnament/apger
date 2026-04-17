@@ -84,17 +84,29 @@ func AnalyzeSplit(destDir, pkgName string, recipe *metadata.Recipe) SplitResult 
 }
 
 // matchAny returns true if path matches any of the glob patterns.
+// Supports ** as a recursive wildcard: the prefix before ** must match the
+// start of path, and the suffix after **/ (if any) is matched with filepath.Match.
 func matchAny(path string, patterns []string) bool {
 	for _, pat := range patterns {
-		// filepath.Match doesn't support **, handle manually
-		if strings.Contains(pat, "**") {
-			prefix := strings.SplitN(pat, "**", 2)[0]
-			if strings.HasPrefix(path, prefix) {
+		if !strings.Contains(pat, "**") {
+			if ok, _ := filepath.Match(pat, path); ok {
 				return true
 			}
 			continue
 		}
-		if ok, _ := filepath.Match(pat, path); ok {
+		// Split on the first occurrence of **
+		parts := strings.SplitN(pat, "**", 2)
+		prefix := parts[0] // e.g. "usr/include/"
+		suffix := strings.TrimPrefix(parts[1], "/") // e.g. "*.h" or "*" or ""
+		if !strings.HasPrefix(path, prefix) {
+			continue
+		}
+		if suffix == "" || suffix == "*" {
+			return true
+		}
+		// Match only the filename portion against the suffix pattern
+		base := filepath.Base(path)
+		if ok, _ := filepath.Match(suffix, base); ok {
 			return true
 		}
 	}

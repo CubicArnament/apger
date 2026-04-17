@@ -1,10 +1,11 @@
-// Package config provides build configuration parsing from apger.conf (TOML).
-package config
+// Package core provides build configuration parsing from apger.conf (TOML).
+package core
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/BurntSushi/toml"
 )
@@ -75,14 +76,31 @@ func (p BuildProfile) CFlags() string {
 		ltoFlag = "-flto=" + p.LTO
 	}
 
+	var flags string
+	if march := p.March.String(); march != "" {
+		flags += "-march=" + march
+	}
 	mtune := p.Mtune.String()
 	if mtune == "" {
 		mtune = p.March.String()
 	}
-
-	flags := fmt.Sprintf("-march=%s -mtune=%s -%s", p.March, mtune, p.OptLevel)
+	if mtune != "" {
+		if flags != "" {
+			flags += " "
+		}
+		flags += "-mtune=" + mtune
+	}
+	if p.OptLevel != "" {
+		if flags != "" {
+			flags += " "
+		}
+		flags += "-" + p.OptLevel
+	}
 	if ltoFlag != "" {
-		flags += " " + ltoFlag
+		if flags != "" {
+			flags += " "
+		}
+		flags += ltoFlag
 	}
 	return flags
 }
@@ -208,9 +226,16 @@ func (cfg Config) Resolve(override RecipeBuildOverride, targetArch MArch) BuildP
 	return base
 }
 
-// crossForFamily finds the first cross profile matching the given arch family.
+// crossForFamily finds the cross profile matching the given arch family.
+// Keys are iterated in sorted order to ensure deterministic selection.
 func (cfg Config) crossForFamily(family ArchFamily) (CrossProfile, bool) {
-	for _, cp := range cfg.Build.Cross {
+	keys := make([]string, 0, len(cfg.Build.Cross))
+	for k := range cfg.Build.Cross {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		cp := cfg.Build.Cross[k]
 		if cp.March.Family() == family {
 			return cp, true
 		}

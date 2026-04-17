@@ -1,4 +1,4 @@
-package config
+package core
 
 import (
 	"bufio"
@@ -161,9 +161,13 @@ func validateMarch(p BuildProfile) error {
 			return nil // native is always fine; non-x86_64 levels not checked here
 		}
 		if m.Level() > hostLevel {
+			// Level index: 0=x86_64, 1=x86_64-v2, 2=x86_64-v3, 3=x86_64-v4
+			// x86_64LevelOrder[idx] gives the human-readable name directly.
 			return fmt.Errorf(
-				"Illegal Instruction: %s=%s requires x86_64-v%d but host CPU only supports up to x86_64-v%d",
-				label, m, m.Level(), hostLevel,
+				"Illegal Instruction: %s=%s requires %s but host CPU only supports up to %s",
+				label, m,
+				x86_64LevelOrder[m.Level()],
+				x86_64LevelOrder[hostLevel],
 			)
 		}
 		return nil

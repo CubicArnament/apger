@@ -3,12 +3,12 @@ package metadata
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 )
 
 // GenerateMetadata creates metadata.json from recipe and build info.
@@ -78,7 +78,9 @@ func GenerateSHA256Checksums(dataDir, outputPath string) error {
 	defer f.Close()
 
 	for _, k := range keys {
-		fmt.Fprintf(f, "%s  %s\n", sums[k], k)
+		if _, err := fmt.Fprintf(f, "%s  %s\n", sums[k], k); err != nil {
+			return fmt.Errorf("write checksums: %w", err)
+		}
 	}
 	return nil
 }
@@ -123,10 +125,11 @@ func CalculateDirSize(dir string) (int64, error) {
 }
 
 // HashRecipe computes a SHA-256 hash of the recipe to detect changes.
-// Uses a deterministic string representation of key recipe fields.
+// Fields are written individually with length prefixes to prevent separator
+// collisions (e.g. name="a|b",version="c" vs name="a",version="b|c").
 func HashRecipe(recipe Recipe) (string, error) {
-	// Deterministic representation: name|version|source_url|template|script
-	repr := strings.Join([]string{
+	h := sha256.New()
+	for _, field := range []string{
 		recipe.Package.Name,
 		recipe.Package.Version,
 		recipe.Package.Architecture,
@@ -135,8 +138,8 @@ func HashRecipe(recipe Recipe) (string, error) {
 		recipe.Build.Template,
 		recipe.Build.Script,
 		recipe.Install.Script,
-	}, "|")
-	h := sha256.New()
-	h.Write([]byte(repr))
+	} {
+		fmt.Fprintf(h, "%d:%s", len(field), field)
+	}
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

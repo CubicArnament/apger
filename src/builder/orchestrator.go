@@ -252,8 +252,9 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		}
 	}
 
-	// PGP sign + publish + report (best-effort — don't fail the build)
-	go o.postBuild(ctx, packageName, ver, splits)
+	// PGP sign + publish + report (best-effort — don't fail the build).
+	// Use a fresh context: the caller's ctx may be cancelled before postBuild finishes.
+	go o.postBuild(context.Background(), packageName, ver, splits)
 
 	o.log.Printf("Package %s %s built successfully (splits: %s, %s, %s-dev)",
 		packageName, ver, libName, packageName, packageName)
@@ -386,11 +387,15 @@ cp build/apger /output/apger`},
 func (o *Orchestrator) runPackagesStage(ctx context.Context) error {
 	o.log.Println("Building packages...")
 
-	// Collect .toml recipes only
-	recipes, _ := filepath.Glob(filepath.Join(o.recipeDir, "**/*.toml"))
-	if len(recipes) == 0 {
-		recipes, _ = filepath.Glob(filepath.Join(o.recipeDir, "*.toml"))
-	}
+	// Collect .toml recipes recursively.
+	// filepath.Glob does not support **, so we use filepath.WalkDir.
+	var recipes []string
+	filepath.WalkDir(o.recipeDir, func(path string, d os.DirEntry, err error) error {
+		if err == nil && !d.IsDir() && filepath.Ext(path) == ".toml" {
+			recipes = append(recipes, path)
+		}
+		return nil
+	})
 
 	if len(recipes) == 0 {
 		o.log.Println("No recipes found, skipping package stage")

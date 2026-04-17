@@ -1,4 +1,4 @@
-package config
+package core
 
 import (
 	"fmt"
@@ -46,6 +46,11 @@ var x86_64LevelIndex = func() map[string]int {
 func normalizeArch(s string) string {
 	s = strings.ToLower(strings.TrimSpace(s))
 
+	// Empty or native pass through unchanged.
+	if s == "" || s == "native" {
+		return s
+	}
+
 	// ── AArch64 aliases ──────────────────────────────────────────────────────
 	switch s {
 	case "arm64", "aarch64", "armv8", "armv8-a", "arm-v8":
@@ -87,6 +92,7 @@ func ParseMArch(s string) (MArch, error) {
 }
 
 // String returns the canonical march string for -march= flags.
+// Returns empty string for a zero-value MArch (no flag should be emitted).
 func (m MArch) String() string { return m.normalized }
 
 // IsNative reports whether this is the "native" pseudo-arch.

@@ -10,7 +10,6 @@ package publisher
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -107,11 +106,11 @@ func uploadAsset(ctx context.Context, c *github.Client, org, repo string, rel *g
 // UploadToOrg creates or updates a repository for pkgName in the org,
 // then uploads each asset as a file in the repo under packages/<version>/.
 func (p *Publisher) UploadToOrg(ctx context.Context, pkgName, version string, assetPaths []string) error {
-	if err := p.EnsureRepo(ctx, pkgName); err != nil {
-		return err
-	}
 	c, err := p.client(ctx)
 	if err != nil {
+		return err
+	}
+	if err := p.ensureRepoWithClient(ctx, c, pkgName); err != nil {
 		return err
 	}
 	for _, path := range assetPaths {
@@ -141,7 +140,7 @@ func (p *Publisher) uploadFileToRepo(ctx context.Context, c *github.Client, repo
 
 	_, _, err = c.Repositories.CreateFile(ctx, p.org, repo, repoPath, &github.RepositoryContentFileOptions{
 		Message: github.Ptr(msg),
-		Content: []byte(base64.StdEncoding.EncodeToString(data)),
+		Content: data,
 		SHA:     sha,
 	})
 	return err
@@ -153,6 +152,10 @@ func (p *Publisher) EnsureRepo(ctx context.Context, pkgName string) error {
 	if err != nil {
 		return err
 	}
+	return p.ensureRepoWithClient(ctx, c, pkgName)
+}
+
+func (p *Publisher) ensureRepoWithClient(ctx context.Context, c *github.Client, pkgName string) error {
 	_, resp, err := c.Repositories.Get(ctx, p.org, pkgName)
 	if err == nil {
 		return nil
