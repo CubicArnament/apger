@@ -1,0 +1,41 @@
+name: Update README
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "repodata/**"
+      - "src/**"
+      - ".github/scripts/update-readme.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run README generator
+        run: python3 .github/scripts/update-readme.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet README.md || (
+            git add README.md &&
+            git commit -m "docs: auto-update package list in README [skip ci]" &&
+            git push
+          )

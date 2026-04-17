@@ -5,68 +5,6 @@ Build system for NurOS packages in APGv2 format. Runs inside Kubernetes pods, bu
 ## Architecture
 
 <!-- TREE_START -->
-```
-apger/
-├── apger.conf                        # Build configuration (single source of truth)
-├── go.mod / go.sum                   # Go module dependencies
-├── README.md
-├── repodata/                         # Package recipes (.toml or .json)
-│   └── switch.json
-├── examples/                         # Example recipe and metadata files
-│   ├── recipe.json
-│   ├── repodata.json
-│   └── metadata.json
-└── src/
-    ├── Meson.build                   # Build system (reads apger.conf for db backend)
-    ├── meson_options.txt             # Meson options: output_name, db_backend
-    ├── k8s-manifest.yaml             # Kubernetes PVC + ConfigMap + Job + Pod
-    ├── cmd/
-    │   └── apger/
-    │       └── main.go               # Binary entry point (package main)
-    ├── core/                         # Configuration and startup
-    │   ├── config.go                 # Config struct, LoadConfig, FindConfig
-    │   ├── main.go                   # Run(), CLI flags, apger.conf wiring
-    │   ├── march.go                  # MArch type: normalization, x86_64 level table
-    │   └── validate.go               # OOMKill + march/CPUID pre-flight validation
-    ├── builder/                      # Package build orchestration
-    │   ├── orchestrator.go           # Kubernetes Job lifecycle, multistage pipeline
-    │   ├── split.go                  # SplitAnalyzer: libs/bins/dev file grouping
-    │   ├── templates.go              # Build system templates (meson/cmake/autotools/…)
-    │   └── downloader.go             # (legacy) HTTP downloader
-    ├── downloader/                   # Source fetching
-    │   └── downloader.go             # aria2c (tarballs) + go-git (git repos) + progress
-    ├── logger/                       # Build log filtering
-    │   └── build_logger.go           # kbuild-style filter: CC/CXX/LD/AS/CARGO/GO/…
-    ├── k8s/                          # Kubernetes manifest generation
-    │   ├── generator.go              # GenerateBuildJob, oomResources, pullPolicy
-    │   └── client.go                 # Kubernetes client wrapper
-    ├── metadata/                     # Recipe and package metadata
-    │   ├── types.go                  # Recipe, RecipeSource, RecipeSplit, PackageMeta
-    │   ├── recipe_loader.go          # LoadRecipe (.toml/.json), FindRecipes, template
-    │   └── generator.go              # GenerateMetadata, checksums, HashRecipe
-    ├── storage/                      # Package build state database
-    │   ├── store.go                  # Store interface + DB wrapper
-    │   ├── packages_db_bbolt.go      # bbolt backend  (build tag: bbolt)
-    │   └── packages_db_sqlite.go     # SQLite3 backend (build tag: sqlite)
-    ├── tui/                          # Terminal UI (bubbletea, keyboard-only)
-    │   ├── main.go                   # Model, screens: Dashboard/FM/Editor/Build
-    │   └── icons.go                  # Nerd Font icons per build template
-    └── apgbuild/                     # APG package archiver (git submodule)
-        ├── go.mod
-        ├── cmd/apgbuild/
-        │   └── main.go               # apgbuild CLI: build / meta --split / sums
-        ├── internal/
-        │   ├── archive/              # tar.zst create/extract (DataDog/zstd)
-        │   ├── builder/              # CreatePackage, checksums, metadata wizard
-        │   ├── checksum/             # CRC32 generation and verification
-        │   ├── elfanalyzer/          # ELF dependency extraction (debug/elf)
-        │   └── metadata/
-        │       ├── metadata.go       # Metadata struct, Load/Save, wizard
-        │       └── split.go          # GenerateSplitMetadata for lib/bin/dev splits
-        └── libapg/                   # C library for APG format (git submodule)
-            ├── src/                  # archive.c, package.c, crc32.c, util.c
-            └── include/              # apg/*.h headers
-```
 <!-- TREE_END -->
 
 ## Recipe Format
@@ -289,6 +227,16 @@ bootstrap = true
 ```
 
 In the TUI they are shown with the ⚡ icon.
+
+## Package Stats
+
+<!-- STATS_START -->
+<!-- STATS_END -->
+
+## Packages
+
+<!-- PACKAGES_START -->
+<!-- PACKAGES_END -->
 
 ## License
 
