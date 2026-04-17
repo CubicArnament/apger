@@ -202,10 +202,11 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 	targetArch, _ := config.ParseMArch(recipe.Package.Architecture)
 	pkgFlags := o.apgerCfg.Resolve(override, targetArch)
 
-	// Get build dependencies
+	// Get build dependencies from recipe [build].dependencies
+	// These are installed in the init container before building.
 	buildDeps := k8s.DefaultDependencies()
-	if len(recipe.Package.Dependencies) > 0 {
-		buildDeps = append(buildDeps, recipe.Package.Dependencies...)
+	if len(recipe.Build.Dependencies) > 0 {
+		buildDeps = append(buildDeps, recipe.Build.Dependencies...)
 	}
 
 	cfg := k8s.JobConfig{
@@ -433,7 +434,7 @@ func jsonArray(items []string) string {
 }
 
 // buildPackageScript generates the full shell script for a package build Job.
-// It includes: base build, hwcaps .so rebuilds, and split packaging.
+// It includes: source download, template-aware build, hwcaps .so rebuilds, and split packaging.
 func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.BuildProfile) string {
 	ver := recipe.Package.Version
 	libName := "lib" + pkgName
@@ -442,7 +443,25 @@ func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.Bui
 		arch = "x86_64"
 	}
 
-	// hwcaps: rebuild .so for each level and place in glibc-hwcaps/<level>/
+	// Download step — use aria2c for tarballs, git clone for repos
+	var downloadStep string
+	switch recipe.Source.TypeSrc {
+	case "git-repo":
+		cloneArgs := "--depth=1"
+		if recipe.Source.IncludeSubmodules {
+			cloneArgs += " --recurse-submodules"
+		}
+		downloadStep = fmt.Sprintf(`git clone %s "%s" /build/src`, cloneArgs, recipe.Source.URL)
+	default: // tarball
+		downloadStep = fmt.Sprintf(`aria2c -x4 -s4 --dir=/tmp --out=source.tar "%s"
+mkdir -p /build/src && cd /build/src
+tar xf /tmp/source.tar --strip-components=1`, recipe.Source.URL)
+	}
+
+	// Build commands based on template
+	buildCmd := templateBuildCommands(recipe)
+
+	// hwcaps: rebuild .so for each level
 	hwcaps := ""
 	if flags.LibraryGlibcHwcaps {
 		for _, level := range flags.LevelsHwcaps {
@@ -460,12 +479,10 @@ export CFLAGS="$SAVED_CFLAGS" CXXFLAGS="$SAVED_CXXFLAGS"
 	}
 
 	return fmt.Sprintf(`set -e
-echo "=== Building %s %s ==="
+echo "=== Building %s %s (template: %s) ==="
 
 # Download source
-curl -fsSL "%s" -o /tmp/source.tar.gz
-mkdir -p /build/src && cd /build/src
-tar xf /tmp/source.tar.gz --strip-components=1
+%s
 
 # Build flags (resolved: config + cross profile + recipe override)
 export CC="%s" CXX="%s"
@@ -473,22 +490,27 @@ export CFLAGS="%s"
 export CXXFLAGS="$CFLAGS"
 export LDFLAGS="%s"
 export DESTDIR=/build/root
-make -j$(nproc)
-make DESTDIR="$DESTDIR" install
+
+# Build + install using %s template
+%s
 %s
 # === Split: lib%s (shared libraries) ===
 mkdir -p /build/split-libs/usr/lib
 find $DESTDIR/usr/lib -maxdepth 1 \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} /build/split-libs/usr/lib/ \; 2>/dev/null || true
 find $DESTDIR/usr/lib64 -maxdepth 1 \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} /build/split-libs/usr/lib/ \; 2>/dev/null || true
 cp -r $DESTDIR/usr/lib/glibc-hwcaps /build/split-libs/usr/lib/ 2>/dev/null || true
-apgbuild meta --split libs --base-name %s --version %s --arch %s --detect-deps /build/split-libs -o /build/split-libs/metadata.json
+apgbuild meta --split libs --base-name %s --version %s --arch %s \
+  --description "%s" --maintainer "%s" --license "%s" \
+  --detect-deps /build/split-libs -o /build/split-libs/metadata.json
 apgbuild build /build/split-libs -o /output/%s-%s.apg
 
 # === Split: %s (binaries) ===
-mkdir -p /build/split-bin
+mkdir -p /build/split-bin/usr
 cp -r $DESTDIR/usr/bin /build/split-bin/usr/ 2>/dev/null || true
 cp -r $DESTDIR/usr/sbin /build/split-bin/usr/ 2>/dev/null || true
-apgbuild meta --split bins --base-name %s --version %s --arch %s --detect-deps /build/split-bin -o /build/split-bin/metadata.json
+apgbuild meta --split bins --base-name %s --version %s --arch %s \
+  --description "%s" --maintainer "%s" --license "%s" \
+  --detect-deps /build/split-bin -o /build/split-bin/metadata.json
 apgbuild build /build/split-bin -o /output/%s-%s.apg
 
 # === Split: %s-dev (headers + pkgconfig) ===
@@ -496,30 +518,117 @@ mkdir -p /build/split-dev/usr/lib
 cp -r $DESTDIR/usr/include /build/split-dev/usr/ 2>/dev/null || true
 cp -r $DESTDIR/usr/lib/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
 cp -r $DESTDIR/usr/lib64/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
-apgbuild meta --split dev --base-name %s --version %s --arch %s -o /build/split-dev/metadata.json
+apgbuild meta --split dev --base-name %s --version %s --arch %s \
+  --description "%s" --maintainer "%s" --license "%s" \
+  -o /build/split-dev/metadata.json
 apgbuild build /build/split-dev -o /output/%s-dev-%s.apg
 
 echo "=== Done: %s %s ==="
 `,
-		pkgName, ver,
-		recipe.Package.Homepage,
+		pkgName, ver, recipe.Build.Template,
+		downloadStep,
 		flags.ResolvedCC(), flags.ResolvedCXX(),
 		flags.CFlags(),
 		flags.LDFlags(),
+		recipe.Build.Template,
+		buildCmd,
 		hwcaps,
 		pkgName,
-		// split-libs meta args
 		pkgName, ver, arch,
+		recipe.Package.Description, recipe.Package.Maintainer, recipe.Package.License,
 		libName, ver,
-		// split-bin
 		pkgName,
 		pkgName, ver, arch,
+		recipe.Package.Description, recipe.Package.Maintainer, recipe.Package.License,
 		pkgName, ver,
-		// split-dev
 		pkgName,
 		pkgName, ver, arch,
+		recipe.Package.Description, recipe.Package.Maintainer, recipe.Package.License,
 		pkgName, ver,
-		// done
 		pkgName, ver,
 	)
+}
+
+// templateBuildCommands returns the build+install shell commands for a given recipe template.
+func templateBuildCommands(recipe metadata.Recipe) string {
+	tmpl := recipe.Build.Template
+	script := recipe.Build.Script
+	installScript := recipe.Install.Script
+
+	switch tmpl {
+	case "meson":
+		return `meson setup /build/builddir /build/src --prefix=/usr --buildtype=release
+ninja -C /build/builddir
+DESTDIR="$DESTDIR" ninja -C /build/builddir install`
+
+	case "cmake":
+		return `cmake -S /build/src -B /build/builddir \
+  -DCMAKE_INSTALL_PREFIX=/usr \
+  -DCMAKE_INSTALL_LIBDIR=lib \
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build /build/builddir --parallel $(nproc)
+DESTDIR="$DESTDIR" cmake --install /build/builddir`
+
+	case "autotools":
+		return `cd /build/src
+./configure --prefix=/usr --libdir=/usr/lib \
+  --disable-dependency-tracking --disable-silent-rules
+make -j$(nproc)
+make DESTDIR="$DESTDIR" install`
+
+	case "cargo":
+		return `cd /build/src
+cargo build --release
+mkdir -p "$DESTDIR/usr/bin"
+find target/release -maxdepth 1 -type f -executable -exec cp {} "$DESTDIR/usr/bin/" \;`
+
+	case "python-pep517":
+		return `cd /build/src
+pip install build wheel
+python -m build --wheel --outdir /build/dist
+pip install --root "$DESTDIR" --no-deps /build/dist/*.whl`
+
+	case "gradle":
+		gradle := "gradle"
+		return fmt.Sprintf(`cd /build/src
+%s build
+mkdir -p "$DESTDIR/usr/share/java"
+find build/libs -name "*.jar" -exec cp {} "$DESTDIR/usr/share/java/" \;`, gradle)
+
+	case "kbuild":
+		return `cd /build/src
+make -j$(nproc)
+make INSTALL_PATH="$DESTDIR/boot" install
+make INSTALL_MOD_PATH="$DESTDIR" modules_install`
+
+	case "makefile":
+		pre := ""
+		if script != "" {
+			pre = script + "\n"
+		}
+		install := `make DESTDIR="$DESTDIR" install`
+		if installScript != "" {
+			install = installScript
+		}
+		return fmt.Sprintf(`cd /build/src
+%smake -j$(nproc)
+%s`, pre, install)
+
+	case "custom":
+		if script == "" {
+			return `echo "WARNING: custom template with no build.script"`
+		}
+		install := ""
+		if installScript != "" {
+			install = "\n" + installScript
+		}
+		return fmt.Sprintf(`cd /build/src
+%s%s`, script, install)
+
+	default:
+		// Fallback: try make
+		return `cd /build/src
+make -j$(nproc)
+make DESTDIR="$DESTDIR" install`
+	}
 }
