@@ -251,8 +251,8 @@ kubectl delete -f src/k8s-manifest.yaml
 # Default (bbolt, no CGO):
 go build -tags bbolt ./...
 
-# SQLite3 (requires CGO + libsqlite3-dev):
-CGO_ENABLED=1 go build -tags sqlite ./...
+# SQLite3 via modernc.org/sqlite (pure Go, no CGO):
+go build -tags sqlite ./...
 ```
 
 ## APGv2 Package Format

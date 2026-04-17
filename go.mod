@@ -11,12 +11,12 @@ require (
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-github/v68 v68.0.0
-	github.com/mattn/go-sqlite3 v1.14.24
 	go.etcd.io/bbolt v1.4.3
 	golang.org/x/oauth2 v0.30.0
 	k8s.io/api v0.35.4
 	k8s.io/apimachinery v0.35.4
 	k8s.io/client-go v0.35.4
+	modernc.org/sqlite v1.34.5
 )
 
 require (

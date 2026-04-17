@@ -167,7 +167,7 @@ spec:
                 python3-devel python3-pip \
                 zstd zstd-devel libzstd-devel \
                 libarchive-devel \
-                mold binutils sqlite-devel \
+                mold binutils \
                 && dnf clean all
           resources:
             requests:

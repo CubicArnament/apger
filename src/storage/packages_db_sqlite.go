@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	// modernc.org/sqlite is a pure-Go SQLite3 implementation — no CGO required.
+	_ "modernc.org/sqlite"
 )
 
 const createTable = `
@@ -24,9 +25,11 @@ type sqliteStore struct {
 	db *sql.DB
 }
 
-// NewDB opens or creates a SQLite3 database at path.
+// NewDB opens or creates a SQLite database at path.
+// Uses modernc.org/sqlite (pure Go, no CGO).
 func NewDB(path string) (*DB, error) {
-	db, err := sql.Open("sqlite3", path+"?_journal=WAL&_timeout=5000")
+	// modernc.org/sqlite registers as driver "sqlite" (not "sqlite3")
+	db, err := sql.Open("sqlite", path+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)")
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite db: %w", err)
 	}
