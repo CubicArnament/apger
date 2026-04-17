@@ -2,7 +2,6 @@ package builder
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -425,8 +424,10 @@ func jsonArray(items []string) string {
 	}
 	quoted := make([]string, len(items))
 	for i, item := range items {
-		b, _ := json.Marshal(item)
-		quoted[i] = string(b)
+		// Simple JSON string escaping: escape backslash and double-quote
+		escaped := strings.ReplaceAll(item, `\`, `\\`)
+		escaped = strings.ReplaceAll(escaped, `"`, `\"`)
+		quoted[i] = `"` + escaped + `"`
 	}
 	return "[" + strings.Join(quoted, ", ") + "]"
 }

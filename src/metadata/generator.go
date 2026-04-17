@@ -3,12 +3,12 @@ package metadata
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 // GenerateMetadata creates metadata.json from recipe and build info.
@@ -123,12 +123,20 @@ func CalculateDirSize(dir string) (int64, error) {
 }
 
 // HashRecipe computes a SHA-256 hash of the recipe to detect changes.
+// Uses a deterministic string representation of key recipe fields.
 func HashRecipe(recipe Recipe) (string, error) {
-	data, err := json.Marshal(recipe)
-	if err != nil {
-		return "", fmt.Errorf("marshal recipe: %w", err)
-	}
+	// Deterministic representation: name|version|source_url|template|script
+	repr := strings.Join([]string{
+		recipe.Package.Name,
+		recipe.Package.Version,
+		recipe.Package.Architecture,
+		recipe.Source.URL,
+		recipe.Source.TypeSrc,
+		recipe.Build.Template,
+		recipe.Build.Script,
+		recipe.Install.Script,
+	}, "|")
 	h := sha256.New()
-	h.Write(data)
+	h.Write([]byte(repr))
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

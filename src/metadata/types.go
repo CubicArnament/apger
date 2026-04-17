@@ -1,7 +1,8 @@
 // Package metadata provides types for APG package recipes and metadata.
 package metadata
 
-// PackageMeta represents the metadata.json structure for APGv2 packages.
+// PackageMeta represents the metadata.json structure inside APGv2 .apg archives.
+// JSON tags are required — metadata.json is part of the APGv2 binary format.
 type PackageMeta struct {
 	Name          string   `json:"name"`
 	Version       string   `json:"version"`
@@ -24,102 +25,78 @@ type PackageMeta struct {
 
 // RecipeSource describes where to fetch the package source.
 type RecipeSource struct {
-	// URL is the download URL (tarball) or git remote URL.
-	URL string `toml:"url" json:"url"`
-	// TypeSrc is "tarball" or "git-repo".
-	TypeSrc string `toml:"type_src" json:"type_src"`
-	// IncludeSubmodules clones git submodules recursively (git-repo only).
-	IncludeSubmodules bool `toml:"include_submodules" json:"include_submodules,omitempty"`
+	URL               string `toml:"url"`
+	TypeSrc           string `toml:"type_src"`            // "tarball" | "git-repo"
+	IncludeSubmodules bool   `toml:"include_submodules"`
 }
 
 // RecipeSplit defines file glob patterns for splitting a package into sub-packages.
 type RecipeSplit struct {
-	Libs []string `toml:"libs" json:"libs,omitempty"` // → lib<name>
-	Bins []string `toml:"bins" json:"bins,omitempty"` // → <name>
-	Dev  []string `toml:"dev"  json:"dev,omitempty"`  // → <name>-dev
+	Libs []string `toml:"libs"` // → lib<name>
+	Bins []string `toml:"bins"` // → <name>
+	Dev  []string `toml:"dev"`  // → <name>-dev
 }
 
-// Recipe represents a package recipe (.toml or .json).
+// Recipe represents a package recipe (.toml only).
 type Recipe struct {
 	Package struct {
-		Name         string   `toml:"name"         json:"name"`
-		Version      string   `toml:"version"      json:"version"`
-		Type         string   `toml:"type"         json:"type"`
-		Architecture string   `toml:"architecture" json:"architecture"`
-		Description  string   `toml:"description"  json:"description"`
-		Maintainer   string   `toml:"maintainer"   json:"maintainer"`
-		License      string   `toml:"license"      json:"license"`
-		Homepage     string   `toml:"homepage"     json:"homepage,omitempty"`
-		Tags         []string `toml:"tags"         json:"tags,omitempty"`
-		Dependencies []string `toml:"dependencies" json:"dependencies,omitempty"`
-		Conflicts    []string `toml:"conflicts"    json:"conflicts,omitempty"`
-		Provides     []string `toml:"provides"     json:"provides,omitempty"`
-		Replaces     []string `toml:"replaces"     json:"replaces,omitempty"`
-		Conf         []string `toml:"conf"         json:"conf,omitempty"`
-		// Bootstrap marks packages that must be built before the toolchain is
-		// available (libc, gcc, binutils). Bootstrap builds skip dependency
-		// checks and use a pre-stage cross-compiler environment.
-		Bootstrap bool `toml:"bootstrap" json:"bootstrap,omitempty"`
-		// Krnl marks this as a Linux kernel package.
-		// When true, the build produces two sub-packages:
-		//   <name>-image   — vmlinuz, System.map, initrd
-		//   <name>-modules — /lib/modules/<version>/
-		// Use template = "kbuild" with Krnl = true.
-		Krnl bool `toml:"krnl" json:"krnl,omitempty"`
-	} `toml:"package" json:"package"`
+		Name         string   `toml:"name"`
+		Version      string   `toml:"version"`
+		Type         string   `toml:"type"`
+		Architecture string   `toml:"architecture"`
+		Description  string   `toml:"description"`
+		Maintainer   string   `toml:"maintainer"`
+		License      string   `toml:"license"`
+		Homepage     string   `toml:"homepage"`
+		Tags         []string `toml:"tags"`
+		Dependencies []string `toml:"dependencies"`
+		Conflicts    []string `toml:"conflicts"`
+		Provides     []string `toml:"provides"`
+		Replaces     []string `toml:"replaces"`
+		Conf         []string `toml:"conf"`
+		// Bootstrap marks packages built before the toolchain (libc, gcc, binutils).
+		Bootstrap bool `toml:"bootstrap"`
+		// Krnl marks Linux kernel packages — produces image + modules splits.
+		Krnl bool `toml:"krnl"`
+	} `toml:"package"`
 
-	// Source describes where to fetch the package source.
-	Source RecipeSource `toml:"source" json:"source,omitempty"`
-
-	Build struct {
-		Template     string   `toml:"template"     json:"template,omitempty"`
-		Dependencies []string `toml:"dependencies" json:"dependencies,omitempty"`
-		Script       string   `toml:"script"       json:"script,omitempty"`
-		Use          []string `toml:"use"          json:"use,omitempty"`
-		// Override allows per-recipe compiler/flag overrides.
-		// Empty fields fall back to apger.conf values.
-		// Example in TOML:
-		//   [build.override]
-		//   cc = "clang"
-		//   opt_level = "O3"
-		Override *BuildOverride `toml:"override" json:"override,omitempty"`
-	} `toml:"build" json:"build,omitempty"`
-
+	Source  RecipeSource `toml:"source"`
+	Build   struct {
+		Template     string         `toml:"template"`
+		Dependencies []string       `toml:"dependencies"`
+		Script       string         `toml:"script"`
+		Use          []string       `toml:"use"`
+		Override     *BuildOverride `toml:"override"`
+	} `toml:"build"`
 	Install struct {
-		Script string `toml:"script" json:"script,omitempty"`
-	} `toml:"install" json:"install,omitempty"`
-
-	Split *RecipeSplit `toml:"split" json:"split,omitempty"`
+		Script string `toml:"script"`
+	} `toml:"install"`
+	Split *RecipeSplit `toml:"split"`
 }
 
 // FileEntry describes a file in the recipe structure.
 type FileEntry struct {
-	Source      string `toml:"source"      json:"source"`
-	Destination string `toml:"destination" json:"destination"`
-	Permissions string `toml:"permissions" json:"permissions,omitempty"`
+	Source      string `toml:"source"`
+	Destination string `toml:"destination"`
+	Permissions string `toml:"permissions"`
 }
 
 // SymlinkEntry describes a symlink in the recipe structure.
 type SymlinkEntry struct {
-	Source      string `toml:"source"      json:"source"`
-	Destination string `toml:"destination" json:"destination"`
+	Source      string `toml:"source"`
+	Destination string `toml:"destination"`
 }
 
-// BuildOverride allows a recipe to override compiler/flag settings from apger.conf.
-// Only non-empty fields take effect; empty fields fall back to the config value.
-//
-// TOML example:
+// BuildOverride allows per-recipe compiler/flag overrides from apger.conf.
+// Empty fields fall back to the config value.
 //
 //	[build.override]
-//	cc        = "clang"
-//	cxx       = "clang++"
+//	cc = "clang"
 //	opt_level = "O3"
-//	lto       = "full"
-//	ld        = "lld"
 type BuildOverride struct {
-	CC       string `toml:"cc"        json:"cc,omitempty"`
-	CXX      string `toml:"cxx"       json:"cxx,omitempty"`
-	LD       string `toml:"ld"        json:"ld,omitempty"`
-	OptLevel string `toml:"opt_level" json:"opt_level,omitempty"`
-	LTO      string `toml:"lto"       json:"lto,omitempty"`
+	CC       string `toml:"cc"`
+	CXX      string `toml:"cxx"`
+	LD       string `toml:"ld"`
+	OptLevel string `toml:"opt_level"`
+	LTO      string `toml:"lto"`
 }
