@@ -419,7 +419,27 @@ func (o *Orchestrator) loadRecipe(path string) (metadata.Recipe, error) {
 	return metadata.LoadRecipe(path)
 }
 
-func jsonArray(items []string) string {
+// hwcapsInstallCmd returns the install command for a hwcaps rebuild.
+// It rebuilds and installs into $DESTDIR_HWCAPS using the same template.
+// Only the compile+install steps are needed (no configure/setup re-run).
+func hwcapsInstallCmd(recipe metadata.Recipe) string {
+	switch recipe.Build.Template {
+	case "meson":
+		return `ninja -C /build/builddir && DESTDIR="$DESTDIR_HWCAPS" ninja -C /build/builddir install`
+	case "cmake":
+		return `cmake --build /build/builddir --parallel $(nproc) && DESTDIR="$DESTDIR_HWCAPS" cmake --install /build/builddir`
+	case "autotools", "makefile":
+		return `make -C /build/src -j$(nproc) && make -C /build/src DESTDIR="$DESTDIR_HWCAPS" install`
+	case "cargo":
+		return `cd /build/src && cargo build --release && mkdir -p "$DESTDIR_HWCAPS/usr/lib" && find target/release -name "*.so*" -exec cp -P {} "$DESTDIR_HWCAPS/usr/lib/" \;`
+	default:
+		// custom/kbuild/gradle: re-run full build script
+		if recipe.Build.Script != "" {
+			return `cd /build/src && ` + recipe.Build.Script
+		}
+		return `make -C /build/src -j$(nproc) && make -C /build/src DESTDIR="$DESTDIR_HWCAPS" install`
+	}
+}
 	if len(items) == 0 {
 		return "[]"
 	}
@@ -461,21 +481,36 @@ tar xf /tmp/source.tar --strip-components=1`, recipe.Source.URL)
 	// Build commands based on template
 	buildCmd := templateBuildCommands(recipe)
 
-	// hwcaps: rebuild .so for each level
+	// hwcaps: rebuild shared libs for each ISA level and place in glibc-hwcaps/<level>/
+	// Only runs if library_glibc_hwcaps=true AND the package produces .so files.
+	// Each level gets its own DESTDIR, then .so files are merged into the main DESTDIR.
 	hwcaps := ""
-	if flags.LibraryGlibcHwcaps {
+	if flags.LibraryGlibcHwcaps && len(flags.LevelsHwcaps) > 0 {
 		for _, level := range flags.LevelsHwcaps {
+			levelStr := level.String()
 			hwcaps += fmt.Sprintf(`
-# === hwcaps: %s ===
-SAVED_CFLAGS="$CFLAGS" SAVED_CXXFLAGS="$CXXFLAGS"
-export CFLAGS="-march=%s -%s -flto=thin"
-export CXXFLAGS="$CFLAGS"
-make -C /build/src -j$(nproc) 2>/dev/null || true
-mkdir -p $DESTDIR/usr/lib/glibc-hwcaps/%s
-find /build/src -maxdepth 4 \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} $DESTDIR/usr/lib/glibc-hwcaps/%s/ \; 2>/dev/null || true
-export CFLAGS="$SAVED_CFLAGS" CXXFLAGS="$SAVED_CXXFLAGS"
-`, level, level, flags.OptLevel, level, level)
+# === hwcaps rebuild: %s ===
+# Only proceed if the package produced shared libraries
+if find $DESTDIR/usr/lib -maxdepth 2 -name "*.so*" -type f 2>/dev/null | grep -q .; then
+  export CFLAGS="-march=%s -%s -flto=thin"
+  export CXXFLAGS="$CFLAGS"
+  # Rebuild into a separate DESTDIR for this hwcaps level
+  export DESTDIR_HWCAPS=/build/hwcaps-%s
+  %s
+  # Copy only .so files (not headers/bins) into glibc-hwcaps/<level>/
+  mkdir -p $DESTDIR/usr/lib/glibc-hwcaps/%s
+  find $DESTDIR_HWCAPS/usr/lib $DESTDIR_HWCAPS/usr/lib64 \
+    -maxdepth 2 \( -name "*.so" -o -name "*.so.*" \) 2>/dev/null \
+    | xargs -I{} cp -P {} $DESTDIR/usr/lib/glibc-hwcaps/%s/ 2>/dev/null || true
+  export CFLAGS="$BASE_CFLAGS" CXXFLAGS="$BASE_CFLAGS"
+fi
+`, levelStr, levelStr, flags.OptLevel, levelStr,
+				hwcapsInstallCmd(recipe),
+				levelStr, levelStr)
 		}
+		// Prepend: save base flags before hwcaps loop
+		hwcaps = `export BASE_CFLAGS="$CFLAGS"
+` + hwcaps
 	}
 
 	return fmt.Sprintf(`set -e
@@ -494,11 +529,21 @@ export DESTDIR=/build/root
 # Build + install using %s template
 %s
 %s
-# === Split: lib%s (shared libraries) ===
+# === Split: lib%s (shared libraries + hwcaps) ===
 mkdir -p /build/split-libs/usr/lib
-find $DESTDIR/usr/lib -maxdepth 1 \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} /build/split-libs/usr/lib/ \; 2>/dev/null || true
-find $DESTDIR/usr/lib64 -maxdepth 1 \( -name "*.so" -o -name "*.so.*" \) -exec cp -P {} /build/split-libs/usr/lib/ \; 2>/dev/null || true
-cp -r $DESTDIR/usr/lib/glibc-hwcaps /build/split-libs/usr/lib/ 2>/dev/null || true
+# Copy all .so files and symlinks recursively (lib + lib64)
+find $DESTDIR/usr/lib $DESTDIR/usr/lib64 \
+  \( -name "*.so" -o -name "*.so.*" \) 2>/dev/null \
+  | while read f; do
+    rel="${f#$DESTDIR/usr/}"
+    dir="/build/split-libs/usr/$(dirname $rel)"
+    mkdir -p "$dir"
+    cp -P "$f" "$dir/" 2>/dev/null || true
+  done
+# Copy glibc-hwcaps directory (contains per-level .so variants)
+if [ -d "$DESTDIR/usr/lib/glibc-hwcaps" ]; then
+  cp -rP $DESTDIR/usr/lib/glibc-hwcaps /build/split-libs/usr/lib/
+fi
 apgbuild meta --split libs --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   --detect-deps /build/split-libs -o /build/split-libs/metadata.json
