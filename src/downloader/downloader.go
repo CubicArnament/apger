@@ -1,5 +1,5 @@
 // Package downloader fetches package sources.
-// Tarballs are downloaded via aria2c subprocess (parallel, resume support).
+// Tarballs are downloaded via aria2c subprocess (parallel segments, resume support).
 // Git repositories are cloned via go-git.
 package downloader
 
@@ -17,6 +17,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 
+	config "github.com/NurOS-Linux/apger/src/core"
 	"github.com/NurOS-Linux/apger/src/metadata"
 )
 
@@ -25,14 +26,15 @@ type Progress struct {
 	Total      int64  // bytes, 0 if unknown
 	Downloaded int64  // bytes received so far
 	SpeedBps   int64  // bytes/sec
+	ETA        string // human-readable ETA from aria2c
 	Done       bool
 	Err        error
 }
 
-// Download fetches the source described by src into destDir.
-// Progress updates are sent to the progress channel (non-blocking).
+// Download fetches the source described by src into destDir using aria2 settings from cfg.
+// Progress updates are sent to the progress channel (non-blocking, buffered).
 // The channel is closed when the download finishes or fails.
-func Download(ctx context.Context, src metadata.RecipeSource, destDir string, progress chan<- Progress) error {
+func Download(ctx context.Context, src metadata.RecipeSource, destDir string, cfg config.Aria2Config, progress chan<- Progress) error {
 	defer close(progress)
 
 	if err := os.MkdirAll(destDir, 0755); err != nil {
@@ -43,7 +45,7 @@ func Download(ctx context.Context, src metadata.RecipeSource, destDir string, pr
 	case "git-repo":
 		return downloadGit(ctx, src, destDir, progress)
 	case "tarball", "":
-		return downloadTarball(ctx, src.URL, destDir, progress)
+		return downloadTarball(ctx, src.URL, destDir, cfg, progress)
 	default:
 		return fmt.Errorf("unknown type_src %q: use tarball or git-repo", src.TypeSrc)
 	}
@@ -51,36 +53,76 @@ func Download(ctx context.Context, src metadata.RecipeSource, destDir string, pr
 
 // ── tarball via aria2c ────────────────────────────────────────────────────────
 
-// aria2ProgressRe matches aria2c console output lines like:
+// aria2ProgressRe matches aria2c summary lines:
 //
-//	[#1 16MiB/64MiB(25%) CN:1 DL:4.2MiB ETA:11s]
-var aria2ProgressRe = regexp.MustCompile(`(\d+)MiB/(\d+)MiB\((\d+)%\).*DL:([\d.]+)(\w+)`)
+//	[#abc123 16MiB/64MiB(25%) CN:4 DL:4.2MiB ETA:11s]
+var aria2ProgressRe = regexp.MustCompile(
+	`(\d+(?:\.\d+)?)([KMG]i?B)/(\d+(?:\.\d+)?)([KMG]i?B)\((\d+)%\).*DL:([\d.]+)([KMG]i?B)(?:.*ETA:(\S+))?`,
+)
 
-func downloadTarball(ctx context.Context, url, destDir string, progress chan<- Progress) error {
-	outFile := filepath.Join(destDir, filepath.Base(url))
+func downloadTarball(ctx context.Context, url, destDir string, cfg config.Aria2Config, progress chan<- Progress) error {
+	connections := cfg.Connections
+	if connections <= 0 {
+		connections = 4
+	}
+	splits := cfg.Splits
+	if splits <= 0 {
+		splits = connections
+	}
+	minSplitSize := cfg.MinSplitSize
+	if minSplitSize == "" {
+		minSplitSize = "1M"
+	}
+	maxTries := cfg.MaxTries
+	if maxTries <= 0 {
+		maxTries = 5
+	}
+	timeout := cfg.Timeout
+	if timeout <= 0 {
+		timeout = 60
+	}
 
-	cmd := exec.CommandContext(ctx, "aria2c",
-		"--dir="+destDir,
-		"--out="+filepath.Base(url),
+	args := []string{
+		"--dir=" + destDir,
+		"--out=" + filepath.Base(url),
+		fmt.Sprintf("--max-connection-per-server=%d", connections),
+		fmt.Sprintf("--split=%d", splits),
+		"--min-split-size=" + minSplitSize,
+		fmt.Sprintf("--max-tries=%d", maxTries),
+		fmt.Sprintf("--connect-timeout=%d", timeout),
 		"--console-readout-interval=500",
 		"--summary-interval=0",
 		"--show-console-readout=true",
 		"--file-allocation=none",
-		"-x4", "-s4", // 4 connections
-		url,
-	)
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return fmt.Errorf("aria2c pipe: %w", err)
+		"--auto-file-renaming=false",
+		"--allow-overwrite=true",
 	}
+
+	if cfg.UserAgent != "" {
+		args = append(args, "--user-agent="+cfg.UserAgent)
+	}
+	if cfg.ProxyURL != "" {
+		args = append(args, "--all-proxy="+cfg.ProxyURL)
+	}
+	if cfg.ContinueDownload {
+		args = append(args, "--continue=true")
+	}
+
+	args = append(args, url)
+
+	cmd := exec.CommandContext(ctx, "aria2c", args...)
+
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return fmt.Errorf("aria2c stdout pipe: %w", err)
 	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("aria2c stderr pipe: %w", err)
+	}
 
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("aria2c not found (install aria2): %w", err)
+		return fmt.Errorf("aria2c not found — install aria2: %w", err)
 	}
 
 	// Parse progress from stdout
@@ -88,33 +130,48 @@ func downloadTarball(ctx context.Context, url, destDir string, progress chan<- P
 		sc := bufio.NewScanner(stdout)
 		for sc.Scan() {
 			line := sc.Text()
-			if m := aria2ProgressRe.FindStringSubmatch(line); m != nil {
-				dl, _ := strconv.ParseFloat(m[1], 64)
-				total, _ := strconv.ParseFloat(m[2], 64)
-				speed, _ := strconv.ParseFloat(m[4], 64)
-				unit := strings.ToLower(m[5])
-				mult := map[string]float64{"kib": 1024, "mib": 1024 * 1024, "gib": 1024 * 1024 * 1024}[unit]
-				if mult == 0 {
-					mult = 1
-				}
-				sendProgress(progress, Progress{
-					Total:      int64(total * 1024 * 1024),
-					Downloaded: int64(dl * 1024 * 1024),
-					SpeedBps:   int64(speed * mult),
-				})
+			m := aria2ProgressRe.FindStringSubmatch(line)
+			if m == nil {
+				continue
 			}
+			dl := parseSize(m[1], m[2])
+			total := parseSize(m[3], m[4])
+			speed := parseSize(m[6], m[7])
+			eta := m[8]
+			sendProgress(progress, Progress{
+				Total:      total,
+				Downloaded: dl,
+				SpeedBps:   speed,
+				ETA:        eta,
+			})
 		}
 	}()
-	// Drain stderr silently
-	go func() { bufio.NewScanner(stderr).Scan() }()
+	// Drain stderr silently (aria2c writes verbose info there)
+	go func() {
+		sc := bufio.NewScanner(stderr)
+		for sc.Scan() {
+		}
+	}()
 
 	if err := cmd.Wait(); err != nil {
 		return fmt.Errorf("aria2c download %s: %w", url, err)
 	}
 
 	sendProgress(progress, Progress{Done: true})
-	_ = outFile
 	return nil
+}
+
+// parseSize converts aria2c size string like "4.2", "MiB" → bytes as int64.
+func parseSize(val, unit string) int64 {
+	v, _ := strconv.ParseFloat(val, 64)
+	mult := map[string]float64{
+		"B": 1, "KB": 1e3, "MB": 1e6, "GB": 1e9,
+		"KiB": 1024, "MiB": 1024 * 1024, "GiB": 1024 * 1024 * 1024,
+	}[unit]
+	if mult == 0 {
+		mult = 1
+	}
+	return int64(v * mult)
 }
 
 // ── git via go-git ────────────────────────────────────────────────────────────

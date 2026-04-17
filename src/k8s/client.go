@@ -132,11 +132,11 @@ func (c *Client) WaitForJob(ctx context.Context, name string, logWriter io.Write
 			c.streamJobLogs(ctx, name, logWriter)
 
 			// Check completion
-			if job.Status.Succeeded != nil && *job.Status.Succeeded > 0 {
+			if job.Status.Succeeded > 0 {
 				return nil
 			}
 
-			if job.Status.Failed != nil && *job.Status.Failed > 0 {
+			if job.Status.Failed > 0 {
 				return fmt.Errorf("job %s failed", name)
 			}
 		}

@@ -179,7 +179,11 @@ func extractTar(reader io.Reader, destDir string) error {
 			return fmt.Errorf("tar read: %w", err)
 		}
 
-		target := filepath.Join(destDir, header.Name)
+		// Guard against path traversal (tar slip)
+		target := filepath.Join(destDir, filepath.Clean("/"+header.Name))
+		if !strings.HasPrefix(target, filepath.Clean(destDir)+string(os.PathSeparator)) {
+			continue // skip malicious entry
+		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
@@ -213,7 +217,10 @@ func extractZip(src, destDir string) error {
 	defer r.Close()
 
 	for _, f := range r.File {
-		target := filepath.Join(destDir, f.Name)
+		target := filepath.Join(destDir, filepath.Clean("/"+f.Name))
+		if !strings.HasPrefix(target, filepath.Clean(destDir)+string(os.PathSeparator)) {
+			continue // zip slip guard
+		}
 
 		if f.FileInfo().IsDir() {
 			if err := os.MkdirAll(target, 0755); err != nil {

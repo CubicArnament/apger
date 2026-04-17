@@ -296,6 +296,26 @@ type LoggingOptions struct {
 	Verbose bool `toml:"verbose"`
 }
 
+// Aria2Config holds aria2c download settings.
+type Aria2Config struct {
+	// Connections is --max-connection-per-server (default 4)
+	Connections int `toml:"connections"`
+	// Splits is --split — number of file segments (default = Connections)
+	Splits int `toml:"splits"`
+	// MinSplitSize is --min-split-size, e.g. "1M" (default "1M")
+	MinSplitSize string `toml:"min_split_size"`
+	// MaxTries is --max-tries (default 5)
+	MaxTries int `toml:"max_tries"`
+	// Timeout is --connect-timeout in seconds (default 60)
+	Timeout int `toml:"timeout"`
+	// ContinueDownload enables --continue=true for resuming partial downloads
+	ContinueDownload bool `toml:"continue"`
+	// UserAgent overrides the default aria2c User-Agent header
+	UserAgent string `toml:"user_agent"`
+	// ProxyURL sets --all-proxy, e.g. "http://proxy:3128"
+	ProxyURL string `toml:"proxy"`
+}
+
 // CompressionConfig holds archive compression settings for .apg packages.
 type CompressionConfig struct {
 	// Type is the compression algorithm: zstd | xz | bz2 | gz | lz4 | lzma
@@ -310,6 +330,7 @@ type Config struct {
 		Packages BuildProfile            `toml:"packages"`
 		Cross    map[string]CrossProfile `toml:"cross"`
 	} `toml:"build"`
+	Aria2       Aria2Config       `toml:"aria2"`
 	Compression CompressionConfig `toml:"compression"`
 	Database struct {
 		Pkgs DatabaseConfig `toml:"pkgs"`
@@ -380,6 +401,13 @@ func DefaultConfig() Config {
 	cfg.Compression.Type = "zstd"
 	cfg.Compression.Level = 19
 
+	cfg.Aria2.Connections = 4
+	cfg.Aria2.Splits = 4
+	cfg.Aria2.MinSplitSize = "1M"
+	cfg.Aria2.MaxTries = 5
+	cfg.Aria2.Timeout = 60
+	cfg.Aria2.ContinueDownload = true
+
 	cfg.Kubernetes.Options.Namespace = "apger"
 	cfg.Kubernetes.Options.BaseImage = "fedora:43"
 	cfg.Kubernetes.Options.SearchLocal = true
@@ -421,7 +449,15 @@ func FindConfig(explicitPath string) Config {
 	if explicitPath != "" {
 		paths = append(paths, explicitPath)
 	}
-	paths = append(paths, "apger.conf", "../apger.conf")
+	// Check APGER_CONFIG env var (useful in pods)
+	if envPath := os.Getenv("APGER_CONFIG"); envPath != "" {
+		paths = append(paths, envPath)
+	}
+	paths = append(paths,
+		"apger.conf",
+		"../apger.conf",
+		"/etc/apger/apger.conf", // Kubernetes ConfigMap mount
+	)
 	if home, _ := os.UserHomeDir(); home != "" {
 		paths = append(paths, filepath.Join(home, ".config", "apger", "apger.conf"))
 	}

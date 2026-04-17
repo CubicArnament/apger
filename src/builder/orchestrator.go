@@ -221,7 +221,7 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		OOMKillLimits:   &o.apgerCfg.Kubernetes.Options.OOMKillLimits,
 		Dependencies:    buildDeps,
 		Command:         []string{"/bin/sh"},
-		Args: []string{"-c", buildPackageScript(packageName, recipe, pkgFlags, o.apgerCfg.Compression)},
+		Args: []string{"-c", buildPackageScript(packageName, recipe, pkgFlags, o.apgerCfg.Compression, o.apgerCfg.Aria2)},
 	}
 
 	job := k8s.GenerateBuildJob(cfg)
@@ -264,7 +264,7 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 // postBuild signs, publishes, and generates a build report after a successful build.
 // Runs in a goroutine — errors are logged but don't fail the build.
 func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, splits []struct{ name, file string }) {
-	mgr, err := credmanager.New()
+	mgr, err := credmanager.NewFromEnv()
 	if err != nil {
 		o.log.Printf("[postBuild] credential manager: %v", err)
 		return
@@ -445,6 +445,9 @@ func hwcapsInstallCmd(recipe metadata.Recipe) string {
 		return `make -C /build/src -j$(nproc) && make -C /build/src DESTDIR="$DESTDIR_HWCAPS" install`
 	}
 }
+
+// jsonArray formats a slice of strings as a JSON array literal.
+func jsonArray(items []string) string {
 	if len(items) == 0 {
 		return "[]"
 	}
@@ -460,12 +463,41 @@ func hwcapsInstallCmd(recipe metadata.Recipe) string {
 
 // buildPackageScript generates the full shell script for a package build Job.
 // It includes: source download, template-aware build, hwcaps .so rebuilds, and split packaging.
-func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.BuildProfile, comp config.CompressionConfig) string {
+func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.BuildProfile, comp config.CompressionConfig, aria config.Aria2Config) string {
 	ver := recipe.Package.Version
 	libName := "lib" + pkgName
 	arch := recipe.Package.Architecture
 	if arch == "" {
 		arch = "x86_64"
+	}
+
+	// Build aria2c flags from config
+	connections := aria.Connections
+	if connections <= 0 {
+		connections = 4
+	}
+	splits := aria.Splits
+	if splits <= 0 {
+		splits = connections
+	}
+	minSplit := aria.MinSplitSize
+	if minSplit == "" {
+		minSplit = "1M"
+	}
+	maxTries := aria.MaxTries
+	if maxTries <= 0 {
+		maxTries = 5
+	}
+	ariaFlags := fmt.Sprintf("-x%d -s%d --min-split-size=%s --max-tries=%d --file-allocation=none --auto-file-renaming=false",
+		connections, splits, minSplit, maxTries)
+	if aria.ContinueDownload {
+		ariaFlags += " --continue=true"
+	}
+	if aria.UserAgent != "" {
+		ariaFlags += fmt.Sprintf(" --user-agent=%q", aria.UserAgent)
+	}
+	if aria.ProxyURL != "" {
+		ariaFlags += " --all-proxy=" + aria.ProxyURL
 	}
 
 	// Download step — use aria2c for tarballs, git clone for repos
@@ -478,9 +510,9 @@ func buildPackageScript(pkgName string, recipe metadata.Recipe, flags config.Bui
 		}
 		downloadStep = fmt.Sprintf(`git clone %s "%s" /build/src`, cloneArgs, recipe.Source.URL)
 	default: // tarball
-		downloadStep = fmt.Sprintf(`aria2c -x4 -s4 --dir=/tmp --out=source.tar "%s"
+		downloadStep = fmt.Sprintf(`aria2c %s --dir=/tmp --out=source.tar "%s"
 mkdir -p /build/src && cd /build/src
-tar xf /tmp/source.tar --strip-components=1`, recipe.Source.URL)
+tar xf /tmp/source.tar --strip-components=1`, ariaFlags, recipe.Source.URL)
 	}
 
 	// Build commands based on template

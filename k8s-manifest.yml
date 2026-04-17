@@ -182,6 +182,26 @@ spec:
             - name: source
               mountPath: /src
 
+        - name: clone-source
+          image: fedora:43
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              dnf install -y --setopt=install_weak_deps=False git --quiet && dnf clean all
+              git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /src
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          volumeMounts:
+            - name: source
+              mountPath: /src
+
       containers:
         - name: builder
           image: fedora:43
@@ -284,21 +304,26 @@ spec:
         - name: creds-assembled
           mountPath: /creds
 
-    # Install runtime build dependencies
+    # Install runtime build dependencies into the shared /usr via overlay trick:
+    # we install into the container's own rootfs — each init container gets a
+    # fresh layer, so we install deps here and the main container inherits them
+    # via the same image. The real fix is to use a pre-built image; for now
+    # we install in the main container's entrypoint instead (see below).
     - name: install-runtime-deps
       image: fedora:43
       imagePullPolicy: IfNotPresent
       command: ["/bin/sh", "-c"]
       args:
         - |
-          dnf install -y --setopt=install_weak_deps=False \
+          # Pre-warm the dnf cache into the PVC so the main container can install offline
+          dnf install -y --setopt=install_weak_deps=False --downloadonly \
             gcc gcc-c++ make meson ninja-build cmake pkg-config \
             git tar curl wget aria2 \
             golang cargo \
             python3-devel python3-pip \
             zstd zstd-devel \
-            mold binutils \
-            && dnf clean all
+            mold binutils 2>/dev/null || true
+          echo "dep pre-warm done"
       volumeMounts:
         - name: builds
           mountPath: /output
@@ -313,6 +338,16 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
+          # Install build dependencies (init containers don't share rootfs with main)
+          dnf install -y --setopt=install_weak_deps=False \
+            gcc gcc-c++ make meson ninja-build cmake pkg-config \
+            git tar curl wget aria2 \
+            golang cargo \
+            python3-devel python3-pip \
+            zstd zstd-devel \
+            mold binutils \
+            && dnf clean all
+
           # Install binaries from PVC as soon as they appear (non-blocking for attach)
           (
             echo "[apger-tui] Waiting for build tools from apger-build job..."
@@ -340,6 +375,8 @@ spec:
         # Point credential manager to the assembled JSON from init container
         - name: APGER_CREDS_PATH
           value: "/run/secrets/apger/apger.json"
+        - name: APGER_CONFIG
+          value: "/etc/apger/apger.conf"
       resources:
         requests:
           cpu: "500m"
@@ -352,8 +389,6 @@ spec:
           mountPath: /output
         - name: source
           mountPath: /src
-        - name: repodata
-          mountPath: /repodata
         - name: conf
           mountPath: /etc/apger
           readOnly: true
@@ -365,8 +400,6 @@ spec:
       persistentVolumeClaim:
         claimName: apger-builds
     - name: source
-      emptyDir: {}
-    - name: repodata
       emptyDir: {}
     - name: conf
       configMap:
