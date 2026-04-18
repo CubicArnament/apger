@@ -249,12 +249,3 @@ func detectHostX86Level() (int, error) {
 		return 0, nil
 	}
 }
-der
-	case v3:
-		return 2, nil
-	case v2:
-		return 1, nil
-	default:
-		return 0, nil
-	}
-}

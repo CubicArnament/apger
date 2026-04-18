@@ -242,7 +242,6 @@ func (m *Model) Run(ctx context.Context) error {
 	m.ctx = ctx
 	p := tea.NewProgram(m,
 		tea.WithAltScreen(),
-		tea.WithoutMouseAllEvents(), // keyboard only
 	)
 	_, err := p.Run()
 	return err

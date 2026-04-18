@@ -22,7 +22,6 @@ import (
 	ghpublisher "github.com/NurOS-Linux/apger/src/publisher"
 	"github.com/NurOS-Linux/apger/src/reporter"
 	"github.com/NurOS-Linux/apger/src/storage"
-	"github.com/NurOS-Linux/apger/src/tui"
 )
 
 // Stage represents a stage in the multistage build pipeline.
@@ -57,7 +56,7 @@ type Orchestrator struct {
 	outputDir     string
 	pvcName       string
 	image         string
-	publishTarget tui.PublishTarget
+	publishTarget config.PublishTarget
 	log           *log.Logger
 	postBuildWg   sync.WaitGroup
 }
@@ -72,7 +71,7 @@ type OrchestratorConfig struct {
 	Image         string
 	DBPath        string
 	ApgerConfig   config.Config
-	PublishTarget tui.PublishTarget // where to publish built packages
+	PublishTarget config.PublishTarget // where to publish built packages
 }
 
 // NewOrchestrator creates a new build orchestrator.
@@ -308,17 +307,17 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 		pub := ghpublisher.New(creds, o.apgerCfg.Save.Options.GithubOrgName)
 		target := o.publishTarget
 
-		if target&tui.PublishNurOSOrg != 0 {
+		if target&config.PublishNurOSOrg != 0 {
 			if err := pub.UploadToOrg(ctx, pkgName, ver, assetPaths); err != nil {
 				o.log.Printf("[postBuild] upload to org %s: %v", pkgName, err)
 			}
 		}
-		if target&tui.PublishGitHubReleases != 0 {
+		if target&config.PublishGitHubReleases != 0 {
 			if err := pub.UploadRelease(ctx, pkgName, ver, assetPaths); err != nil {
 				o.log.Printf("[postBuild] upload release %s: %v", pkgName, err)
 			}
 		}
-		if target&tui.PublishLocal != 0 {
+		if target&config.PublishLocal != 0 {
 			if err := ghpublisher.CopyToLocal(assetPaths, o.outputDir); err != nil {
 				o.log.Printf("[postBuild] copy local %s: %v", pkgName, err)
 			}

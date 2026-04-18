@@ -2,10 +2,7 @@
 package builder
 
 import (
-	"archive/tar"
-	"archive/zip"
-	"compress/bzip2"
-	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +10,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
+
+	ar "github.com/CiscoSecurityServices/go-libarchive"
 )
 
 // Downloader handles downloading source code from various sources.
@@ -35,21 +35,10 @@ func NewDownloader() *Downloader {
 // DownloadSource downloads source from URL to destination directory.
 // Supports git, tar.gz, tar.xz, tar.bz2, and zip.
 func (d *Downloader) DownloadSource(sourceURL, destDir string, progress func(downloaded, total int64)) error {
-	switch {
-	case strings.HasSuffix(sourceURL, ".git"):
+	if strings.HasSuffix(sourceURL, ".git") {
 		return d.downloadGit(sourceURL, destDir)
-	case strings.HasSuffix(sourceURL, ".tar.gz"), strings.HasSuffix(sourceURL, ".tgz"):
-		return d.downloadTar(sourceURL, destDir, "gz", progress)
-	case strings.HasSuffix(sourceURL, ".tar.xz"):
-		return d.downloadTar(sourceURL, destDir, "xz", progress)
-	case strings.HasSuffix(sourceURL, ".tar.bz2"):
-		return d.downloadTar(sourceURL, destDir, "bz2", progress)
-	case strings.HasSuffix(sourceURL, ".zip"):
-		return d.downloadZip(sourceURL, destDir, progress)
-	default:
-		// Try as archive by default
-		return d.downloadTar(sourceURL, destDir, "gz", progress)
 	}
+	return d.downloadArchive(sourceURL, destDir, progress)
 }
 
 func (d *Downloader) downloadGit(gitURL, destDir string) error {
@@ -59,8 +48,7 @@ func (d *Downloader) downloadGit(gitURL, destDir string) error {
 	return cmd.Run()
 }
 
-func (d *Downloader) downloadTar(url, destDir, compression string, progress func(downloaded, total int64)) error {
-	// Download to temp file
+func (d *Downloader) downloadArchive(url, destDir string, progress func(downloaded, total int64)) error {
 	tmpFile, err := os.CreateTemp("", "apger-download-*")
 	if err != nil {
 		return fmt.Errorf("create temp file: %w", err)
@@ -83,7 +71,6 @@ func (d *Downloader) downloadTar(url, destDir, compression string, progress func
 		return fmt.Errorf("download %s: status %d", url, resp.StatusCode)
 	}
 
-	// Download with progress
 	var writer io.Writer = tmpFile
 	if progress != nil && resp.ContentLength > 0 {
 		writer = &progressWriter{writer: tmpFile, progress: progress, total: resp.ContentLength}
@@ -93,69 +80,18 @@ func (d *Downloader) downloadTar(url, destDir, compression string, progress func
 		return fmt.Errorf("save download: %w", err)
 	}
 
-	// Reset file pointer
 	if _, err := tmpFile.Seek(0, 0); err != nil {
 		return fmt.Errorf("seek temp file: %w", err)
 	}
 
-	// Decompress
-	var tarReader io.Reader
-	switch compression {
-	case "gz":
-		gzReader, err := gzip.NewReader(tmpFile)
-		if err != nil {
-			return fmt.Errorf("gzip decompress: %w", err)
-		}
-		defer gzReader.Close()
-		tarReader = gzReader
-	case "bz2":
-		tarReader = bzip2.NewReader(tmpFile)
-	case "xz":
-		// xz requires external tool on Windows
-		return extractXZ(tmpFile.Name(), destDir)
-	default:
-		return fmt.Errorf("unsupported compression: %s", compression)
-	}
-
-	// Extract tar
-	return extractTar(tarReader, destDir)
-}
-
-func (d *Downloader) downloadZip(url, destDir string, progress func(downloaded, total int64)) error {
-	tmpFile, err := os.CreateTemp("", "apger-download-*")
-	if err != nil {
-		return fmt.Errorf("create temp file: %w", err)
-	}
-	defer os.Remove(tmpFile.Name())
-	defer tmpFile.Close()
-
-	resp, err := d.client.Get(url)
-	if err != nil {
-		return fmt.Errorf("download %s: %w", url, err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("download %s: status %d", url, resp.StatusCode)
-	}
-
-	var writer io.Writer = tmpFile
-	if progress != nil && resp.ContentLength > 0 {
-		writer = &progressWriter{writer: tmpFile, progress: progress, total: resp.ContentLength}
-	}
-
-	if _, err := io.Copy(writer, resp.Body); err != nil {
-		return fmt.Errorf("save download: %w", err)
-	}
-
-	return extractZip(tmpFile.Name(), destDir)
+	return extractArchive(tmpFile, destDir)
 }
 
 // progressWriter wraps an io.Writer to report progress.
 type progressWriter struct {
-	writer   io.Writer
-	progress func(downloaded, total int64)
-	total    int64
+	writer     io.Writer
+	progress   func(downloaded, total int64)
+	total      int64
 	downloaded int64
 }
 
@@ -168,119 +104,53 @@ func (w *progressWriter) Write(p []byte) (int, error) {
 	return n, err
 }
 
-func extractTar(reader io.Reader, destDir string) error {
-	tr := tar.NewReader(reader)
+func extractArchive(reader io.Reader, destDir string) error {
+	archiveReader, err := ar.NewReader(reader)
+	if err != nil {
+		return fmt.Errorf("open archive: %w", err)
+	}
+	defer archiveReader.Close()
 
 	for {
-		header, err := tr.Next()
+		entry, err := archiveReader.Next()
 		if err == io.EOF {
 			break
 		}
+		if errors.Is(err, ar.ErrArchiveWarn) {
+			continue
+		}
 		if err != nil {
-			return fmt.Errorf("tar read: %w", err)
+			return fmt.Errorf("read archive entry: %w", err)
 		}
 
-		// Guard against path traversal (tar slip)
-		target := filepath.Join(destDir, filepath.Clean("/"+header.Name))
+		target := filepath.Join(destDir, filepath.Clean("/"+entry.PathName()))
 		if !strings.HasPrefix(target, filepath.Clean(destDir)+string(os.PathSeparator)) {
-			continue // skip malicious entry
+			continue
 		}
 
-		switch header.Typeflag {
-		case tar.TypeDir:
+		stat := entry.Stat()
+		if stat.IsDir() {
 			if err := os.MkdirAll(target, 0755); err != nil {
 				return fmt.Errorf("mkdir %s: %w", target, err)
-			}
-		case tar.TypeReg:
-			if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
-				return fmt.Errorf("mkdir parent %s: %w", target, err)
-			}
-			f, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
-				return fmt.Errorf("create file %s: %w", target, err)
-			}
-			if _, err := io.Copy(f, io.LimitReader(tr, 2<<30)); err != nil {
-				f.Close()
-				return fmt.Errorf("write file %s: %w", target, err)
-			}
-			f.Close()
-		}
-	}
-
-	return nil
-}
-
-func extractZip(src, destDir string) error {
-	r, err := zip.OpenReader(src)
-	if err != nil {
-		return fmt.Errorf("open zip: %w", err)
-	}
-	defer r.Close()
-
-	for _, f := range r.File {
-		target := filepath.Join(destDir, filepath.Clean("/"+f.Name))
-		if !strings.HasPrefix(target, filepath.Clean(destDir)+string(os.PathSeparator)) {
-			continue // zip slip guard
-		}
-
-		if f.FileInfo().IsDir() {
-			if err := os.MkdirAll(target, 0755); err != nil {
-				return err
 			}
 			continue
 		}
 
 		if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
-			return err
+			return fmt.Errorf("mkdir parent %s: %w", target, err)
 		}
 
-		rc, err := f.Open()
+		f, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, stat.Mode())
 		if err != nil {
-			return fmt.Errorf("open zip entry %s: %w", f.Name, err)
-		}
-
-		outFile, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, f.Mode())
-		if err != nil {
-			rc.Close()
 			return fmt.Errorf("create file %s: %w", target, err)
 		}
 
-		if _, err := io.Copy(outFile, rc); err != nil {
-			rc.Close()
-			outFile.Close()
+		if _, err := io.Copy(f, io.LimitReader(archiveReader, 2<<30)); err != nil {
+			f.Close()
 			return fmt.Errorf("write file %s: %w", target, err)
 		}
-
-		rc.Close()
-		outFile.Close()
+		f.Close()
 	}
 
 	return nil
-}
-
-func extractXZ(src, destDir string) error {
-	cmd := exec.Command("xz", "-d", "-k", "-c", src)
-
-	pipeReader, pipeWriter := io.Pipe()
-	cmd.Stdout = pipeWriter
-
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("start xz: %w", err)
-	}
-
-	errCh := make(chan error, 1)
-	go func() {
-		err := extractTar(pipeReader, destDir)
-		pipeReader.CloseWithError(err)
-		errCh <- err
-	}()
-
-	xzErr := cmd.Wait()
-	pipeWriter.Close()
-	tarErr := <-errCh
-
-	if xzErr != nil {
-		return fmt.Errorf("xz: %w", xzErr)
-	}
-	return tarErr
 }

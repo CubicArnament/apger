@@ -14,15 +14,17 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	core "github.com/NurOS-Linux/apger/src/core"
 )
 
-// PublishTarget bitmask for publish destinations.
-type PublishTarget uint8
+// PublishTarget is an alias for core.PublishTarget.
+type PublishTarget = core.PublishTarget
 
 const (
-	PublishGitHubReleases PublishTarget = 1 << iota // GitHub Releases in NurOS-Packages/<pkg>
-	PublishNurOSOrg                                 // NurOS-Packages org repo (file commit)
-	PublishLocal                                    // Local only, no remote publish
+	PublishGitHubReleases = core.PublishGitHubReleases
+	PublishNurOSOrg       = core.PublishNurOSOrg
+	PublishLocal          = core.PublishLocal
 )
 
 // SettingsScreen manages publish target selection.
