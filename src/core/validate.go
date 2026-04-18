@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -91,11 +92,15 @@ func parseMemoryQuantity(s string) (uint64, error) {
 	return v, err
 }
 
-// hostCPUCores returns the number of logical CPU cores from /proc/cpuinfo.
+// hostCPUCores returns the number of logical CPU cores.
+// On Linux reads /proc/cpuinfo; on other platforms falls back to runtime.NumCPU().
 func hostCPUCores() (float64, error) {
+	if runtime.GOOS != "linux" {
+		return float64(runtime.NumCPU()), nil
+	}
 	f, err := os.Open("/proc/cpuinfo")
 	if err != nil {
-		return 0, err
+		return float64(runtime.NumCPU()), nil
 	}
 	defer f.Close()
 	var count float64
@@ -106,7 +111,7 @@ func hostCPUCores() (float64, error) {
 		}
 	}
 	if count == 0 {
-		return 0, fmt.Errorf("no processors found")
+		return float64(runtime.NumCPU()), nil
 	}
 	return count, nil
 }
@@ -197,6 +202,9 @@ func validateMarch(p BuildProfile) error {
 //	2 = x86_64-v3 (AVX2, BMI1/2, FMA, MOVBE)
 //	3 = x86_64-v4 (AVX-512)
 func detectHostX86Level() (int, error) {
+	if runtime.GOOS != "linux" {
+		return 0, fmt.Errorf("unsupported platform")
+	}
 	f, err := os.Open("/proc/cpuinfo")
 	if err != nil {
 		return 0, err
@@ -233,6 +241,15 @@ func detectHostX86Level() (int, error) {
 	switch {
 	case v4:
 		return 3, nil // index of x86_64-v4 in x86_64LevelOrder
+	case v3:
+		return 2, nil
+	case v2:
+		return 1, nil
+	default:
+		return 0, nil
+	}
+}
+der
 	case v3:
 		return 2, nil
 	case v2:

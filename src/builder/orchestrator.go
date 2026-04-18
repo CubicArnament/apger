@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -58,6 +59,7 @@ type Orchestrator struct {
 	image         string
 	publishTarget tui.PublishTarget
 	log           *log.Logger
+	postBuildWg   sync.WaitGroup
 }
 
 // OrchestratorConfig holds configuration for the orchestrator.
@@ -110,6 +112,7 @@ func NewOrchestrator(cfg OrchestratorConfig) (*Orchestrator, error) {
 
 // Close releases orchestrator resources.
 func (o *Orchestrator) Close() error {
+	o.postBuildWg.Wait()
 	return o.db.Close()
 }
 
@@ -209,8 +212,11 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		buildDeps = append(buildDeps, recipe.Build.Dependencies...)
 	}
 
+	safeJobName := strings.ToLower(strings.NewReplacer("_", "-", ".", "-").Replace(
+		fmt.Sprintf("build-%s-%s", packageName, recipe.Package.Version),
+	))
 	cfg := k8s.JobConfig{
-		JobName:         fmt.Sprintf("build-%s-%s", packageName, recipe.Package.Version),
+		JobName:         safeJobName,
 		PackageName:     packageName,
 		PackageVersion:  recipe.Package.Version,
 		Image:           o.image,
@@ -254,7 +260,11 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 
 	// PGP sign + publish + report (best-effort — don't fail the build).
 	// Use a fresh context: the caller's ctx may be cancelled before postBuild finishes.
-	go o.postBuild(context.Background(), packageName, ver, splits)
+	o.postBuildWg.Add(1)
+	go func() {
+		defer o.postBuildWg.Done()
+		o.postBuild(context.Background(), packageName, ver, splits)
+	}()
 
 	o.log.Printf("Package %s %s built successfully (splits: %s, %s, %s-dev)",
 		packageName, ver, libName, packageName, packageName)

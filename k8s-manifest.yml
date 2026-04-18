@@ -157,7 +157,8 @@ spec:
         stage: build-tools
     spec:
       restartPolicy: OnFailure
-      activeDeadlineSeconds: 3600
+      automountServiceAccountToken: false
+      activeDeadlineSeconds: 7200
       initContainers:
         - name: install-deps
           image: fedora:43
@@ -167,11 +168,10 @@ spec:
             - |
               set -e
               dnf install -y --setopt=install_weak_deps=False \
-                gcc gcc-c++ make meson ninja-build cmake pkg-config \
+                gcc gcc-c++ make \
+                meson ninja-build cmake pkg-config \
                 git aria2 \
                 golang cargo \
-                python3-devel python3-pip \
-
                 libarchive-devel \
                 mold binutils \
                 && dnf clean all
@@ -254,6 +254,8 @@ spec:
           env:
             - name: CGO_ENABLED
               value: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
 
       volumes:
         - name: builds
@@ -278,6 +280,7 @@ metadata:
 spec:
   restartPolicy: Never
   terminationGracePeriodSeconds: 10
+  automountServiceAccountToken: false
 
   initContainers:
     # Assemble apger.json from individual Secret keys into a shared emptyDir
@@ -310,30 +313,6 @@ spec:
         - name: creds-assembled
           mountPath: /creds
 
-    # Install runtime build dependencies into the shared /usr via overlay trick:
-    # we install into the container's own rootfs — each init container gets a
-    # fresh layer, so we install deps here and the main container inherits them
-    # via the same image. The real fix is to use a pre-built image; for now
-    # we install in the main container's entrypoint instead (see below).
-    - name: install-runtime-deps
-      image: fedora:43
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          # Pre-warm the dnf cache into the PVC so the main container can install offline
-          dnf install -y --setopt=install_weak_deps=False --downloadonly \
-            gcc gcc-c++ make meson ninja-build cmake pkg-config \
-            git aria2 \
-            golang cargo \
-            python3-devel python3-pip \
-
-            mold binutils 2>/dev/null || true
-          echo "dep pre-warm done"
-      volumeMounts:
-        - name: builds
-          mountPath: /output
-
   containers:
     - name: tui
       image: fedora:43
@@ -346,19 +325,19 @@ spec:
         - |
           # Install build dependencies (init containers don't share rootfs with main)
           dnf install -y --setopt=install_weak_deps=False \
-            gcc gcc-c++ make meson ninja-build cmake pkg-config \
+            gcc gcc-c++ make \
+            meson ninja-build cmake pkg-config \
             git aria2 \
             golang cargo \
-            python3-devel python3-pip \
-
+            libarchive-devel \
             mold binutils \
             && dnf clean all
 
           # Install binaries from PVC as soon as they appear (non-blocking for attach)
           (
             echo "[apger-tui] Waiting for build tools from apger-build job..."
-            until [ -f /output/apger ] && [ -f /output/apgbuild ]; do
-              sleep 3
+            i=0; until [ -f /output/apger ] && [ -f /output/apgbuild ]; do
+              sleep 3; i=$((i+1)); [ $i -gt 600 ] && echo timeout && exit 1
             done
             cp /output/apger    /usr/local/bin/apger
             cp /output/apgbuild /usr/local/bin/apgbuild

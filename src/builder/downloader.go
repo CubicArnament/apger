@@ -24,6 +24,7 @@ type Downloader struct {
 func NewDownloader() *Downloader {
 	return &Downloader{
 		client: &http.Client{
+			Timeout: 30 * time.Minute,
 			Transport: &http.Transport{
 				DisableKeepAlives: true,
 			},
@@ -198,7 +199,7 @@ func extractTar(reader io.Reader, destDir string) error {
 			if err != nil {
 				return fmt.Errorf("create file %s: %w", target, err)
 			}
-			if _, err := io.Copy(f, tr); err != nil {
+			if _, err := io.Copy(f, io.LimitReader(tr, 2<<30)); err != nil {
 				f.Close()
 				return fmt.Errorf("write file %s: %w", target, err)
 			}
@@ -258,26 +259,28 @@ func extractZip(src, destDir string) error {
 }
 
 func extractXZ(src, destDir string) error {
-	// Use xz command for decompression
 	cmd := exec.Command("xz", "-d", "-k", "-c", src)
-	cmd.Stdout = os.Stdout // Will be replaced by tar extractor
 
-	// Create pipe for tar streaming
 	pipeReader, pipeWriter := io.Pipe()
 	cmd.Stdout = pipeWriter
 
-	// Start xz decompression
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("start xz: %w", err)
 	}
 
-	// Extract tar in background
+	errCh := make(chan error, 1)
 	go func() {
-		if err := extractTar(pipeReader, destDir); err != nil {
-			pipeReader.CloseWithError(fmt.Errorf("extract tar: %w", err))
-		}
-		pipeReader.Close()
+		err := extractTar(pipeReader, destDir)
+		pipeReader.CloseWithError(err)
+		errCh <- err
 	}()
 
-	return cmd.Wait()
+	xzErr := cmd.Wait()
+	pipeWriter.Close()
+	tarErr := <-errCh
+
+	if xzErr != nil {
+		return fmt.Errorf("xz: %w", xzErr)
+	}
+	return tarErr
 }

@@ -18,7 +18,7 @@ type bboltStore struct {
 
 // NewDB opens or creates a bbolt database at path.
 func NewDB(path string) (*DB, error) {
-	db, err := bbolt.Open(path, 0600, &bbolt.Options{Timeout: 1 * time.Second})
+	db, err := bbolt.Open(path, 0600, &bbolt.Options{Timeout: 30 * time.Second})
 	if err != nil {
 		return nil, fmt.Errorf("open bbolt db: %w", err)
 	}

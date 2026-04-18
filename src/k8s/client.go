@@ -108,36 +108,50 @@ func (c *Client) WaitForJob(ctx context.Context, name string, logWriter io.Write
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	watcher, err := c.clientset.BatchV1().Jobs(c.namespace).Watch(ctx, metav1.SingleObject(metav1.ObjectMeta{Name: name}))
-	if err != nil {
-		return fmt.Errorf("watch job %s: %w", name, err)
-	}
-	defer watcher.Stop()
-
 	for {
+		watcher, err := c.clientset.BatchV1().Jobs(c.namespace).Watch(ctx, metav1.SingleObject(metav1.ObjectMeta{Name: name}))
+		if err != nil {
+			return fmt.Errorf("watch job %s: %w", name, err)
+		}
+
+		done, err := c.watchUntilDone(ctx, name, logWriter, watcher)
+		watcher.Stop()
+		if err != nil {
+			return err
+		}
+		if done {
+			return nil
+		}
+		// channel closed by server — re-watch
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("timeout waiting for job %s", name)
+		default:
+		}
+	}
+}
+
+// watchUntilDone processes watch events until job completes, fails, or channel closes.
+// Returns (true, nil) on success, (false, err) on job failure, (false, nil) on channel close.
+func (c *Client) watchUntilDone(ctx context.Context, name string, logWriter io.Writer, watcher watch.Interface) (bool, error) {
+	for {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("timeout waiting for job %s", name)
 		case event, ok := <-watcher.ResultChan():
 			if !ok {
-				return fmt.Errorf("watch channel closed for job %s", name)
+				return false, nil // channel closed — caller will retry
 			}
-
 			job, ok := event.Object.(*batchv1.Job)
 			if !ok {
 				continue
 			}
-
-			// Stream logs periodically
 			c.streamJobLogs(ctx, name, logWriter)
-
-			// Check completion
 			if job.Status.Succeeded > 0 {
-				return nil
+				return true, nil
 			}
-
 			if job.Status.Failed > 0 {
-				return fmt.Errorf("job %s failed", name)
+				return false, fmt.Errorf("job %s failed", name)
 			}
 		}
 	}
