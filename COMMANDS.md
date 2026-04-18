@@ -81,6 +81,18 @@ kubectl logs pod/apger-tui -n apger
 
 # Follow live
 kubectl logs -f pod/apger-tui -n apger
+
+# Previous container (if restarted)
+kubectl logs pod/apger-tui -n apger --previous
+
+# Last N lines
+kubectl logs pod/apger-tui -n apger --tail=100
+
+# With timestamps
+kubectl logs pod/apger-tui -n apger --timestamps
+
+# All containers in pod
+kubectl logs pod/apger-tui -n apger --all-containers=true
 ```
 
 ## 6. Copy output packages from PVC
@@ -99,4 +111,148 @@ kubectl delete pod pvc-access -n apger
 
 ```sh
 kubectl delete -f k8s-manifest.yml
+
+# Force delete stuck pod
+kubectl delete pod apger-tui -n apger --grace-period=0 --force
+```
+
+---
+
+## Debugging — Why is a pod stuck?
+
+### Quick overview
+
+```sh
+# List all resources in namespace
+kubectl get all -n apger
+
+# Watch pod status in real time
+kubectl get pods -n apger -w
+
+# Show pod status with node assignment and IP
+kubectl get pods -n apger -o wide
+```
+
+### Events — first place to look
+
+```sh
+# All events in namespace, sorted by time
+kubectl get events -n apger --sort-by='.lastTimestamp'
+
+# Events for a specific pod
+kubectl get events -n apger --field-selector involvedObject.name=apger-tui
+
+# Events for the build job
+kubectl get events -n apger --field-selector involvedObject.name=apger-build
+
+# Watch events live
+kubectl get events -n apger -w
+```
+
+### Describe — full state + event history
+
+```sh
+# Describe TUI pod (shows: state, conditions, image pull status, mounts, events)
+kubectl describe pod apger-tui -n apger
+
+# Describe build job
+kubectl describe job apger-build -n apger
+
+# Describe PVC (check if Bound — if Pending, storage provisioner is stuck)
+kubectl describe pvc apger-builds -n apger
+
+# Describe ConfigMap
+kubectl describe configmap apger-conf -n apger
+```
+
+### Common stuck states and fixes
+
+**ImagePullBackOff / ErrImagePull**
+```sh
+# Check which image failed
+kubectl describe pod apger-tui -n apger | grep -A5 "Events:"
+
+# For Kind: load image manually
+kind load docker-image fedora:43
+```
+
+**Pending — no node has enough resources**
+```sh
+# Check node capacity
+kubectl describe nodes | grep -A5 "Allocated resources"
+
+# Check pod resource requests
+kubectl describe pod apger-tui -n apger | grep -A10 "Requests:"
+```
+
+**Pending — PVC not bound**
+```sh
+kubectl get pvc -n apger
+kubectl describe pvc apger-builds -n apger
+# If no StorageClass available:
+kubectl get storageclass
+```
+
+**Init container stuck**
+```sh
+# List init containers and their state
+kubectl describe pod apger-tui -n apger | grep -A20 "Init Containers:"
+
+# Logs from init container
+kubectl logs apger-tui -n apger -c <init-container-name>
+```
+
+**CrashLoopBackOff**
+```sh
+# Logs from last crash
+kubectl logs pod/apger-tui -n apger --previous
+
+# Check exit code
+kubectl describe pod apger-tui -n apger | grep "Exit Code"
+```
+
+**OOMKilled**
+```sh
+kubectl describe pod apger-tui -n apger | grep -E "OOMKilled|Reason|Exit Code"
+# Increase memory limits in k8s-manifest.yml or apger.conf [kubernetes.options.oomkill_limits]
+```
+
+**Job never completes**
+```sh
+# Check job conditions
+kubectl describe job apger-build -n apger | grep -A10 "Conditions:"
+
+# Check if pod for job is running
+kubectl get pods -n apger -l job-name=apger-build
+
+# Logs from job pod
+kubectl logs -l job-name=apger-build -n apger --tail=50
+```
+
+### Exec into a running pod for manual inspection
+
+```sh
+# Shell into TUI pod
+kubectl exec -it apger-tui -n apger -- /bin/sh
+
+# Shell into build job pod (while running)
+kubectl exec -it $(kubectl get pod -n apger -l job-name=apger-build -o jsonpath='{.items[0].metadata.name}') -n apger -- /bin/sh
+
+# Check disk usage on PVC
+kubectl exec -it apger-tui -n apger -- df -h /output
+kubectl exec -it apger-tui -n apger -- du -sh /output/*
+```
+
+### Node-level diagnostics
+
+```sh
+# Which node is the pod on
+kubectl get pod apger-tui -n apger -o jsonpath='{.spec.nodeName}'
+
+# Node conditions (MemoryPressure, DiskPressure, etc.)
+kubectl describe node <node-name> | grep -A10 "Conditions:"
+
+# Node resource usage (requires metrics-server)
+kubectl top node
+kubectl top pod -n apger
 ```
