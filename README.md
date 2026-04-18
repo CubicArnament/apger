@@ -28,6 +28,7 @@ apger/
 │   │   ├── config.go  # Config struct, LoadConfig, FindConfig
 │   │   ├── main.go  # Run(), CLI flags, apger.conf wiring
 │   │   ├── march.go  # MArch type: normalization, x86_64 level table
+│   │   ├── publish_target.go
 │   │   └── validate.go  # OOMKill + march/CPUID pre-flight validation
 │   ├── credentials/
 │   │   ├── github_app.go  # GitHub App token exchange
@@ -64,6 +65,7 @@ apger/
 ├── .gitignore
 ├── .gitmodules
 ├── apger.conf  # build config (single source of truth)
+├── COMMANDS.md
 ├── go.mod  # Go module
 ├── go.sum  # Go checksums
 ├── k8s-manifest.yml  # Kubernetes PVC + ConfigMap + Job + Pod
