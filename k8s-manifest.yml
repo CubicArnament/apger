@@ -1,19 +1,16 @@
 # APGer Kubernetes Manifest
 #
-# Resources:
-#   PVC          apger-builds     — output storage for built .apg packages
-#   ConfigMap    apger-conf       — apger.conf
-#   Secret       apger-credentials — GitHub App + PGP credentials
-#   Pod          apger            — builds libapg+apgbuild+apger, then runs apger interactively
+# Architecture:
+#   1. Pod `apger` builds libapg.so → apgbuild → apger (init containers)
+#   2. apger copies apgbuild + libapg.so to PVC /output/tools/
+#   3. apger spawns per-package Jobs; each Job mounts PVC and runs apgbuild
+#   4. Job dies, next Job starts — apger orchestrates the queue
 #
 # Quick start:
 #   kubectl apply -f k8s-manifest.yml
 #   kubectl attach -it apger -n apger
 #
-# Detach without killing: Ctrl+P, Ctrl+Q
-# Re-attach: kubectl attach -it apger -n apger
-# Build a package: apger --cmd build --package curl
-# View logs: kubectl logs -f pod/apger -n apger
+# Detach: Ctrl+P, Ctrl+Q  |  Re-attach: kubectl attach -it apger -n apger
 
 ---
 apiVersion: v1
@@ -79,14 +76,12 @@ data:
     verbose = false
 
 ---
-# Create with:
-#   kubectl create secret generic apger-credentials \
-#     --from-literal=github_app_id=<APP_ID> \
-#     --from-file=github_pem=<path/to/app.private-key.pem> \
-#     --from-literal=pgp_private_key="$(cat private.asc)" \
-#     --from-literal=name="Your Name" \
-#     --from-literal=email="you@example.com" \
-#     -n apger
+# kubectl create secret generic apger-credentials \
+#   --from-literal=github_app_id=<APP_ID> \
+#   --from-file=github_pem=<path/to/app.private-key.pem> \
+#   --from-literal=pgp_private_key="$(cat private.asc)" \
+#   --from-literal=name="Your Name" --from-literal=email="you@example.com" \
+#   -n apger
 apiVersion: v1
 kind: Secret
 metadata:
@@ -104,8 +99,6 @@ stringData:
   email: ""
 
 ---
-# Single pod: builds libapg + apgbuild + apger, then runs apger interactively.
-# apger itself spawns Kubernetes Jobs for package builds and uses the PVC for output.
 apiVersion: v1
 kind: Pod
 metadata:
@@ -119,7 +112,7 @@ spec:
   automountServiceAccountToken: false
 
   initContainers:
-    # 1. Install build dependencies
+    # Stage 1: install build dependencies
     - name: install-deps
       image: fedora:43
       imagePullPolicy: IfNotPresent
@@ -128,23 +121,16 @@ spec:
         - |
           set -e
           dnf install -y --setopt=install_weak_deps=False \
-            gcc gcc-c++ make \
-            meson ninja-build pkg-config \
-            git aria2 \
-            golang \
-            libarchive-devel lmdb-devel \
-            yyjson-devel libsodium-devel \
+            gcc gcc-c++ make meson ninja-build pkg-config \
+            git aria2 golang \
+            libarchive-devel lmdb-devel yyjson-devel libsodium-devel \
             mold binutils \
             && dnf clean all
       resources:
-        requests:
-          cpu: "1"
-          memory: 1Gi
-        limits:
-          cpu: "4"
-          memory: 4Gi
+        requests: {cpu: "1", memory: 1Gi}
+        limits:   {cpu: "4", memory: 4Gi}
 
-    # 2. Clone source
+    # Stage 2: clone source with submodules
     - name: clone-source
       image: fedora:43
       imagePullPolicy: IfNotPresent
@@ -154,17 +140,13 @@ spec:
           set -e
           git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /src
       resources:
-        requests:
-          cpu: "500m"
-          memory: 512Mi
-        limits:
-          cpu: "2"
-          memory: 2Gi
+        requests: {cpu: "500m", memory: 512Mi}
+        limits:   {cpu: "2",    memory: 2Gi}
       volumeMounts:
         - name: source
           mountPath: /src
 
-    # 3. Build libapg + apgbuild + apger via src/Meson.build
+    # Stage 3: build libapg.so → apgbuild → apger, install to /tools
     - name: build-tools
       image: fedora:43
       imagePullPolicy: IfNotPresent
@@ -172,30 +154,26 @@ spec:
       args:
         - |
           set -e
-          echo "=== Building libapg + apgbuild + apger ==="
+          echo "=== libapg + apgbuild + apger ==="
           cd /src/src
           meson setup build --prefix=/tools --buildtype=release
           ninja -C build
           ninja -C build install
-          ldconfig /tools/lib || true
-          echo "=== Build complete ==="
+          ldconfig /tools/lib 2>/dev/null || true
+          echo "=== Done: $(ls /tools/bin/) ==="
+      env:
+        - name: CGO_ENABLED
+          value: "1"
       resources:
-        requests:
-          cpu: "2"
-          memory: 2Gi
-        limits:
-          cpu: "10"
-          memory: 16Gi
+        requests: {cpu: "2",  memory: 2Gi}
+        limits:   {cpu: "10", memory: 16Gi}
       volumeMounts:
         - name: source
           mountPath: /src
         - name: tools
           mountPath: /tools
-      env:
-        - name: CGO_ENABLED
-          value: "1"
 
-    # 4. Assemble credentials JSON
+    # Stage 4: assemble credentials JSON into RAM volume
     - name: assemble-credentials
       image: fedora:43
       imagePullPolicy: IfNotPresent
@@ -203,18 +181,14 @@ spec:
       args:
         - |
           APP_ID=$(cat /secrets/github_app_id 2>/dev/null || echo "0")
-          PEM=$(cat /secrets/github_pem 2>/dev/null | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
-          PGP=$(cat /secrets/pgp_private_key 2>/dev/null | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
-          NAME=$(cat /secrets/name 2>/dev/null || echo "apger")
+          PEM=$(cat /secrets/github_pem 2>/dev/null \
+            | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
+          PGP=$(cat /secrets/pgp_private_key 2>/dev/null \
+            | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
+          NAME=$(cat /secrets/name  2>/dev/null || echo "apger")
           EMAIL=$(cat /secrets/email 2>/dev/null || echo "apger@nuros.org")
           cat > /creds/apger.json <<EOF
-          {
-            "name":            "$NAME",
-            "email":           "$EMAIL",
-            "github_app_id":   $APP_ID,
-            "github_pem":      $PEM,
-            "pgp_private_key": $PGP
-          }
+          {"name":"$NAME","email":"$EMAIL","github_app_id":$APP_ID,"github_pem":$PEM,"pgp_private_key":$PGP}
           EOF
           chmod 600 /creds/apger.json
       volumeMounts:
@@ -233,6 +207,12 @@ spec:
         - |
           export PATH="/tools/bin:$PATH"
           export LD_LIBRARY_PATH="/tools/lib:$LD_LIBRARY_PATH"
+          # Stage apgbuild + libapg.so to PVC so build Jobs can use them
+          mkdir -p /output/tools/bin /output/tools/lib
+          cp /tools/bin/apgbuild        /output/tools/bin/apgbuild
+          cp /tools/lib/libapg.so*      /output/tools/lib/ 2>/dev/null || true
+          chmod +x /output/tools/bin/apgbuild
+          echo "[apger] Tools staged to PVC at /output/tools/"
           echo "[apger] Ready. Run: apger --tui"
           exec /bin/bash --login || sleep infinity
       stdin: true
@@ -249,12 +229,8 @@ spec:
         - name: CGO_ENABLED
           value: "1"
       resources:
-        requests:
-          cpu: "500m"
-          memory: 512Mi
-        limits:
-          cpu: "10"
-          memory: 16Gi
+        requests: {cpu: "500m", memory: 512Mi}
+        limits:   {cpu: "10",   memory: 16Gi}
       volumeMounts:
         - name: tools
           mountPath: /tools

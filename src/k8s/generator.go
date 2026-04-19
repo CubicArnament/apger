@@ -11,32 +11,33 @@ import (
 	config "github.com/NurOS-Linux/apger/src/core"
 )
 
-// JobConfig holds конфигурацию для генерации Job манифеста.
+// JobConfig holds configuration for generating a build Job manifest.
 type JobConfig struct {
-	JobName         string
-	PackageName     string
-	PackageVersion  string
-	Image           string
-	ImagePullPolicy string // IfNotPresent, Always, Never
-	Command         []string
-	Args            []string
-	Env             map[string]string
-	// BuildFlags from apger.conf [build.packages] or [build.self]
+	JobName        string
+	PackageName    string
+	PackageVersion string
+	Image          string
+	ImagePullPolicy string
+	// Command/Args override the default apgbuild invocation (optional)
+	Command []string
+	Args    []string
+	Env     map[string]string
+	// BuildFlags from apger.conf [build.packages]
 	BuildFlags *config.BuildProfile
-	// OOMKillLimits from apger.conf — nil or empty strings = use defaults (4 CPU / 4Gi)
+	// OOMKillLimits from apger.conf
 	OOMKillLimits *config.OOMKillLimits
-	// Dependencies — package list for dnf install in init container
+	// Dependencies for dnf install in init container
 	Dependencies []string
 	PVCName      string
+	// PVCMountPath is where built .apg packages are written (e.g. /output/packages)
 	PVCMountPath string
 }
 
-// DefaultDependencies returns the standard set of build dependencies for Fedora.
+// DefaultDependencies returns the standard Fedora build dependencies.
 func DefaultDependencies() []string {
 	return []string{
 		"gcc", "gcc-c++", "make",
-		"meson", "ninja-build",
-		"cmake", "pkg-config",
+		"meson", "ninja-build", "cmake", "pkg-config",
 		"git", "tar", "curl", "wget",
 		"go", "cargo",
 		"python3-devel", "python3-pip",
@@ -45,8 +46,6 @@ func DefaultDependencies() []string {
 	}
 }
 
-// oomResources returns ResourceRequirements using OOMKillLimits from config.
-// Empty CPU/memory strings fall back to defaults (4 CPU / 4Gi).
 func oomResources(limits *config.OOMKillLimits) corev1.ResourceRequirements {
 	cpuLimit := "4"
 	memLimit := "4Gi"
@@ -70,7 +69,6 @@ func oomResources(limits *config.OOMKillLimits) corev1.ResourceRequirements {
 	}
 }
 
-// pullPolicyFromString converts string to corev1.PullPolicy.
 func pullPolicyFromString(s string) corev1.PullPolicy {
 	switch s {
 	case "Always":
@@ -82,7 +80,12 @@ func pullPolicyFromString(s string) corev1.PullPolicy {
 	}
 }
 
-// GenerateBuildJob creates a Kubernetes Job manifest for building a package.
+// GenerateBuildJob creates a Job that:
+//  1. Installs build deps (init container)
+//  2. Runs apgbuild from /tools/bin/ (copied to PVC by apger at startup)
+//     Output .apg goes to PVCMountPath/packages/
+//
+// The PVC is mounted read-write; /tools/ subpath provides apgbuild + libapg.so.
 func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 	falseVal := false
 
@@ -90,9 +93,11 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 		{Name: "PACKAGE_NAME", Value: cfg.PackageName},
 		{Name: "PACKAGE_VERSION", Value: cfg.PackageVersion},
 		{Name: "DESTDIR", Value: "/build/root"},
+		// apgbuild and libapg.so live in /tools (subpath of PVC)
+		{Name: "PATH", Value: "/tools/bin:/usr/local/bin:/usr/bin:/bin"},
+		{Name: "LD_LIBRARY_PATH", Value: "/tools/lib"},
 	}
 	if cfg.BuildFlags != nil {
-		// ResolvedCC/CXX expands "default" to actual compiler (gcc/clang based on arch)
 		envVars = append(envVars,
 			corev1.EnvVar{Name: "CC", Value: cfg.BuildFlags.ResolvedCC()},
 			corev1.EnvVar{Name: "CXX", Value: cfg.BuildFlags.ResolvedCXX()},
@@ -106,12 +111,14 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 	}
 
 	volumeMounts := []corev1.VolumeMount{
-		{Name: "build-output", MountPath: cfg.PVCMountPath},
+		// Full PVC: /output/tools/bin/apgbuild, /output/tools/lib/libapg.so, /output/packages/
+		{Name: "pvc", MountPath: "/output"},
+		// Symlink /tools → /output/tools for convenience (done in args)
 		{Name: "build-tmp", MountPath: "/build"},
 	}
 	volumes := []corev1.Volume{
 		{
-			Name: "build-output",
+			Name: "pvc",
 			VolumeSource: corev1.VolumeSource{
 				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: cfg.PVCName},
 			},
@@ -119,13 +126,17 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 		{Name: "build-tmp", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
 	}
 
+	// Default command: run apgbuild from PVC tools
 	command := cfg.Command
-	if len(command) == 0 {
-		command = []string{"/bin/sh"}
-	}
 	args := cfg.Args
-	if len(args) == 0 {
-		args = []string{"-c", "echo build"}
+	if len(command) == 0 {
+		command = []string{"/bin/sh", "-c"}
+		outFile := fmt.Sprintf("/output/packages/%s-%s-$(uname -m).apg", cfg.PackageName, cfg.PackageVersion)
+		args = []string{fmt.Sprintf(
+			`set -e
+ln -sf /output/tools /tools
+mkdir -p /output/packages
+apgbuild build /build/src -o %s`, outFile)}
 	}
 
 	depInstallCmd := "dnf install -y --setopt=install_weak_deps=False " + joinSpace(cfg.Dependencies) + " && dnf clean all"
@@ -134,25 +145,35 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:   cfg.JobName,
-			Labels: map[string]string{"app": "apger", "package": cfg.PackageName, "version": cfg.PackageVersion, "stage": "build"},
+			Name: cfg.JobName,
+			Labels: map[string]string{
+				"app":     "apger",
+				"package": cfg.PackageName,
+				"version": cfg.PackageVersion,
+				"stage":   "build",
+			},
 		},
 		Spec: batchv1.JobSpec{
 			TTLSecondsAfterFinished: ptrInt32(3600),
-			BackoffLimit:            ptrInt32(3), // retry up to 3 times before marking failed
+			BackoffLimit:            ptrInt32(3),
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{"app": "apger", "package": cfg.PackageName, "version": cfg.PackageVersion},
+					Labels: map[string]string{
+						"app":     "apger",
+						"package": cfg.PackageName,
+						"version": cfg.PackageVersion,
+					},
 				},
 				Spec: corev1.PodSpec{
-					RestartPolicy:         corev1.RestartPolicyOnFailure,
-					ActiveDeadlineSeconds: ptrInt64(7200),
+					RestartPolicy:                corev1.RestartPolicyOnFailure,
+					ActiveDeadlineSeconds:        ptrInt64(7200),
+					AutomountServiceAccountToken: &falseVal,
 					InitContainers: []corev1.Container{{
 						Name:            "install-deps",
 						Image:           cfg.Image,
 						ImagePullPolicy: pullPolicy,
-						Command:         []string{"/bin/sh"},
-						Args:            []string{"-c", depInstallCmd},
+						Command:         []string{"/bin/sh", "-c"},
+						Args:            []string{depInstallCmd},
 						Resources:       res,
 						VolumeMounts:    volumeMounts,
 					}},
@@ -167,72 +188,9 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 						VolumeMounts:    volumeMounts,
 						SecurityContext: &corev1.SecurityContext{
 							AllowPrivilegeEscalation: &falseVal,
-							ReadOnlyRootFilesystem:   &falseVal,
 						},
 					}},
 					Volumes: volumes,
-				},
-			},
-		},
-	}
-}
-
-// GenerateMultiStageJob creates a Job for the complete multistage build pipeline.
-// selfFlags must come from apger.conf [build.self].
-func GenerateMultiStageJob(cfg JobConfig, selfFlags config.BuildProfile) *batchv1.Job {
-	falseVal := false
-	pullPolicy := pullPolicyFromString(cfg.ImagePullPolicy)
-	res := oomResources(cfg.OOMKillLimits)
-
-	depInstallCmd := "dnf install -y --setopt=install_weak_deps=False " + joinSpace(cfg.Dependencies) + " && dnf clean all"
-
-	script := fmt.Sprintf(`#!/bin/sh
-set -e
-echo "=== Installing dependencies ==="
-%s
-export CC=%s CXX=%s CFLAGS="%s" CXXFLAGS="%s" LDFLAGS="%s"
-echo "=== Stage 1: Building apgbuild ==="
-cd /src/apgbuild && meson setup build --prefix=/usr --buildtype=release && ninja -C build && ninja -C build install
-echo "=== Stage 2: Building apger ==="
-cd /src && meson setup build --prefix=/usr --buildtype=release && ninja -C build && ninja -C build install
-echo "=== Stage 3: Starting TUI ==="
-exec apger --tui
-`, depInstallCmd, selfFlags.ResolvedCC(), selfFlags.ResolvedCXX(),
-		selfFlags.CFlags(), selfFlags.CXXFlags(), selfFlags.LDFlags())
-
-	return &batchv1.Job{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:   cfg.JobName,
-			Labels: map[string]string{"app": "apger", "stage": "multistage"},
-		},
-		Spec: batchv1.JobSpec{
-			BackoffLimit: ptrInt32(1),
-			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{"app": "apger", "stage": "multistage"}},
-				Spec: corev1.PodSpec{
-					RestartPolicy: corev1.RestartPolicyOnFailure,
-					Containers: []corev1.Container{{
-						Name:            "multistage-builder",
-						Image:           cfg.Image,
-						ImagePullPolicy: pullPolicy,
-						Command:         []string{"/bin/sh"},
-						Args:            []string{"-c", script},
-						Resources:       res,
-						VolumeMounts: []corev1.VolumeMount{
-							{Name: "build-output", MountPath: cfg.PVCMountPath},
-							{Name: "source-code", MountPath: "/src"},
-						},
-						SecurityContext: &corev1.SecurityContext{AllowPrivilegeEscalation: &falseVal},
-					}},
-					Volumes: []corev1.Volume{
-						{
-							Name: "build-output",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: cfg.PVCName},
-							},
-						},
-						{Name: "source-code", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}},
-					},
 				},
 			},
 		},
