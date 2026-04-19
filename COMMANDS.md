@@ -268,7 +268,8 @@ kubectl delete namespace apger
 ## 9. NFS setup — packages appear on your machine automatically
 
 The PVC uses `storageClassName: nfs-client` (ReadWriteMany).
-Built packages written to `/output/packages/` inside the pod appear in `/srv/apger-packages/` on the NFS host automatically.
+Built packages appear in `/srv/apger-packages/<local_path>/` on the NFS host automatically.
+`local_path` is set in TUI Settings (Local publish mode) or in `apger.conf` `[save.options] local_path`. Default: `packages`.
 
 ### Common setup (all distros)
 
@@ -303,13 +304,6 @@ sudo systemctl enable --now nfs-server
 ```sh
 sudo zypper install -y nfs-kernel-server
 sudo systemctl enable --now nfsserver
-```
-
-**Alpine Linux (apk, OpenRC)**
-```sh
-sudo apk add nfs-utils
-sudo rc-update add nfs
-sudo rc-service nfs start
 ```
 
 **Gentoo (emerge, only systemd version)**

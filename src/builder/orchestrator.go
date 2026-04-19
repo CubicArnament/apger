@@ -3,6 +3,7 @@ package builder
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -318,12 +319,24 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 			}
 		}
 		if target&config.PublishLocal != 0 {
-			// Write a .ready marker for each asset so `apger pull` on the host
-			// knows which packages are ready to be copied via kubectl cp.
-			for _, ap := range assetPaths {
-				marker := ap + ".ready"
-				if err := os.WriteFile(marker, []byte(filepath.Base(ap)), 0644); err != nil {
-					o.log.Printf("[postBuild] write marker %s: %v", marker, err)
+			// local_path is a subdirectory inside the NFS-mounted PVC.
+			// On the host it appears as /srv/apger-packages/<local_path>/
+			localSub := o.apgerCfg.Save.Options.LocalPath
+			if localSub == "" {
+				localSub = "packages"
+			}
+			destDir := filepath.Join(o.outputDir, localSub)
+			if err := os.MkdirAll(destDir, 0755); err != nil {
+				o.log.Printf("[postBuild] mkdir local dest: %v", err)
+			} else {
+				for _, ap := range assetPaths {
+					dest := filepath.Join(destDir, filepath.Base(ap))
+					if err := os.Rename(ap, dest); err != nil {
+						// Rename may fail across filesystems — fall back to copy
+						if err2 := copyFile(ap, dest); err2 != nil {
+							o.log.Printf("[postBuild] copy to local %s: %v", filepath.Base(ap), err2)
+						}
+					}
 				}
 			}
 		}
@@ -734,4 +747,20 @@ make INSTALL_MOD_PATH="$DESTDIR" modules_install`
 make -j$(nproc)
 make DESTDIR="$DESTDIR" install`
 	}
+}
+
+
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
 }
