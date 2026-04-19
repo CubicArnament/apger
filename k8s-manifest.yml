@@ -5,12 +5,146 @@
 #   2. apger copies apgbuild + libapg.so to PVC /output/tools/
 #   3. apger spawns per-package Jobs; each Job mounts PVC and runs apgbuild
 #   4. Job dies, next Job starts — apger orchestrates the queue
+#   5. Built packages in PVC appear on NFS host automatically
+#
+# Prerequisites (WSL2/Linux host, one-time):
+#   sudo apt install nfs-kernel-server
+#   sudo mkdir -p /srv/apger-packages && sudo chmod 777 /srv/apger-packages
+#   echo '/srv/apger-packages *(rw,sync,no_subtree_check,no_root_squash)' | sudo tee -a /etc/exports
+#   sudo exportfs -ra && sudo service nfs-kernel-server start
+#
+# Then set NFS_SERVER below to your WSL2 IP (ip addr show eth0) and apply:
+#   kubectl apply -f k8s-manifest.yml
 #
 # Quick start:
 #   kubectl apply -f k8s-manifest.yml
 #   kubectl attach -it apger -n apger
 #
 # Detach: Ctrl+P, Ctrl+Q  |  Re-attach: kubectl attach -it apger -n apger
+
+# ── NFS Provisioner (no Helm required) ───────────────────────────────────────
+# Change NFS_SERVER to your WSL2/Linux host IP before applying.
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nfs-provisioner
+  namespace: apger
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nfs-provisioner
+rules:
+  - apiGroups: [""]
+    resources: [persistentvolumes]
+    verbs: [get, list, watch, create, delete]
+  - apiGroups: [""]
+    resources: [persistentvolumeclaims]
+    verbs: [get, list, watch, update]
+  - apiGroups: [storage.k8s.io]
+    resources: [storageclasses]
+    verbs: [get, list, watch]
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [create, update, patch]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nfs-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: nfs-provisioner
+    namespace: apger
+roleRef:
+  kind: ClusterRole
+  name: nfs-provisioner
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nfs-provisioner
+  namespace: apger
+rules:
+  - apiGroups: [""]
+    resources: [endpoints]
+    verbs: [get, list, watch, create, update, patch]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nfs-provisioner
+  namespace: apger
+subjects:
+  - kind: ServiceAccount
+    name: nfs-provisioner
+    namespace: apger
+roleRef:
+  kind: Role
+  name: nfs-provisioner
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-provisioner
+  namespace: apger
+  labels:
+    app: nfs-provisioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-provisioner
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-provisioner
+    spec:
+      serviceAccountName: nfs-provisioner
+      containers:
+        - name: nfs-provisioner
+          image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          env:
+            - name: PROVISIONER_NAME
+              value: apger/nfs
+            - name: NFS_SERVER
+              # ← Change to your WSL2/Linux host IP (ip addr show eth0)
+              value: "172.17.0.1"
+            - name: NFS_PATH
+              value: /srv/apger-packages
+          volumeMounts:
+            - name: nfs-root
+              mountPath: /persistentvolumes
+      volumes:
+        - name: nfs-root
+          nfs:
+            # ← Same IP as NFS_SERVER above
+            server: "172.17.0.1"
+            path: /srv/apger-packages
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client
+provisioner: apger/nfs
+parameters:
+  archiveOnDelete: "false"
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+
+# ── apger resources ───────────────────────────────────────────────────────────
 
 ---
 # NFS StorageClass — provisioned by nfs-subdir-external-provisioner.

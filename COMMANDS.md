@@ -291,17 +291,11 @@ sudo systemctl enable --now nfs-server
 ### Install NFS provisioner in Kubernetes
 
 ```sh
-helm repo add nfs-subdir-external-provisioner \
-  https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-
-helm install nfs-provisioner \
-  nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
-  --set nfs.server=<NFS_SERVER_IP> \
-  --set nfs.path=/srv/apger-packages \
-  --set storageClass.name=nfs-client \
-  --set storageClass.defaultClass=false \
-  -n apger --create-namespace
+# Edit NFS_SERVER in k8s-manifest.yml to your WSL2 IP first, then:
+kubectl apply -f k8s-manifest.yml
 ```
+
+The provisioner, StorageClass, and RBAC are all included in `k8s-manifest.yml` — no Helm required.
 
 ### NixOS worker node
 
