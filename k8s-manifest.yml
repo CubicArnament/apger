@@ -347,9 +347,10 @@ spec:
 
           # Keep pod alive and interactive immediately — attach at any time
           # with: kubectl attach -it apger-tui -n apger
+          export PATH="/usr/local/bin:$PATH"
           echo "[apger-tui] Pod ready. Attach with: kubectl attach -it apger-tui -n apger"
           echo "[apger-tui] Waiting for build tools... (run 'apger --tui' once ready)"
-          exec /bin/bash
+          exec /bin/bash --login
       stdin: true
       tty: true
       env:

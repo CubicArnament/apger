@@ -256,3 +256,10 @@ kubectl describe node <node-name> | grep -A10 "Conditions:"
 kubectl top node
 kubectl top pod -n apger
 ```
+
+## 8. Delete namespace (full wipe)
+
+```sh
+# Deletes everything: pods, jobs, PVC, configmap, secrets, namespace itself
+kubectl delete namespace apger
+```
