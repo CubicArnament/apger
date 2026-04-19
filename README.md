@@ -67,8 +67,6 @@ apger/
 ├── .gitmodules
 ├── apger.conf  # build config (single source of truth)
 ├── COMMANDS.md
-├── go.mod  # Go module
-├── go.sum  # Go checksums
 ├── k8s-manifest.yml  # Kubernetes PVC + ConfigMap + Job + Pod
 └── README.md
 ```
