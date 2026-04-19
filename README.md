@@ -68,7 +68,8 @@ apger/
 ├── apger.conf  # build config (single source of truth)
 ├── COMMANDS.md
 ├── k8s-manifest.yml  # Kubernetes PVC + ConfigMap + Job + Pod
-└── README.md
+├── README.md
+└── setup-nfs.sh
 ```
 <!-- TREE_END -->
 
