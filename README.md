@@ -59,6 +59,8 @@ apger/
 │   │   ├── main.go  # Model, screens: Dashboard/FM/Editor/Build
 │   │   ├── screen_credentials.go  # credentials screen
 │   │   └── screen_settings.go  # settings screen
+│   ├── go.mod
+│   ├── go.sum
 │   ├── Meson.build  # build system
 │   └── meson_options.txt  # meson options
 ├── .gitignore
