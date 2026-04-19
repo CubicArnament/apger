@@ -263,3 +263,25 @@ kubectl top pod -n apger
 # Deletes everything: pods, jobs, PVC, configmap, secrets, namespace itself
 kubectl delete namespace apger
 ```
+
+
+## 9. Copy built packages to your machine (Local publish mode)
+
+When publish target is set to **Local** in TUI Settings, apger writes `.ready` markers
+inside the pod. Run `apger-pull` **on your host** to copy packages via `kubectl cp`:
+
+```sh
+# One-shot: copy all ready packages
+apger-pull --dest ~/packages
+
+# Watch mode: keep polling every 5s and copy as packages finish
+apger-pull --dest ~/packages --watch
+
+# Custom namespace/pod
+apger-pull --dest ~/packages --namespace apger --pod apger --pod-dir /output/packages --watch
+```
+
+Build `apger-pull` on your host:
+```sh
+cd src && go build -o apger-pull ./cmd/apger-pull/
+```

@@ -318,20 +318,12 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 			}
 		}
 		if target&config.PublishLocal != 0 {
-			localPath := o.apgerCfg.Save.Options.LocalPath
-			if localPath == "" {
-				o.log.Printf("[postBuild] local_path not set in apger.conf, skipping copy")
-			} else {
-				for _, ap := range assetPaths {
-					cmd := exec.Command("kubectl", "cp",
-						"apger/apger:"+ap,
-						localPath+"/"+filepath.Base(ap),
-					)
-					if out, err := cmd.CombinedOutput(); err != nil {
-						o.log.Printf("[postBuild] kubectl cp %s: %v: %s", filepath.Base(ap), err, out)
-					} else {
-						o.log.Printf("[postBuild] copied %s → %s", filepath.Base(ap), localPath)
-					}
+			// Write a .ready marker for each asset so `apger pull` on the host
+			// knows which packages are ready to be copied via kubectl cp.
+			for _, ap := range assetPaths {
+				marker := ap + ".ready"
+				if err := os.WriteFile(marker, []byte(filepath.Base(ap)), 0644); err != nil {
+					o.log.Printf("[postBuild] write marker %s: %v", marker, err)
 				}
 			}
 		}
