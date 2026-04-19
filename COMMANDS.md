@@ -268,44 +268,74 @@ kubectl delete namespace apger
 ## 9. NFS setup — packages appear on your machine automatically
 
 The PVC uses `storageClassName: nfs-client` (ReadWriteMany).
-Built packages written to `/output/packages/` inside the pod appear in the NFS export directory on your machine automatically — no kubectl cp needed.
+Built packages written to `/output/packages/` inside the pod appear in `/srv/apger-packages/` on the NFS host automatically.
 
-### On the NFS server machine (WSL2 / Linux host)
+### Common setup (all distros)
 
 ```sh
-# Install NFS server
-sudo apt install nfs-kernel-server   # Debian/Ubuntu/WSL2
-# or: sudo dnf install nfs-utils     # Fedora/NixOS
-
-# Create export directory
 sudo mkdir -p /srv/apger-packages
 sudo chmod 777 /srv/apger-packages
-
-# Add export (replace 192.168.0.0/24 with your network)
-echo '/srv/apger-packages 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)' \
-  | sudo tee -a /etc/exports
+echo '/srv/apger-packages *(rw,sync,no_subtree_check,no_root_squash)' | sudo tee -a /etc/exports
 sudo exportfs -ra
+```
+
+### Install NFS server by distro
+
+**Debian / Ubuntu / WSL2 (apt)**
+```sh
+sudo apt install -y nfs-kernel-server
+sudo systemctl enable --now nfs-kernel-server
+```
+
+**Fedora / RHEL / CentOS / AlmaLinux / Rocky (dnf/yum)**
+```sh
+sudo dnf install -y nfs-utils
 sudo systemctl enable --now nfs-server
+```
+
+**Arch Linux / Manjaro (pacman)**
+```sh
+sudo pacman -S --noconfirm nfs-utils
+sudo systemctl enable --now nfs-server
+```
+
+**openSUSE / SLES (zypper)**
+```sh
+sudo zypper install -y nfs-kernel-server
+sudo systemctl enable --now nfsserver
+```
+
+**Alpine Linux (apk, OpenRC)**
+```sh
+sudo apk add nfs-utils
+sudo rc-update add nfs
+sudo rc-service nfs start
+```
+
+**Gentoo (emerge)**
+```sh
+sudo emerge --ask net-fs/nfs-utils
+sudo rc-update add nfs default
+sudo rc-service nfs start
+```
+
+**NixOS**
+```nix
+services.nfs.server = {
+  enable = true;
+  exports = ''
+    /srv/apger-packages *(rw,sync,no_subtree_check,no_root_squash)
+  '';
+};
 ```
 
 ### Install NFS provisioner in Kubernetes
 
 ```sh
-# Edit NFS_SERVER in k8s-manifest.yml to your WSL2 IP first, then:
+# Edit NFS_SERVER in k8s-manifest.yml to your host IP first, then:
 kubectl apply -f k8s-manifest.yml
 ```
 
 The provisioner, StorageClass, and RBAC are all included in `k8s-manifest.yml` — no Helm required.
-
-### NixOS worker node
-
-```nix
-services.nfs.server = {
-  enable = true;
-  exports = ''
-    /srv/apger-packages 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)
-  '';
-};
-```
 
 After setup, `kubectl apply -f k8s-manifest.yml` — packages appear in `/srv/apger-packages/` on the NFS host as they are built.
