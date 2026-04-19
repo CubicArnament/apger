@@ -217,22 +217,15 @@ spec:
             - |
               set -e
 
-              echo "=== Stage 1: libapg (C library) ==="
-              cd /src/apgbuild/libapg
+              echo "=== Building apger + apgbuild + libapg ==="
+              cd /src/src
               meson setup build --prefix=/usr --buildtype=release
               ninja -C build
               ninja -C build install
-              ldconfig
 
-              echo "=== Stage 2: apgbuild (Go CLI) ==="
-              cd /src/apgbuild
-              CGO_ENABLED=1 go build -tags bbolt -o /output/apgbuild ./cmd/apgbuild/
-              chmod +x /output/apgbuild
-
-              echo "=== Stage 3: apger ==="
-              cd /src
-              CGO_ENABLED=1 go build -tags bbolt -o /output/apger ./src/cmd/apger/
-              chmod +x /output/apger
+              cp /usr/bin/apger    /output/apger    2>/dev/null || cp /usr/local/bin/apger    /output/apger
+              cp /usr/bin/apgbuild /output/apgbuild 2>/dev/null || cp /usr/local/bin/apgbuild /output/apgbuild
+              chmod +x /output/apger /output/apgbuild
 
               echo "=== Build tools ready ==="
           resources:
