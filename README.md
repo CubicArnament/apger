@@ -8,7 +8,6 @@ Build system for NurOS packages in APGv2 format. Runs inside Kubernetes pods, bu
 ```
 apger/
 ├── examples/  # example recipe / metadata files
-│   ├── metadata.toml
 │   ├── recipe.toml
 │   └── repodata.toml
 ├── repodata/  # package recipes (.toml)
