@@ -226,17 +226,13 @@ spec:
 
               echo "=== Stage 2: apgbuild (Go CLI) ==="
               cd /src/apgbuild
-              meson setup build --prefix=/usr --buildtype=release
-              ninja -C build
-              ninja -C build install
-              cp /usr/bin/apgbuild /output/apgbuild
+              CGO_ENABLED=1 go build -tags bbolt -o /output/apgbuild ./cmd/apgbuild/
+              chmod +x /output/apgbuild
 
               echo "=== Stage 3: apger ==="
-              cd /src/src
-              meson setup build --prefix=/usr --buildtype=release
-              ninja -C build
-              ninja -C build install
-              cp /usr/bin/apger /output/apger
+              cd /src
+              CGO_ENABLED=1 go build -tags bbolt -o /output/apger ./src/cmd/apger/
+              chmod +x /output/apger
 
               echo "=== Build tools ready ==="
           resources:
@@ -350,7 +346,8 @@ spec:
           export PATH="/usr/local/bin:$PATH"
           echo "[apger-tui] Pod ready. Attach with: kubectl attach -it apger-tui -n apger"
           echo "[apger-tui] Waiting for build tools... (run 'apger --tui' once ready)"
-          exec /bin/bash --login
+          # Keep pod alive regardless of TTY state
+          exec /bin/bash --login || sleep infinity
       stdin: true
       tty: true
       env:
