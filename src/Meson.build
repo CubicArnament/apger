@@ -83,7 +83,7 @@ endif
 # ── go mod download ───────────────────────────────────────────────────────────
 # Fetch all dependencies before building so the build step is offline-safe.
 
-go_mod_dir = join_paths(meson.project_source_root(), '..')
+go_mod_dir = meson.project_source_root()
 
 go_mod_download = custom_target('go-mod-download',
   output: 'go-mod-download.stamp',
@@ -139,7 +139,7 @@ apger_exe = custom_target('apger',
     '-tags', db_backend,
     '-ldflags', go_ldflags_str,
     '-o', '@OUTPUT@',
-    join_paths(go_mod_dir, 'src', 'cmd', 'apger'),
+    join_paths(go_mod_dir, 'cmd', 'apger'),
   ],
 )
 
