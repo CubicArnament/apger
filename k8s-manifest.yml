@@ -120,7 +120,7 @@ spec:
               value: apger/nfs
             - name: NFS_SERVER
               # ← Change to your WSL2/Linux host IP (ip addr show eth0)
-              value: "172.17.0.1"
+              value: "192.168.0.104"
             - name: NFS_PATH
               value: /srv/apger-packages
           volumeMounts:
@@ -130,7 +130,7 @@ spec:
         - name: nfs-root
           nfs:
             # ← Same IP as NFS_SERVER above
-            server: "172.17.0.1"
+            server: "192.168.0.104"
             path: /srv/apger-packages
 
 ---
