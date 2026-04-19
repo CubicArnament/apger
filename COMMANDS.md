@@ -312,11 +312,10 @@ sudo rc-update add nfs
 sudo rc-service nfs start
 ```
 
-**Gentoo (emerge)**
+**Gentoo (emerge, only systemd version)**
 ```sh
 sudo emerge --ask net-fs/nfs-utils
-sudo rc-update add nfs default
-sudo rc-service nfs start
+sudo systemctl enable --now nfs-server
 ```
 
 **NixOS**
