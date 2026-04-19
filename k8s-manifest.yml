@@ -13,6 +13,9 @@
 # Detach: Ctrl+P, Ctrl+Q  |  Re-attach: kubectl attach -it apger -n apger
 
 ---
+# NFS StorageClass — provisioned by nfs-subdir-external-provisioner.
+# Install provisioner first (see COMMANDS.md § NFS setup).
+# NFS server exports the directory that appears on your host machine automatically.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -21,9 +24,9 @@ metadata:
   labels:
     app: apger
 spec:
-  storageClassName: standard
+  storageClassName: nfs-client
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 50Gi

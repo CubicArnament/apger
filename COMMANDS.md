@@ -265,16 +265,53 @@ kubectl delete namespace apger
 ```
 
 
-## 9. Copy built packages to your machine (Local publish mode)
+## 9. NFS setup — packages appear on your machine automatically
 
-When publish target is set to **Local** in TUI Settings, packages accumulate in the pod at `/output/packages/`.
-Copy them to your machine manually:
+The PVC uses `storageClassName: nfs-client` (ReadWriteMany).
+Built packages written to `/output/packages/` inside the pod appear in the NFS export directory on your machine automatically — no kubectl cp needed.
+
+### On the NFS server machine (WSL2 / Linux host)
 
 ```sh
-# Copy all packages from pod to local directory
-kubectl exec apger -n apger -- find /output/packages -name "*.apg" | \
-  xargs -I{} kubectl cp apger/apger:{} ./packages/
+# Install NFS server
+sudo apt install nfs-kernel-server   # Debian/Ubuntu/WSL2
+# or: sudo dnf install nfs-utils     # Fedora/NixOS
 
-# Or copy a specific package
-kubectl cp apger/apger:/output/packages/curl-8.7.1-x86_64.apg ./packages/
+# Create export directory
+sudo mkdir -p /srv/apger-packages
+sudo chmod 777 /srv/apger-packages
+
+# Add export (replace 192.168.0.0/24 with your network)
+echo '/srv/apger-packages 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)' \
+  | sudo tee -a /etc/exports
+sudo exportfs -ra
+sudo systemctl enable --now nfs-server
 ```
+
+### Install NFS provisioner in Kubernetes
+
+```sh
+helm repo add nfs-subdir-external-provisioner \
+  https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+
+helm install nfs-provisioner \
+  nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+  --set nfs.server=<NFS_SERVER_IP> \
+  --set nfs.path=/srv/apger-packages \
+  --set storageClass.name=nfs-client \
+  --set storageClass.defaultClass=false \
+  -n apger --create-namespace
+```
+
+### NixOS worker node
+
+```nix
+services.nfs.server = {
+  enable = true;
+  exports = ''
+    /srv/apger-packages 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)
+  '';
+};
+```
+
+After setup, `kubectl apply -f k8s-manifest.yml` — packages appear in `/srv/apger-packages/` on the NFS host as they are built.
