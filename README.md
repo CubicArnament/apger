@@ -21,8 +21,10 @@ apger/
 │   │   ├── split.go  # SplitAnalyzer: libs/bins/dev file grouping
 │   │   └── templates.go  # build system templates (meson/cmake/autotools/…)
 │   ├── cmd/
-│   │   └── apger/
-│   │       └── main.go  # binary entry point
+│   │   ├── apger/
+│   │   │   └── main.go  # binary entry point
+│   │   └── apger-pull/
+│   │       └── main.go
 │   ├── core/
 │   │   ├── config.go  # Config struct, LoadConfig, FindConfig
 │   │   ├── main.go  # Run(), CLI flags, apger.conf wiring
