@@ -319,20 +319,25 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 			}
 		}
 		if target&config.PublishLocal != 0 {
-			// local_path is a subdirectory inside the NFS-mounted PVC.
-			// On the host it appears as /srv/apger-packages/<local_path>/
 			localSub := o.apgerCfg.Save.Options.LocalPath
 			if localSub == "" {
 				localSub = "packages"
 			}
 			destDir := filepath.Join(o.outputDir, localSub)
+			switch o.apgerCfg.Save.Options.SortMode {
+			case config.SortByType:
+				destDir = filepath.Join(destDir, pkgRepoType(pkgName))
+			case config.SortByArch:
+				destDir = filepath.Join(destDir, pkgArchFromPaths(assetPaths))
+			case config.SortByBoth:
+				destDir = filepath.Join(destDir, pkgArchFromPaths(assetPaths), pkgRepoType(pkgName))
+			}
 			if err := os.MkdirAll(destDir, 0755); err != nil {
 				o.log.Printf("[postBuild] mkdir local dest: %v", err)
 			} else {
 				for _, ap := range assetPaths {
 					dest := filepath.Join(destDir, filepath.Base(ap))
 					if err := os.Rename(ap, dest); err != nil {
-						// Rename may fail across filesystems — fall back to copy
 						if err2 := copyFile(ap, dest); err2 != nil {
 							o.log.Printf("[postBuild] copy to local %s: %v", filepath.Base(ap), err2)
 						}
@@ -763,4 +768,31 @@ func copyFile(src, dst string) error {
 	defer out.Close()
 	_, err = io.Copy(out, in)
 	return err
+}
+
+
+// pkgRepoType returns the repo type (core/main/extra) for a package name
+// by looking it up in the repodata directory. Falls back to "extra".
+func pkgRepoType(pkgName string) string {
+	for _, repo := range []string{"core", "main", "extra"} {
+		pattern := "repodata/" + repo + "/" + pkgName + "*.toml"
+		if matches, _ := filepath.Glob(pattern); len(matches) > 0 {
+			return repo
+		}
+	}
+	return "extra"
+}
+
+// pkgArchFromPaths extracts architecture from the first .apg filename.
+// e.g. curl-8.7.1-x86_64.apg → x86_64
+func pkgArchFromPaths(paths []string) string {
+	for _, p := range paths {
+		base := filepath.Base(p)
+		// name-version-arch.apg
+		parts := strings.Split(strings.TrimSuffix(base, ".apg"), "-")
+		if len(parts) >= 3 {
+			return parts[len(parts)-1]
+		}
+	}
+	return "noarch"
 }

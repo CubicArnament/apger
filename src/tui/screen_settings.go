@@ -45,8 +45,22 @@ type SettingsScreen struct {
 	// path input state (shown when Local is selected)
 	pathInput  string
 	pathFocus  bool
-	suggestion string // fish-style ghost completion
-	LocalPath  string // confirmed local output path
+	suggestion string
+	LocalPath  string
+	// sort mode radio (shown when Local is selected)
+	sortCursor int
+	SortMode   core.PackageSortMode
+}
+
+var sortModes = []struct {
+	mode    core.PackageSortMode
+	label   string
+	example string
+}{
+	{core.SortNone,   "No sorting",              "output-pkgs/pkg.apg"},
+	{core.SortByType, "Sort by type",             "output-pkgs/extra/pkg.apg"},
+	{core.SortByArch, "Sort by architecture",     "output-pkgs/x86_64/pkg.apg"},
+	{core.SortByBoth, "Sort by arch + type",      "output-pkgs/x86_64/extra/pkg.apg"},
 }
 
 type settingsItem struct {
@@ -78,7 +92,7 @@ func NewSettingsScreen(targets PublishTarget) *SettingsScreen {
 	if targets == 0 {
 		targets = PublishGitHubReleases
 	}
-	return &SettingsScreen{targets: targets}
+	return &SettingsScreen{targets: targets, SortMode: core.SortNone}
 }
 
 // Targets returns the currently selected publish targets.
@@ -129,14 +143,37 @@ func (s *SettingsScreen) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Normal navigation
 		switch key.String() {
 		case "up", "k":
-			if s.cursor > 0 {
+			if s.targets&PublishLocal != 0 && s.sortCursor > 0 {
+				s.sortCursor--
+			} else if s.cursor > 0 {
 				s.cursor--
 			}
 		case "down", "j":
-			if s.cursor < len(settingsItems)-1 {
+			if s.targets&PublishLocal != 0 && s.sortCursor < len(sortModes)-1 {
+				s.sortCursor++
+			} else if s.cursor < len(settingsItems)-1 {
 				s.cursor++
 			}
-		case " ", "enter":
+		case " ":
+			if s.targets&PublishLocal != 0 {
+				// Space on sort radio — select mode
+				s.SortMode = sortModes[s.sortCursor].mode
+			} else {
+				bit := settingsItems[s.cursor].bit
+				if s.targets&bit != 0 {
+					s.targets &^= bit
+				} else {
+					s.targets |= bit
+					if bit == PublishLocal {
+						s.targets = PublishLocal
+						s.pathFocus = true
+						s.suggestion = completePath(s.pathInput)
+					} else {
+						s.targets &^= PublishLocal
+					}
+				}
+			}
+		case "enter":
 			bit := settingsItems[s.cursor].bit
 			if s.targets&bit != 0 {
 				s.targets &^= bit
@@ -144,7 +181,6 @@ func (s *SettingsScreen) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				s.targets |= bit
 				if bit == PublishLocal {
 					s.targets = PublishLocal
-					// Focus path input
 					s.pathFocus = true
 					s.suggestion = completePath(s.pathInput)
 				} else {
@@ -179,12 +215,11 @@ func (s *SettingsScreen) View() string {
 			b.WriteString(styleNormal.Render(line) + "\n")
 		}
 
-		// Show path input below Local option when selected
+		// Show path input + sort radio below Local option when selected
 		if item.bit == PublishLocal && s.targets&PublishLocal != 0 {
 			b.WriteString("\n")
-			b.WriteString(stylePathLabel.Render("  Local path (on your machine): "))
+			b.WriteString(stylePathLabel.Render("  Output path: "))
 
-			// Render user text (white) + suggestion suffix (grey)
 			userText := stylePathInput.Render(s.pathInput)
 			ghost := ""
 			if s.suggestion != "" && strings.HasPrefix(s.suggestion, s.pathInput) && s.suggestion != s.pathInput {
@@ -200,6 +235,23 @@ func (s *SettingsScreen) View() string {
 				b.WriteString(styleDim.Render("  tab accept  enter confirm  esc cancel") + "\n")
 			} else if s.LocalPath != "" {
 				b.WriteString(styleOK.Render("  ✓ "+s.LocalPath) + "\n")
+			}
+
+			// Sort mode radio buttons
+			b.WriteString("\n")
+			b.WriteString(stylePathLabel.Render("  Package sorting:") + "\n")
+			for j, sm := range sortModes {
+				radio := "( )"
+				if s.SortMode == sm.mode {
+					radio = styleOK.Render("(●)")
+				}
+				line := fmt.Sprintf("  %s %s", radio, sm.label)
+				if j == s.sortCursor && !s.pathFocus {
+					b.WriteString(styleSelected.Render(line))
+				} else {
+					b.WriteString(styleNormal.Render(line))
+				}
+				b.WriteString(styleDim.Render("  → "+sm.example) + "\n")
 			}
 			b.WriteString("\n")
 		}

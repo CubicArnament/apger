@@ -282,17 +282,27 @@ type DatabaseConfig struct {
 	Name string `toml:"name"`
 }
 
+// PackageSortMode controls subdirectory structure for local package output.
+type PackageSortMode string
+
+const (
+	SortNone   PackageSortMode = "none"  // output-pkgs/pkg.apg
+	SortByType PackageSortMode = "type"  // output-pkgs/extra/pkg.apg
+	SortByArch PackageSortMode = "arch"  // output-pkgs/x86_64/pkg.apg
+	SortByBoth PackageSortMode = "both"  // output-pkgs/x86_64/extra/pkg.apg
+)
+
 // SaveOptions holds package save/publish options.
 type SaveOptions struct {
-	Remote        bool   `toml:"remote"`
-	Type          string `toml:"type"`
-	GithubOrgName string `toml:"github_org_name"`
-	Method        string `toml:"method"`
-	Repository    bool   `toml:"repository"`
-	// LocalPath is the path on the user's machine (outside the pod) where
-	// built packages are copied via kubectl cp after each Job completes.
-	// Only used when publish target is Local.
-	LocalPath     string `toml:"local_path"`
+	Remote        bool            `toml:"remote"`
+	Type          string          `toml:"type"`
+	GithubOrgName string          `toml:"github_org_name"`
+	Method        string          `toml:"method"`
+	Repository    bool            `toml:"repository"`
+	// LocalPath is a subdirectory inside the NFS-mounted PVC root.
+	LocalPath     string          `toml:"local_path"`
+	// SortMode controls subdirectory structure for local packages.
+	SortMode      PackageSortMode `toml:"sort_mode"`
 }
 
 // LoggingOptions holds logging/output settings.
