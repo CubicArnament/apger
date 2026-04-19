@@ -318,8 +318,21 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 			}
 		}
 		if target&config.PublishLocal != 0 {
-			if err := ghpublisher.CopyToLocal(assetPaths, o.outputDir); err != nil {
-				o.log.Printf("[postBuild] copy local %s: %v", pkgName, err)
+			localPath := o.apgerCfg.Save.Options.LocalPath
+			if localPath == "" {
+				o.log.Printf("[postBuild] local_path not set in apger.conf, skipping copy")
+			} else {
+				for _, ap := range assetPaths {
+					cmd := exec.Command("kubectl", "cp",
+						"apger/apger:"+ap,
+						localPath+"/"+filepath.Base(ap),
+					)
+					if out, err := cmd.CombinedOutput(); err != nil {
+						o.log.Printf("[postBuild] kubectl cp %s: %v: %s", filepath.Base(ap), err, out)
+					} else {
+						o.log.Printf("[postBuild] copied %s → %s", filepath.Base(ap), localPath)
+					}
+				}
 			}
 		}
 	}

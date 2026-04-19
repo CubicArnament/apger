@@ -69,7 +69,7 @@ var settingsItems = []settingsItem{
 	{
 		label:  "Local only (no publish)",
 		bit:    PublishLocal,
-		detail: "Keep packages in a local directory, skip all remote publishing",
+		detail: "Copy packages to a local path on your machine after build (via kubectl cp)",
 	},
 }
 
@@ -182,7 +182,7 @@ func (s *SettingsScreen) View() string {
 		// Show path input below Local option when selected
 		if item.bit == PublishLocal && s.targets&PublishLocal != 0 {
 			b.WriteString("\n")
-			b.WriteString(stylePathLabel.Render("  Output path: "))
+			b.WriteString(stylePathLabel.Render("  Local path (on your machine): "))
 
 			// Render user text (white) + suggestion suffix (grey)
 			userText := stylePathInput.Render(s.pathInput)

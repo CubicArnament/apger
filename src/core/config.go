@@ -289,6 +289,10 @@ type SaveOptions struct {
 	GithubOrgName string `toml:"github_org_name"`
 	Method        string `toml:"method"`
 	Repository    bool   `toml:"repository"`
+	// LocalPath is the path on the user's machine (outside the pod) where
+	// built packages are copied via kubectl cp after each Job completes.
+	// Only used when publish target is Local.
+	LocalPath     string `toml:"local_path"`
 }
 
 // LoggingOptions holds logging/output settings.
