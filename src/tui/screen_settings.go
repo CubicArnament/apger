@@ -11,9 +11,11 @@ package tui
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -42,15 +44,18 @@ type SettingsScreen struct {
 	cursor     int
 	targets    PublishTarget
 	saved      bool
-	// path input state (shown when Local is selected)
 	pathInput  string
 	pathFocus  bool
 	suggestion string
 	LocalPath  string
-	// sort mode radio (shown when Local is selected)
 	sortCursor int
 	SortMode   core.PackageSortMode
+	// NFS status
+	nfsServer string // from apger.conf or env
+	nfsUp     *bool  // nil=unknown, true=up, false=down
 }
+
+type nfsCheckMsg bool // true=up, false=down
 
 var sortModes = []struct {
 	mode    core.PackageSortMode
@@ -98,10 +103,45 @@ func NewSettingsScreen(targets PublishTarget) *SettingsScreen {
 // Targets returns the currently selected publish targets.
 func (s *SettingsScreen) Targets() PublishTarget { return s.targets }
 
-func (s *SettingsScreen) Init() tea.Cmd { return nil }
+func (s *SettingsScreen) Init() tea.Cmd {
+	return s.checkNFS()
+}
+
+func (s *SettingsScreen) checkNFS() tea.Cmd {
+	server := s.nfsServer
+	if server == "" {
+		server = os.Getenv("NFS_SERVER")
+	}
+	if server == "" {
+		return nil
+	}
+	return func() tea.Msg {
+		// Try TCP port 2049 (NFS)
+		conn, err := net.DialTimeout("tcp", server+":2049", 2*time.Second)
+		if err != nil {
+			return nfsCheckMsg(false)
+		}
+		conn.Close()
+		return nfsCheckMsg(true)
+	}
+}
 
 func (s *SettingsScreen) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if key, ok := msg.(tea.KeyMsg); ok {
+	switch msg := msg.(type) {
+	case nfsCheckMsg:
+		up := bool(msg)
+		s.nfsUp = &up
+		// Re-check every 10s
+		return s, tea.Tick(10*time.Second, func(t time.Time) tea.Msg {
+			return s.checkNFS()()
+		})
+	case tea.KeyMsg:
+		return s.handleKey(msg)
+	}
+	return s, nil
+}
+
+func (s *SettingsScreen) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		// Path input is focused — handle typing
 		if s.pathFocus {
 			switch key.String() {
@@ -218,6 +258,23 @@ func (s *SettingsScreen) View() string {
 		// Show path input + sort radio below Local option when selected
 		if item.bit == PublishLocal && s.targets&PublishLocal != 0 {
 			b.WriteString("\n")
+
+			// NFS status indicator
+			nfsLine := ""
+			server := s.nfsServer
+			if server == "" {
+				server = os.Getenv("NFS_SERVER")
+			}
+			if server == "" {
+				nfsLine = styleDim.Render("  NFS: server not configured (set NFS_SERVER env or apger.conf)")
+			} else if s.nfsUp == nil {
+				nfsLine = styleDim.Render("  NFS: checking " + server + "...")
+			} else if *s.nfsUp {
+				nfsLine = lipgloss.NewStyle().Foreground(lipgloss.Color("82")).Render("  ● Server UP  " + server)
+			} else {
+				nfsLine = lipgloss.NewStyle().Foreground(lipgloss.Color("196")).Render("  ● Server DOWN  " + server)
+			}
+			b.WriteString(nfsLine + "\n\n")
 			b.WriteString(stylePathLabel.Render("  Output path: "))
 
 			userText := stylePathInput.Render(s.pathInput)

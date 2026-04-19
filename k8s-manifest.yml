@@ -119,19 +119,21 @@ spec:
             - name: PROVISIONER_NAME
               value: apger/nfs
             - name: NFS_SERVER
-              # ← Change to your WSL2/Linux host IP (ip addr show eth0)
-              value: "192.168.0.104"
+              # Set by setup-nfs.sh automatically, or edit manually.
+              # Keep this value out of version control — use a local override:
+              #   kubectl set env deployment/nfs-provisioner NFS_SERVER=<your-ip> -n apger
+              value: "NFS_SERVER_IP"  # NFS_SERVER
             - name: NFS_PATH
-              value: /srv/apger-packages
+              value: /srv/pvc-nfs
           volumeMounts:
             - name: nfs-root
               mountPath: /persistentvolumes
       volumes:
         - name: nfs-root
           nfs:
-            # ← Same IP as NFS_SERVER above
-            server: "192.168.0.104"
-            path: /srv/apger-packages
+            # ← Same as NFS_SERVER above (set by setup-nfs.sh)
+            server: "NFS_SERVER_IP"
+            path: /srv/pvc-nfs
 
 ---
 apiVersion: storage.k8s.io/v1
@@ -148,8 +150,7 @@ volumeBindingMode: Immediate
 
 ---
 # NFS StorageClass — provisioned by nfs-subdir-external-provisioner.
-# Install provisioner first (see COMMANDS.md § NFS setup).
-# NFS server exports the directory that appears on your host machine automatically.
+# Run setup-nfs.sh first — it sets NFS_SERVER_IP automatically.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
