@@ -265,23 +265,17 @@ kubectl delete namespace apger
 ```
 
 
-## 9. Copy built packages to your machine (Local publish mode)
+## 9. Deploy and auto-collect packages (Local publish mode)
 
-When publish target is set to **Local** in TUI Settings, apger writes `.ready` markers
-inside the pod. Run `apger-pull` **on your host** to copy packages via `kubectl cp`:
+When publish target is set to **Local** in TUI Settings, use `apger --cmd deploy` **on your host**.
+It applies the manifest and automatically watches for finished packages, copying them via `kubectl cp`:
 
 ```sh
-# One-shot: copy all ready packages
-apger-pull --dest ~/packages
+# Set local_path in apger.conf [save.options] first, then:
+apger --cmd deploy
 
-# Watch mode: keep polling every 5s and copy as packages finish
-apger-pull --dest ~/packages --watch
-
-# Custom namespace/pod
-apger-pull --dest ~/packages --namespace apger --pod apger --pod-dir /output/packages --watch
+# Or with explicit paths:
+apger --cmd deploy --manifest k8s-manifest.yml --config apger.conf
 ```
 
-Build `apger-pull` on your host:
-```sh
-cd src && go build -o apger-pull ./cmd/apger-pull/
-```
+The watcher polls every 5s. When a package finishes building, it is automatically copied to `local_path`. Press Ctrl+C to stop watching.

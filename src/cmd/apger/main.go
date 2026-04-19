@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/NurOS-Linux/apger/src/builder"
 	"github.com/NurOS-Linux/apger/src/core"
@@ -33,6 +36,7 @@ func main() {
 	flag.StringVar(&cfg.PVCName, "pvc", "", "PVC name (default: from apger.conf)")
 	flag.StringVar(&imageOverride, "image", "", "Builder container image (overrides apger.conf base_image)")
 	flag.StringVar(&cfg.ConfigPath, "config", "", "Path to apger.conf")
+	flag.StringVar(&cfg.Manifest, "manifest", "k8s-manifest.yml", "Path to k8s-manifest.yml (for deploy command)")
 	flag.Parse()
 
 	apgerCfg := core.FindConfig(cfg.ConfigPath)
@@ -74,6 +78,8 @@ func main() {
 	var err error
 	if cfg.UseTUI && cfg.Command == "" {
 		err = runTUI(ctx, cfg, apgerCfg)
+	} else if cfg.Command == "deploy" {
+		err = runDeploy(ctx, cfg, apgerCfg)
 	} else {
 		err = runCLI(ctx, cfg, apgerCfg)
 	}
@@ -136,5 +142,91 @@ func runCLI(ctx context.Context, cfg core.CLIConfig, apgerCfg core.Config) error
 		return nil
 	default:
 		return fmt.Errorf("unknown command: %s", cfg.Command)
+	}
+}
+
+
+// runDeploy applies the k8s manifest and starts an automatic package watcher.
+// Run this on the HOST (not inside the pod).
+// Usage: apger --cmd deploy [--manifest k8s-manifest.yml] [--dest /local/path]
+func runDeploy(ctx context.Context, cfg core.CLIConfig, apgerCfg core.Config) error {
+	manifest := cfg.Manifest
+	if manifest == "" {
+		manifest = "k8s-manifest.yml"
+	}
+	dest := apgerCfg.Save.Options.LocalPath
+
+	// 1. kubectl apply
+	log.Printf("[deploy] applying %s ...", manifest)
+	applyCmd := exec.Command("kubectl", "apply", "-f", manifest)
+	applyCmd.Stdout = os.Stdout
+	applyCmd.Stderr = os.Stderr
+	if err := applyCmd.Run(); err != nil {
+		return fmt.Errorf("kubectl apply: %w", err)
+	}
+	log.Println("[deploy] manifest applied")
+
+	// 2. If local publish is not configured, nothing to watch
+	if dest == "" || apgerCfg.Save.Options.Type != "local" {
+		log.Println("[deploy] local_path not set — skipping package watcher")
+		return nil
+	}
+
+	if err := os.MkdirAll(dest, 0755); err != nil {
+		return fmt.Errorf("create dest dir: %w", err)
+	}
+
+	ns := apgerCfg.Kubernetes.Options.Namespace
+	pod := "apger"
+	podDir := "/output/packages"
+	seen := map[string]bool{}
+
+	log.Printf("[deploy] watching for packages → %s (Ctrl+C to stop)", dest)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+		}
+
+		out, err := exec.CommandContext(ctx, "kubectl", "exec", pod, "-n", ns, "--",
+			"find", podDir, "-name", "*.ready", "-type", "f").Output()
+		if err == nil {
+			for _, marker := range strings.Fields(string(out)) {
+				if seen[marker] {
+					continue
+				}
+				apgInPod := strings.TrimSuffix(marker, ".ready")
+				base := filepath.Base(apgInPod)
+				localDest := filepath.Join(dest, base)
+
+				log.Printf("[deploy] pulling %s ...", base)
+				cp := exec.CommandContext(ctx, "kubectl", "cp",
+					fmt.Sprintf("%s/%s:%s", ns, pod, apgInPod), localDest)
+				cp.Stdout = os.Stdout
+				cp.Stderr = os.Stderr
+				if err := cp.Run(); err != nil {
+					log.Printf("[deploy] kubectl cp failed: %v", err)
+					continue
+				}
+				// optional .sig
+				exec.CommandContext(ctx, "kubectl", "cp",
+					fmt.Sprintf("%s/%s:%s.sig", ns, pod, apgInPod), localDest+".sig",
+				).Run() //nolint:errcheck
+				// remove marker
+				exec.CommandContext(ctx, "kubectl", "exec", pod, "-n", ns, "--",
+					"rm", "-f", marker).Run() //nolint:errcheck
+
+				seen[marker] = true
+				log.Printf("[deploy] ✓ %s → %s", base, dest)
+			}
+		}
+
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-time.After(5 * time.Second):
+		}
 	}
 }

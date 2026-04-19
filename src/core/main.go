@@ -14,4 +14,5 @@ type CLIConfig struct {
 	Command     string
 	PackageName string
 	ConfigPath  string
+	Manifest    string // path to k8s-manifest.yml (for deploy command)
 }
