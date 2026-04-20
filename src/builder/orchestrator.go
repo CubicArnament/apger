@@ -286,7 +286,7 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		defer o.postBuildWg.Done()
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 		defer cancel()
-		o.postBuild(ctx, packageName, ver, splits, logBuf.String(), buildStart, buildDuration)
+		o.postBuild(ctx, packageName, ver, splits, logBuf.String(), buildStart, buildDuration, recipe)
 	}()
 
 	o.log.Printf("Package %s %s built successfully (splits: %s, %s, %s-dev)",
@@ -296,7 +296,7 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 
 // postBuild signs, publishes, generates report, and exports build log after a successful build.
 // Runs in a goroutine — errors are logged but don't fail the build.
-func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, splits []struct{ name, file string }, buildLog string, buildStart time.Time, buildDuration time.Duration) {
+func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, splits []struct{ name, file string }, buildLog string, buildStart time.Time, buildDuration time.Duration, recipe metadata.Recipe) {
 	mgr, err := credmanager.NewFromEnv()
 	if err != nil {
 		o.log.Printf("[postBuild] credential manager: %v", err)
@@ -401,10 +401,17 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 		OutputFiles: outputFiles,
 	}
 	
-	if err := logger.ExportBuildLog(o.outputDir, logEntry); err != nil {
+	// Determine repo type from package name (simple heuristic)
+	repoType := "main"
+	if recipe.Package.Type == "library" {
+		repoType = "core"
+	}
+	// TODO: Add proper repo type detection from recipe metadata
+	
+	if err := logger.ExportBuildLog(o.outputDir, logEntry, recipe.Package.Architecture, repoType); err != nil {
 		o.log.Printf("[postBuild] export build log: %v", err)
 	} else {
-		o.log.Printf("[postBuild] build log exported to %s/build-logs/", o.outputDir)
+		o.log.Printf("[postBuild] build log exported to %s/build-logs/%s/%s/", o.outputDir, recipe.Package.Architecture, repoType)
 	}
 }
 

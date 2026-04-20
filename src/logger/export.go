@@ -21,10 +21,18 @@ type BuildLogEntry struct {
 	OutputFiles []string
 }
 
-// ExportBuildLog saves build log to output/build-logs/ directory.
-// Format: build-logs/<package>-<timestamp>.log
-func ExportBuildLog(outputDir string, entry BuildLogEntry) error {
-	logDir := filepath.Join(outputDir, "build-logs")
+// ExportBuildLog saves build log to output/build-logs/<arch>/<type>/ directory.
+// Format: build-logs/<arch>/<type>/<package>-<timestamp>.log
+func ExportBuildLog(outputDir string, entry BuildLogEntry, arch string, repoType string) error {
+	// Default values
+	if arch == "" {
+		arch = "x86_64"
+	}
+	if repoType == "" {
+		repoType = "main"
+	}
+	
+	logDir := filepath.Join(outputDir, "build-logs", arch, repoType)
 	if err := os.MkdirAll(logDir, 0755); err != nil {
 		return fmt.Errorf("create log dir: %w", err)
 	}
@@ -44,6 +52,8 @@ func ExportBuildLog(outputDir string, entry BuildLogEntry) error {
 	fmt.Fprintf(f, "=== APGer Build Log ===\n")
 	fmt.Fprintf(f, "Package:    %s\n", entry.PackageName)
 	fmt.Fprintf(f, "Version:    %s\n", entry.Version)
+	fmt.Fprintf(f, "Arch:       %s\n", arch)
+	fmt.Fprintf(f, "Repo:       %s\n", repoType)
 	fmt.Fprintf(f, "Timestamp:  %s\n", entry.Timestamp.Format(time.RFC3339))
 	fmt.Fprintf(f, "Duration:   %s\n", entry.Duration)
 	fmt.Fprintf(f, "Status:     %s\n", statusString(entry.Success))

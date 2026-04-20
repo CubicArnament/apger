@@ -1,7 +1,10 @@
 // Package credentials manages apger credentials.
 //
-// Storage: ~/.apger/credentials/apger.db (encrypted bbolt database)
+// Storage: /srv/apger-nfs/.credentials/apger.db (encrypted bbolt database on NFS)
 // Encryption: AES-256-GCM with key derived from machine ID + username
+//
+// Multi-node support: All nodes (master + workers) can access credentials via NFS
+// and sign packages. Credentials are encrypted and shared across the cluster.
 //
 // Authentication priority per user:
 //   1. GitHub App (AppID + PEM) → JWT → installation token
@@ -89,24 +92,20 @@ type Manager struct {
 	key  []byte // AES-256 key
 }
 
-// New creates a Manager using ~/.apger/credentials/apger.db.
+// New creates a Manager using /srv/apger-nfs/.credentials/apger.db (NFS shared storage).
 func New() (*Manager, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf("get home dir: %w", err)
-	}
 	key, err := deriveKey()
 	if err != nil {
 		return nil, fmt.Errorf("derive encryption key: %w", err)
 	}
 	return &Manager{
-		path: filepath.Join(home, ".apger", "credentials", "apger.db"),
+		path: "/srv/apger-nfs/.credentials/apger.db",
 		key:  key,
 	}, nil
 }
 
 // NewFromEnv creates a Manager that reads from APGER_CREDS_PATH env var,
-// falling back to the default path.
+// falling back to the default NFS path.
 func NewFromEnv() (*Manager, error) {
 	key, err := deriveKey()
 	if err != nil {
@@ -115,12 +114,8 @@ func NewFromEnv() (*Manager, error) {
 	if p := os.Getenv("APGER_CREDS_PATH"); p != "" {
 		return &Manager{path: p, key: key}, nil
 	}
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf("get home dir: %w", err)
-	}
 	return &Manager{
-		path: filepath.Join(home, ".apger", "credentials", "apger.db"),
+		path: "/srv/apger-nfs/.credentials/apger.db",
 		key:  key,
 	}, nil
 }
