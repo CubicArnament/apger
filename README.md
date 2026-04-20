@@ -63,8 +63,7 @@ apger/
 │   │   └── screen_settings.go  # settings screen
 │   ├── go.mod
 │   ├── go.sum
-│   ├── Meson.build  # build system
-│   └── meson_options.txt  # meson options
+│   └── Meson.build  # build system
 ├── .gitattributes
 ├── .gitignore
 ├── .gitmodules
