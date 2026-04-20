@@ -57,7 +57,7 @@ apply_configmap() {
         kubectl create configmap nfs-config --namespace=apger \
             --from-literal=nfs_server="$ip" --from-literal=nfs_path="$NFS_ROOT" \
             --dry-run=client -o yaml | kubectl apply -f -
-        echo -e "${GREEN}✓${NC} ConfigMap applied"
+        echo -e "${GREEN}✓${NC} ConfigMap applied"; _K8S_CM=1
     else
         echo -e "${YELLOW}!${NC} kubectl unreachable — run manually:"
         echo "    kubectl create configmap nfs-config --namespace=apger --from-env-file=.env.nfs"
@@ -69,10 +69,17 @@ show_status() {
     local k8s_status k8s_cm
     if k8s_reachable; then
         k8s_status="${GREEN}●${NC} Cluster reachable"
-        kubectl get configmap nfs-config --namespace=apger >/dev/null 2>&1 \
+        if [ -z "$_K8S_CM" ]; then
+            kubectl get configmap nfs-config --namespace=apger >/dev/null 2>&1 \
+                && _K8S_CM=1 || _K8S_CM=0
+        fi
+        [ "$_K8S_CM" = "1" ] \
             && k8s_cm="${GREEN}●${NC} ConfigMap active" \
             || k8s_cm="${GRAY}●${NC} ConfigMap not found"
     else
+        k8s_status="${GRAY}●${NC} Cluster unreachable"
+        k8s_cm="${GRAY}●${NC} Unknown"
+    fi
         k8s_status="${GRAY}●${NC} Cluster unreachable"
         k8s_cm="${GRAY}●${NC} Unknown"
     fi
@@ -162,7 +169,7 @@ delete_configmap() {
     rm -f .env.nfs
     if k8s_reachable; then
         kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
-        echo -e "${GREEN}✓${NC} ConfigMap deleted"
+        echo -e "${GREEN}✓${NC} ConfigMap deleted"; _K8S_CM=0
     else
         echo -e "${YELLOW}!${NC} Cluster unreachable — only .env.nfs removed"
     fi
