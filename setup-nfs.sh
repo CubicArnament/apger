@@ -137,7 +137,79 @@ EOF
     echo "Env:  .env.nfs"
 }
 
-start_nfs() {
+apply_configmap() {
+    local nfs_ip=$1
+    if command -v kubectl >/dev/null 2>&1; then
+        kubectl create configmap nfs-config \
+            --namespace=apger \
+            --from-literal=nfs_server="$nfs_ip" \
+            --from-literal=nfs_path="$NFS_ROOT" \
+            --dry-run=client -o yaml | kubectl apply -f -
+        echo -e "${GREEN}✓${NC} ConfigMap applied to Kubernetes"
+    else
+        echo -e "${YELLOW}!${NC} kubectl not found — ConfigMap not applied"
+        echo "    Run manually: kubectl create configmap nfs-config --namespace=apger --from-env-file=.env.nfs"
+    fi
+}
+
+regenerate_env() {
+    echo "Regenerating .env.nfs and ConfigMap..."
+    local nfs_ip=$(ip route get 1 | awk '{print $7; exit}')
+
+    # Remove old env file
+    rm -f .env.nfs
+
+    # Delete old ConfigMap if exists
+    if command -v kubectl >/dev/null 2>&1; then
+        kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
+    fi
+
+    cat > .env.nfs <<EOF
+NFS_SERVER=$nfs_ip
+NFS_PATH=$NFS_ROOT
+EOF
+
+    apply_configmap "$nfs_ip"
+    echo -e "${GREEN}✓${NC} Regenerated: IP=$nfs_ip, Path=$NFS_ROOT"
+}
+
+delete_nfs() {
+    local status=$(get_nfs_status)
+    if [ "$status" = "not_configured" ]; then
+        echo "NFS server is not configured."
+        return 0
+    fi
+
+    echo -e "${RED}WARNING: This will delete $NFS_ROOT and all its contents!${NC}"
+    echo "Packages, credentials and build logs will be permanently lost."
+    echo -n "Type 'yes' to confirm: "
+    read -r confirm
+    if [ "$confirm" != "yes" ]; then
+        echo "Cancelled."
+        return 0
+    fi
+
+    # Stop service first
+    if [ "$status" = "running" ]; then
+        systemctl stop "$NFS_SERVICE"
+        systemctl disable "$NFS_SERVICE"
+    fi
+
+    # Remove from exports
+    sed -i "\|$NFS_ROOT|d" "$NFS_EXPORTS"
+    exportfs -ra
+
+    # Remove data
+    rm -rf "$NFS_ROOT"
+    rm -f .env.nfs
+
+    # Delete ConfigMap
+    if command -v kubectl >/dev/null 2>&1; then
+        kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
+    fi
+
+    echo -e "${GREEN}✓${NC} NFS server deleted"
+}
     local status=$(get_nfs_status)
     
     if [ "$status" = "not_configured" ]; then
@@ -184,7 +256,9 @@ show_menu() {
     echo "1) Setup NFS server"
     echo "2) Start NFS server"
     echo "3) Stop NFS server"
-    echo "4) Exit"
+    echo "4) Re-generate .env.nfs and ConfigMap"
+    echo "5) Delete NFS server"
+    echo "6) Exit"
     echo ""
     echo -n "Select option: "
 }
@@ -216,6 +290,18 @@ main() {
                 read -p "Press Enter to continue..."
                 ;;
             4)
+                echo ""
+                regenerate_env
+                echo ""
+                read -p "Press Enter to continue..."
+                ;;
+            5)
+                echo ""
+                delete_nfs
+                echo ""
+                read -p "Press Enter to continue..."
+                ;;
+            6)
                 echo "Exiting..."
                 exit 0
                 ;;
