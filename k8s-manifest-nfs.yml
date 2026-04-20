@@ -310,7 +310,6 @@ spec:
             && dnf clean all
           echo "=== Stage 2: clone source ==="
           git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /repo
-          ls /repo/src
           echo "=== Stage 3: build ==="
           cd /repo/src
           meson setup build --prefix=/tools --buildtype=release
