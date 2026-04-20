@@ -55,7 +55,7 @@ show_status() {
 
     # Kubernetes status
     local k8s_status k8s_cm
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
         k8s_status="${GREEN}●${NC} Cluster reachable"
         if kubectl get configmap nfs-config --namespace=apger >/dev/null 2>&1; then
             k8s_cm="${GREEN}●${NC} ConfigMap active"
@@ -136,7 +136,7 @@ NFS_SERVER=$nfs_ip
 NFS_PATH=$NFS_ROOT
 EOF
     
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
         kubectl create configmap nfs-config \
             --namespace=apger \
             --from-literal=nfs_server="$nfs_ip" \
@@ -156,7 +156,7 @@ EOF
 
 apply_configmap() {
     local nfs_ip=$1
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
         kubectl create configmap nfs-config \
             --namespace=apger \
             --from-literal=nfs_server="$nfs_ip" \
@@ -177,7 +177,7 @@ regenerate_env() {
     rm -f .env.nfs
 
     # Delete old ConfigMap if exists
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
         kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
     fi
 
@@ -221,7 +221,7 @@ delete_nfs() {
     rm -f .env.nfs
 
     # Delete ConfigMap
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
         kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
     fi
 
@@ -269,7 +269,7 @@ stop_nfs() {
 
 delete_configmap() {
     rm -f .env.nfs
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
         kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
         echo -e "${GREEN}✓${NC} ConfigMap deleted"
     else
