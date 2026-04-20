@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "pipewire"
+type = "simple"
+exec = "/usr/bin/pipewire"
+restart = true
+
+[scripts]
+post_install = """
+servctl start pipewire
+"""
+pre_remove = """
+servctl stop pipewire
+"""

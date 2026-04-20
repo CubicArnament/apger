@@ -651,7 +651,13 @@ func (s *CredentialsScreen) save() tea.Cmd {
 		c.PGPPrivateKey = s.users[s.listIdx].PGPPrivateKey
 	}
 
+	ctx := s.ctx
+
 	return func() tea.Msg {
+		// Validate credentials before saving
+		if err := credentials.ValidateCredentials(ctx, c); err != nil {
+			return credErrMsg{err}
+		}
 		if err := s.mgr.SaveUser(c); err != nil {
 			return credErrMsg{err}
 		}

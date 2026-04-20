@@ -65,11 +65,26 @@ func validateOOMKill(limits OOMKillLimits) error {
 // parseCPUQuantity parses "10", "2.5", "500m" → float64 cores.
 func parseCPUQuantity(s string) (float64, error) {
 	s = strings.TrimSpace(s)
+	var v float64
+	var err error
+	
 	if strings.HasSuffix(s, "m") {
-		v, err := strconv.ParseFloat(s[:len(s)-1], 64)
-		return v / 1000, err
+		v, err = strconv.ParseFloat(s[:len(s)-1], 64)
+		if err != nil {
+			return 0, err
+		}
+		v = v / 1000
+	} else {
+		v, err = strconv.ParseFloat(s, 64)
+		if err != nil {
+			return 0, err
+		}
 	}
-	return strconv.ParseFloat(s, 64)
+	
+	if v <= 0 {
+		return 0, fmt.Errorf("CPU quantity must be positive, got %s", s)
+	}
+	return v, nil
 }
 
 // parseMemoryQuantity parses "16Gi", "8G", "512Mi", "1024M" → bytes.
@@ -129,7 +144,7 @@ func hostMemoryBytes() (uint64, error) {
 		if strings.HasPrefix(line, "MemTotal:") {
 			fields := strings.Fields(line)
 			if len(fields) < 2 {
-				break
+				return 0, fmt.Errorf("invalid MemTotal format in /proc/meminfo")
 			}
 			kb, err := strconv.ParseUint(fields[1], 10, 64)
 			if err != nil {
@@ -137,6 +152,9 @@ func hostMemoryBytes() (uint64, error) {
 			}
 			return kb * 1024, nil
 		}
+	}
+	if err := sc.Err(); err != nil {
+		return 0, err
 	}
 	return 0, fmt.Errorf("MemTotal not found in /proc/meminfo")
 }

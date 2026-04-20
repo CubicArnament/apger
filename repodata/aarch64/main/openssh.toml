@@ -1,16 +1,16 @@
 [package]
 name = "openssh"
-version = "9.7p1"
+version = "10.3p1"
 type = "binary"
 architecture = "aarch64"
-description = "OpenBSD Secure Shell"
+description = "OpenBSD Secure Shell client and utilities for encrypted remote access"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "BSD-2-Clause"
 homepage = "https://www.openssh.com"
 dependencies = ["openssl", "zlib", "pam"]
 
 [source]
-url = "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.7p1.tar.gz"
+url = "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.3p1.tar.gz"
 type_src = "tarball"
 
 [build]

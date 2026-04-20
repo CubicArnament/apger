@@ -1,23 +1,28 @@
 [package]
 name = "binutils"
-version = "2.42"
+version = "2.46.0"
 type = "binary"
 architecture = "aarch64"
-description = "GNU binary utilities"
+description = "GNU Binutils — collection of binary tools including assembler (as), linker (ld), and object file utilities"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "GPL-3.0"
+license = "GPL-3.0-or-later"
 homepage = "https://www.gnu.org/software/binutils/"
 dependencies = []
 bootstrap = true
 
 [source]
-url = "https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.xz"
+url = "https://ftp.gnu.org/gnu/binutils/binutils-2.46.0.tar.xz"
 type_src = "tarball"
 
 [build]
 template = "autotools"
-dependencies = []
+dependencies = ["make", "gcc", "glibc"]
 use = []
 
 [install]
 script = ""
+
+[scripts]
+post_install = """
+ldconfig
+"""

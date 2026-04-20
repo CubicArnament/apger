@@ -1,6 +1,6 @@
 [package]
 name = "gtk3"
-version = "3.24.42"
+version = "3.24.52"
 type = "binary"
 architecture = "aarch64"
 description = "GTK+ 3 graphical user interface toolkit"
@@ -10,7 +10,7 @@ homepage = "https://gtk.org"
 dependencies = ["glib2", "pango", "cairo", "gdk-pixbuf2", "atk", "harfbuzz"]
 
 [source]
-url = "https://download.gnome.org/sources/gtk/3.24/gtk-3.24.42.tar.xz"
+url = "https://download.gnome.org/sources/gtk/3.24/gtk-3.24.52.tar.xz"
 type_src = "tarball"
 
 [build]
@@ -19,4 +19,4 @@ dependencies = ["glib2-devel", "pango-devel", "cairo-devel", "gdk-pixbuf2-devel"
 use = []
 
 [install]
-script = ""
+script = "ldconfig"

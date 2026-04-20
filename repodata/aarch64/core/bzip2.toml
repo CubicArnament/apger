@@ -3,11 +3,12 @@ name = "bzip2"
 version = "1.0.8"
 type = "library"
 architecture = "aarch64"
-description = "High-quality block-sorting file compressor"
+description = "bzip2 — high-quality block-sorting file compressor using the Burrows-Wheeler algorithm; provides libbz2 shared library"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "BSD-2-Clause"
+license = "bzip2-1.0.6"
 homepage = "https://sourceware.org/bzip2/"
 dependencies = ["glibc"]
+bootstrap = false
 
 [source]
 url = "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
@@ -15,8 +16,13 @@ type_src = "tarball"
 
 [build]
 template = "makefile"
-dependencies = []
+dependencies = ["make", "gcc"]
 use = []
 
 [install]
 script = ""
+
+[scripts]
+post_install = """
+ldconfig
+"""

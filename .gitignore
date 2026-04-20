@@ -21,3 +21,12 @@ Thumbs.db
 # Package manager
 node_modules/
 vendor/
+
+# Kubernetes secrets & env
+*secret*.yml
+*secret*.yaml
+*configmap*.yml
+*configmap*.yaml
+*.env
+.env.*
+apger.json

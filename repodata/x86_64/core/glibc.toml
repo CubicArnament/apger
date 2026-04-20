@@ -1,17 +1,17 @@
 [package]
 name = "glibc"
-version = "2.39"
+version = "2.43"
 type = "library"
 architecture = "x86_64"
-description = "GNU C Library — the standard C library for Linux systems"
+description = "GNU C Library — the standard C library for Linux; provides POSIX, ISO C, and UNIX98 APIs including libc, libm, libpthread, libdl, and the dynamic linker"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "LGPL-2.1"
+license = "LGPL-2.1-or-later"
 homepage = "https://www.gnu.org/software/libc/"
 dependencies = []
 bootstrap = true
 
 [source]
-url = "https://ftp.gnu.org/gnu/glibc/glibc-2.39.tar.xz"
+url = "https://ftp.gnu.org/gnu/glibc/glibc-2.43.tar.xz"
 type_src = "tarball"
 
 [build]
@@ -21,3 +21,8 @@ use = []
 
 [install]
 script = ""
+
+[scripts]
+post_install = """
+ldconfig
+"""

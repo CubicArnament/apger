@@ -1,17 +1,17 @@
 [package]
 name = "bash"
-version = "5.2.21"
+version = "5.3"
 type = "binary"
 architecture = "x86_64"
-description = "GNU Bourne Again Shell — the standard shell for NurOS"
+description = "GNU Bourne Again Shell — the standard interactive and scripting shell for GNU/Linux systems"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "GPL-3.0"
+license = "GPL-3.0-or-later"
 homepage = "https://www.gnu.org/software/bash/"
 dependencies = ["glibc", "readline", "ncurses"]
 bootstrap = false
 
 [source]
-url = "https://ftp.gnu.org/gnu/bash/bash-5.2.21.tar.gz"
+url = "https://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz"
 type_src = "tarball"
 
 [build]
@@ -21,3 +21,17 @@ use = []
 
 [install]
 script = ""
+
+[scripts]
+post_install = '''
+# Register bash as a valid login shell
+if ! grep -qx '/usr/bin/bash' /etc/shells 2>/dev/null; then
+    echo '/usr/bin/bash' >> /etc/shells
+fi
+'''
+post_remove = '''
+# Remove bash from /etc/shells if no longer present
+if [ ! -x /usr/bin/bash ]; then
+    sed -i '\|^/usr/bin/bash$|d' /etc/shells
+fi
+'''

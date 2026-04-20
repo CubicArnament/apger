@@ -3,8 +3,8 @@ module github.com/NurOS-Linux/apger/src
 go 1.26.1
 
 require (
-	github.com/BurntSushi/toml v1.4.0
 	github.com/CiscoSecurityServices/go-libarchive v0.0.0-20260129002355-2d6f5e55f9a6
+	github.com/GoKillers/libsodium-go v0.0.0-20171022220152-dd733721c3cb
 	github.com/ProtonMail/go-crypto v1.4.1
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
@@ -12,6 +12,7 @@ require (
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-github/v68 v68.0.0
+	github.com/pelletier/go-toml/v2 v2.2.3
 	go.etcd.io/bbolt v1.4.3
 	golang.org/x/oauth2 v0.30.0
 	k8s.io/api v0.35.4

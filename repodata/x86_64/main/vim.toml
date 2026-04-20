@@ -1,22 +1,21 @@
 [package]
 name = "vim"
-version = "9.1.0"
+version = "9.2.0368"
 type = "binary"
 architecture = "x86_64"
-description = "Vi IMproved text editor"
+description = "Highly configurable text editor built to enable efficient text editing"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "Vim"
 homepage = "https://www.vim.org"
-dependencies = ["ncurses", "python3", "lua", "ruby"]
-bootstrap = false
+dependencies = ["ncurses", "python3"]
 
 [source]
-url = "https://github.com/vim/vim/archive/refs/tags/v9.1.0.tar.gz"
+url = "https://github.com/vim/vim/archive/refs/tags/v9.2.0368.tar.gz"
 type_src = "tarball"
 
 [build]
 template = "autotools"
-dependencies = ["ncurses-devel", "python3-devel", "lua-devel", "ruby-devel"]
+dependencies = ["ncurses-devel", "python3-devel"]
 use = []
 
 [install]

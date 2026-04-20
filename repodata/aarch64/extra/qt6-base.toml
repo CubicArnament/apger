@@ -1,6 +1,6 @@
 [package]
 name = "qt6-base"
-version = "6.7.1"
+version = "6.9.3"
 type = "binary"
 architecture = "aarch64"
 description = "Qt6 base libraries and tools"
@@ -10,7 +10,7 @@ homepage = "https://qt.io"
 dependencies = ["libpng", "libjpeg-turbo", "freetype2", "fontconfig", "harfbuzz", "openssl", "vulkan-loader"]
 
 [source]
-url = "https://download.qt.io/official_releases/qt/6.7/6.7.1/submodules/qtbase-everywhere-src-6.7.1.tar.xz"
+url = "https://download.qt.io/official_releases/qt/6.9/6.9.3/submodules/qtbase-everywhere-src-6.9.3.tar.xz"
 type_src = "tarball"
 
 [build]
@@ -19,4 +19,4 @@ dependencies = ["libpng-devel", "libjpeg-turbo-devel", "freetype2-devel", "fontc
 use = []
 
 [install]
-script = ""
+script = "ldconfig"

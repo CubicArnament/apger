@@ -112,7 +112,20 @@ func NewOrchestrator(cfg OrchestratorConfig) (*Orchestrator, error) {
 
 // Close releases orchestrator resources.
 func (o *Orchestrator) Close() error {
-	o.postBuildWg.Wait()
+	// Wait for postBuild goroutines with timeout
+	done := make(chan struct{})
+	go func() {
+		o.postBuildWg.Wait()
+		close(done)
+	}()
+	
+	select {
+	case <-done:
+		// All goroutines finished
+	case <-time.After(15 * time.Minute):
+		o.log.Printf("Warning: postBuild goroutines did not finish within timeout")
+	}
+	
 	return o.db.Close()
 }
 
@@ -240,9 +253,17 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 	}
 
 	o.log.Printf("Waiting for job %s to complete...", cfg.JobName)
-	if err := o.k8sClient.WaitForJob(ctx, cfg.JobName, logger.New(os.Stdout, o.apgerCfg.Logging.Verbose), 2*time.Hour); err != nil {
+	
+	// Capture build logs
+	var logBuf strings.Builder
+	multiWriter := io.MultiWriter(os.Stdout, &logBuf)
+	buildLogger := logger.New(multiWriter, o.apgerCfg.Logging.Verbose)
+	
+	buildStart := time.Now()
+	if err := o.k8sClient.WaitForJob(ctx, cfg.JobName, buildLogger, 2*time.Hour); err != nil {
 		return fmt.Errorf("wait for job: %w", err)
 	}
+	buildDuration := time.Since(buildStart)
 
 	ver := recipe.Package.Version
 	libName := "lib" + packageName
@@ -259,11 +280,13 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 	}
 
 	// PGP sign + publish + report (best-effort — don't fail the build).
-	// Use a fresh context: the caller's ctx may be cancelled before postBuild finishes.
+	// Use a timeout context: allow postBuild to complete but with reasonable limit.
 	o.postBuildWg.Add(1)
 	go func() {
 		defer o.postBuildWg.Done()
-		o.postBuild(context.Background(), packageName, ver, splits)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+		defer cancel()
+		o.postBuild(ctx, packageName, ver, splits, logBuf.String(), buildStart, buildDuration)
 	}()
 
 	o.log.Printf("Package %s %s built successfully (splits: %s, %s, %s-dev)",
@@ -271,9 +294,9 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 	return nil
 }
 
-// postBuild signs, publishes, and generates a build report after a successful build.
+// postBuild signs, publishes, generates report, and exports build log after a successful build.
 // Runs in a goroutine — errors are logged but don't fail the build.
-func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, splits []struct{ name, file string }) {
+func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, splits []struct{ name, file string }, buildLog string, buildStart time.Time, buildDuration time.Duration) {
 	mgr, err := credmanager.NewFromEnv()
 	if err != nil {
 		o.log.Printf("[postBuild] credential manager: %v", err)
@@ -286,10 +309,19 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 	}
 
 	var assetPaths []string
+	var sha256Hash string
+	
 	for _, s := range splits {
 		apgPath := filepath.Join(o.outputDir, s.file)
 		if _, err := os.Stat(apgPath); err != nil {
 			continue
+		}
+
+		// Compute SHA256 for main package
+		if s.name == pkgName {
+			if hash, err := logger.ComputeSHA256(apgPath); err == nil {
+				sha256Hash = hash
+			}
 		}
 
 		// PGP sign
@@ -350,6 +382,29 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 	// Build report
 	if err := reporter.GenerateReport(o.db, ".logs"); err != nil {
 		o.log.Printf("[postBuild] generate report: %v", err)
+	}
+	
+	// Export build log
+	var outputFiles []string
+	for _, ap := range assetPaths {
+		outputFiles = append(outputFiles, filepath.Base(ap))
+	}
+	
+	logEntry := logger.BuildLogEntry{
+		PackageName: pkgName,
+		Version:     ver,
+		Timestamp:   buildStart,
+		Duration:    buildDuration,
+		Success:     true,
+		Log:         buildLog,
+		SHA256:      sha256Hash,
+		OutputFiles: outputFiles,
+	}
+	
+	if err := logger.ExportBuildLog(o.outputDir, logEntry); err != nil {
+		o.log.Printf("[postBuild] export build log: %v", err)
+	} else {
+		o.log.Printf("[postBuild] build log exported to %s/build-logs/", o.outputDir)
 	}
 }
 
@@ -586,6 +641,9 @@ fi
 	if comp.Type == "" {
 		compFlags = "--compression zstd --level 19"
 	}
+	
+	// Generate script commands
+	scriptCmds := generateScriptCommands(recipe)
 
 	return fmt.Sprintf(`set -e
 echo "=== Building %s %s (template: %s) ==="
@@ -605,7 +663,7 @@ export COMP_FLAGS="%s"
 %s
 %s
 # === Split: lib%s (shared libraries + hwcaps) ===
-mkdir -p /build/split-libs/usr/lib
+mkdir -p /build/split-libs/usr/lib /build/split-libs/scripts
 # Copy all .so files and symlinks recursively (lib + lib64)
 find $DESTDIR/usr/lib $DESTDIR/usr/lib64 \
   \( -name "*.so" -o -name "*.so.*" \) 2>/dev/null \
@@ -619,25 +677,98 @@ find $DESTDIR/usr/lib $DESTDIR/usr/lib64 \
 if [ -d "$DESTDIR/usr/lib/glibc-hwcaps" ]; then
   cp -rP $DESTDIR/usr/lib/glibc-hwcaps /build/split-libs/usr/lib/
 fi
+cd /build/split-libs && %s
 apgbuild meta --split libs --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   --detect-deps /build/split-libs -o /build/split-libs/metadata.json
 apgbuild build /build/split-libs $COMP_FLAGS -o /output/%s-%s.apg
 
 # === Split: %s (binaries) ===
-mkdir -p /build/split-bin/usr
+mkdir -p /build/split-bin/usr /build/split-bin/scripts
 cp -r $DESTDIR/usr/bin /build/split-bin/usr/ 2>/dev/null || true
 cp -r $DESTDIR/usr/sbin /build/split-bin/usr/ 2>/dev/null || true
+cd /build/split-bin && %s
 apgbuild meta --split bins --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   --detect-deps /build/split-bin -o /build/split-bin/metadata.json
 apgbuild build /build/split-bin $COMP_FLAGS -o /output/%s-%s.apg
 
 # === Split: %s-dev (headers + pkgconfig) ===
-mkdir -p /build/split-dev/usr/lib
+mkdir -p /build/split-dev/usr/lib /build/split-dev/scripts
 cp -r $DESTDIR/usr/include /build/split-dev/usr/ 2>/dev/null || true
 cp -r $DESTDIR/usr/lib/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
 cp -r $DESTDIR/usr/lib64/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
+cd /build/split-dev && %s
+apgbuild meta --split dev --base-name %s --version %s --arch %s \
+  --description "%s" --maintainer "%s" --license "%s" \
+  -o /build/split-dev/metadata.json
+apgbuild build /build/split-dev $COMP_FLAGS -o /output/%s-dev-%s.apg
+
+echo "=== Done: %s %s ==="
+`,
+		pkgName, ver, recipe.Build.Template,
+		downloadStep,
+		flags.ResolvedCC(), flags.ResolvedCXX(),
+		flags.CFlags(),
+		flags.LDFlags(),
+		compFlags,
+		recipe.Build.Template,
+		buildCmd,
+		hwcaps,
+		pkgName,
+		scriptCmds,
+		pkgName, ver, arch,
+		recipe.Package.Description, recipe.Package.Maintainer, recipe.Package.License,
+		libName, ver,
+		pkgName,
+		scriptCmds,
+		pkgName, ver, arch,
+		recipe.Package.Description, recipe.Package.Maintainer, recipe.Package.License,
+		pkgName, ver,
+		pkgName,
+		scriptCmds,
+		pkgName, ver, arch,
+		recipe.Package.Description, recipe.Package.Maintainer, recipe.Package.License,
+		pkgName, ver,
+		pkgName, ver,
+	)
+}
+mkdir -p /build/split-libs/usr/lib /build/split-libs/scripts
+# Copy all .so files and symlinks recursively (lib + lib64)
+find $DESTDIR/usr/lib $DESTDIR/usr/lib64 \
+  \( -name "*.so" -o -name "*.so.*" \) 2>/dev/null \
+  | while read f; do
+    rel="${f#$DESTDIR/usr/}"
+    dir="/build/split-libs/usr/$(dirname $rel)"
+    mkdir -p "$dir"
+    cp -P "$f" "$dir/" 2>/dev/null || true
+  done
+# Copy glibc-hwcaps directory (contains per-level .so variants)
+if [ -d "$DESTDIR/usr/lib/glibc-hwcaps" ]; then
+  cp -rP $DESTDIR/usr/lib/glibc-hwcaps /build/split-libs/usr/lib/
+fi
+%s
+apgbuild meta --split libs --base-name %s --version %s --arch %s \
+  --description "%s" --maintainer "%s" --license "%s" \
+  --detect-deps /build/split-libs -o /build/split-libs/metadata.json
+apgbuild build /build/split-libs $COMP_FLAGS -o /output/%s-%s.apg
+
+# === Split: %s (binaries) ===
+mkdir -p /build/split-bin/usr /build/split-bin/scripts
+cp -r $DESTDIR/usr/bin /build/split-bin/usr/ 2>/dev/null || true
+cp -r $DESTDIR/usr/sbin /build/split-bin/usr/ 2>/dev/null || true
+%s
+apgbuild meta --split bins --base-name %s --version %s --arch %s \
+  --description "%s" --maintainer "%s" --license "%s" \
+  --detect-deps /build/split-bin -o /build/split-bin/metadata.json
+apgbuild build /build/split-bin $COMP_FLAGS -o /output/%s-%s.apg
+
+# === Split: %s-dev (headers + pkgconfig) ===
+mkdir -p /build/split-dev/usr/lib /build/split-dev/scripts
+cp -r $DESTDIR/usr/include /build/split-dev/usr/ 2>/dev/null || true
+cp -r $DESTDIR/usr/lib/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
+cp -r $DESTDIR/usr/lib64/pkgconfig /build/split-dev/usr/lib/ 2>/dev/null || true
+%s
 apgbuild meta --split dev --base-name %s --version %s --arch %s \
   --description "%s" --maintainer "%s" --license "%s" \
   -o /build/split-dev/metadata.json
@@ -668,6 +799,39 @@ echo "=== Done: %s %s ==="
 		pkgName, ver,
 		pkgName, ver,
 	)
+}
+
+// generateScriptCommands generates shell commands to create APGv2 scripts in scripts/ directory
+func generateScriptCommands(recipe metadata.Recipe) string {
+	scripts := metadata.GenerateScripts(recipe)
+	
+	var commands []string
+	for name, content := range scripts {
+		// Escape content for heredoc
+		escaped := strings.ReplaceAll(content, "'", "'\\''")
+		commands = append(commands, fmt.Sprintf(`cat > scripts/%s <<'SCRIPT_EOF'
+%s
+SCRIPT_EOF
+chmod +x scripts/%s`, name, escaped, name))
+	}
+	
+	// Generate neoinit service YAML if defined
+	if recipe.Service != nil {
+		serviceYAML := metadata.GenerateNeoinitService(recipe)
+		if serviceYAML != "" {
+			escaped := strings.ReplaceAll(serviceYAML, "'", "'\\''")
+			commands = append(commands, fmt.Sprintf(`mkdir -p etc/neoinit/services
+cat > etc/neoinit/services/%s.yaml <<'SERVICE_EOF'
+%s
+SERVICE_EOF`, recipe.Package.Name, escaped))
+		}
+	}
+	
+	if len(commands) == 0 {
+		return ""
+	}
+	
+	return strings.Join(commands, "\n")
 }
 
 // templateBuildCommands returns the build+install shell commands for a given recipe template.

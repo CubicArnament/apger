@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "cups"
+type = "simple"
+exec = "/usr/sbin/cupsd -f"
+restart = true
+
+[scripts]
+post_install = """
+servctl start cups
+"""
+pre_remove = """
+servctl stop cups
+"""

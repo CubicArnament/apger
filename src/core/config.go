@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/BurntSushi/toml"
+	"github.com/pelletier/go-toml/v2"
 )
 
 // defaultCC maps architecture family to default C compiler.
@@ -24,6 +24,16 @@ var defaultCXX = map[ArchFamily]string{
 	FamilyAArch64: "clang++",
 	FamilyRISCV64: "clang++",
 	FamilyOther:   "clang++",
+}
+
+// mustParseMArch parses a march string and panics on error.
+// Only used for hardcoded valid values in DefaultConfig.
+func mustParseMArch(s string) MArch {
+	m, err := ParseMArch(s)
+	if err != nil {
+		panic(fmt.Sprintf("mustParseMArch(%q): %v", s, err))
+	}
+	return m
 }
 
 // resolveCompiler returns the actual compiler binary for a given "cc" value and target arch.
@@ -365,10 +375,10 @@ type Config struct {
 func DefaultConfig() Config {
 	var cfg Config
 
-	march, _ := ParseMArch("x86_64-v2")
-	mtune, _ := ParseMArch("x86_64-v3")
-	v3, _ := ParseMArch("x86_64-v3")
-	v2, _ := ParseMArch("x86_64-v2")
+	march := mustParseMArch("x86_64-v2")
+	mtune := mustParseMArch("x86_64-v3")
+	v3 := mustParseMArch("x86_64-v3")
+	v2 := mustParseMArch("x86_64-v2")
 
 	cfg.Build.Packages.March = march
 	cfg.Build.Packages.Mtune = mtune
@@ -381,8 +391,8 @@ func DefaultConfig() Config {
 	cfg.Build.Packages.LevelsHwcaps = []MArch{v3, v2}
 
 	// Default cross profiles
-	aarch64March, _ := ParseMArch("armv8-a")  // -march=armv8-a for AArch64 targets
-	riscv64March, _ := ParseMArch("rv64gc")   // -march=rv64gc for RISC-V 64-bit
+	aarch64March := mustParseMArch("armv8-a")  // -march=armv8-a for AArch64 targets
+	riscv64March := mustParseMArch("rv64gc")   // -march=rv64gc for RISC-V 64-bit
 
 	cfg.Build.Cross = map[string]CrossProfile{
 		"aarch64": {
@@ -451,7 +461,7 @@ func LoadConfig(path string) (Config, error) {
 		}
 		return cfg, fmt.Errorf("read config: %w", err)
 	}
-	if _, err := toml.Decode(string(data), &cfg); err != nil {
+	if err := toml.Unmarshal(data, &cfg); err != nil {
 		return cfg, fmt.Errorf("parse config: %w", err)
 	}
 	return cfg, nil

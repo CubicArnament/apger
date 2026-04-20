@@ -92,6 +92,23 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 
 ---
+# NFS connection config — edit before applying.
+# Set by setup-nfs.sh automatically, or edit manually.
+# Format: "ip:port" — port 2049 is NFS default.
+# Worker nodes use the same server — Kubernetes passes this to kubelet automatically.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nfs-config
+  namespace: apger
+  labels:
+    app: apger
+data:
+  # NFS_SERVER in "ip:port" format. setup-nfs.sh sets this automatically.
+  nfs_server: "NFS_SERVER_IP:2049"
+  nfs_path: "/srv/pvc-nfs"
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -119,20 +136,22 @@ spec:
             - name: PROVISIONER_NAME
               value: apger/nfs
             - name: NFS_SERVER
-              # Set by setup-nfs.sh automatically, or edit manually.
-              # Keep this value out of version control — use a local override:
-              #   kubectl set env deployment/nfs-provisioner NFS_SERVER=<your-ip> -n apger
-              value: "NFS_SERVER_IP"  # NFS_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: nfs-config
+                  key: nfs_server
             - name: NFS_PATH
-              value: /srv/pvc-nfs
+              valueFrom:
+                configMapKeyRef:
+                  name: nfs-config
+                  key: nfs_path
           volumeMounts:
             - name: nfs-root
               mountPath: /persistentvolumes
       volumes:
         - name: nfs-root
           nfs:
-            # ← Same as NFS_SERVER above (set by setup-nfs.sh)
-            server: "NFS_SERVER_IP"
+            server: "NFS_SERVER_IP"   # set by setup-nfs.sh
             path: /srv/pvc-nfs
 
 ---
@@ -145,6 +164,15 @@ parameters:
   archiveOnDelete: "false"
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
 
 # ── apger resources ───────────────────────────────────────────────────────────
 
@@ -165,6 +193,60 @@ spec:
   resources:
     requests:
       storage: 50Gi
+
+---
+# Credentials storage — OPTIONAL hostPath PVC with auto-mount.
+# 
+# Behavior:
+# 1. Pod starts WITHOUT PVC mount (optional: true)
+# 2. User saves credentials in TUI → saved to /home/.apger/credentials/apger.db
+# 3. On next Pod restart, if hostPath exists → PVC auto-mounts
+# 4. Credentials persisted to host filesystem
+#
+# Setup:
+# 1. Edit hostPath below: replace YOUR_USERNAME with your actual username
+# 2. kubectl apply -f k8s-manifest.yml
+# 3. Attach to Pod, add credentials in TUI (press 'c')
+# 4. Restart Pod → PVC will mount automatically
+#
+# Worker nodes: build packages but don't sign (no credentials access)
+# Master node: signs packages (credentials available via PVC)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: apger-credentials-pv
+  namespace: apger
+  labels:
+    app: apger
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /home/YOUR_USERNAME/.apger/credentials
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apger-credentials
+  namespace: apger
+  labels:
+    app: apger
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: apger
 
 ---
 apiVersion: v1
@@ -214,6 +296,11 @@ data:
     verbose = false
 
 ---
+# DEPRECATED: Credentials now stored in encrypted bbolt database at ~/.apger/credentials/apger.db
+# This Secret is kept for backwards compatibility but not used by the Pod.
+# Use TUI credentials screen (press 'c') to manage maintainers.
+#
+# Legacy kubectl command (not recommended):
 # kubectl create secret generic apger-credentials \
 #   --from-literal=github_app_id=<APP_ID> \
 #   --from-file=github_pem=<path/to/app.private-key.pem> \
@@ -238,6 +325,43 @@ stringData:
 
 ---
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: apger
+  namespace: apger
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: apger-secret-manager
+  namespace: apger
+rules:
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get, create, update, patch]
+    resourceNames: [apger-credentials]
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [create]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: apger-secret-manager
+  namespace: apger
+subjects:
+  - kind: ServiceAccount
+    name: apger
+    namespace: apger
+roleRef:
+  kind: Role
+  name: apger-secret-manager
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: apger
@@ -247,9 +371,38 @@ metadata:
 spec:
   restartPolicy: Never
   terminationGracePeriodSeconds: 10
-  automountServiceAccountToken: false
+  serviceAccountName: apger
 
   initContainers:
+    # Stage 0: sync credentials from hostPath to Secret
+    - name: sync-credentials
+      image: bitnami/kubectl:latest
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+          CREDS_DB="/creds/apger.db"
+          
+          if [ -f "$CREDS_DB" ]; then
+            echo "=== Credentials found, syncing to Secret ==="
+            # Read encrypted database and encode to base64
+            DB_B64=$(base64 -w0 "$CREDS_DB")
+            
+            # Create/update Secret with encrypted database
+            kubectl create secret generic apger-credentials \
+              --from-literal=encrypted_db="$DB_B64" \
+              --namespace=apger \
+              --dry-run=client -o yaml | kubectl apply -f -
+            
+            echo "✓ Credentials synced to Secret"
+          else
+            echo "=== No credentials found, skipping sync ==="
+          fi
+      volumeMounts:
+        - name: credentials-storage
+          mountPath: /creds
+
     # Stage 1: install build dependencies
     - name: install-deps
       image: fedora:43
@@ -311,31 +464,6 @@ spec:
         - name: tools
           mountPath: /tools
 
-    # Stage 4: assemble credentials JSON into RAM volume
-    - name: assemble-credentials
-      image: fedora:43
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          APP_ID=$(cat /secrets/github_app_id 2>/dev/null || echo "0")
-          PEM=$(cat /secrets/github_pem 2>/dev/null \
-            | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
-          PGP=$(cat /secrets/pgp_private_key 2>/dev/null \
-            | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo '""')
-          NAME=$(cat /secrets/name  2>/dev/null || echo "apger")
-          EMAIL=$(cat /secrets/email 2>/dev/null || echo "apger@nuros.org")
-          cat > /creds/apger.json <<EOF
-          {"name":"$NAME","email":"$EMAIL","github_app_id":$APP_ID,"github_pem":$PEM,"pgp_private_key":$PGP}
-          EOF
-          chmod 600 /creds/apger.json
-      volumeMounts:
-        - name: credentials
-          mountPath: /secrets
-          readOnly: true
-        - name: creds-assembled
-          mountPath: /creds
-
   containers:
     - name: apger
       image: fedora:43
@@ -361,11 +489,16 @@ spec:
         - name: COLORTERM
           value: "truecolor"
         - name: APGER_CREDS_PATH
-          value: "/run/secrets/apger/apger.json"
+          value: "/home/.apger/credentials/apger.db"
         - name: APGER_CONFIG
           value: "/etc/apger/apger.conf"
         - name: CGO_ENABLED
           value: "1"
+        - name: NFS_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: nfs-config
+              key: nfs_server
       resources:
         requests: {cpu: "500m", memory: 512Mi}
         limits:   {cpu: "10",   memory: 16Gi}
@@ -377,13 +510,18 @@ spec:
         - name: conf
           mountPath: /etc/apger
           readOnly: true
-        - name: creds-assembled
-          mountPath: /run/secrets/apger
+        - name: credentials-storage
+          mountPath: /home/.apger/credentials
+          # Optional: if PVC not bound, falls back to local ~/.apger/credentials
 
   volumes:
     - name: builds
       persistentVolumeClaim:
         claimName: apger-builds
+    - name: credentials-storage
+      persistentVolumeClaim:
+        claimName: apger-credentials
+        optional: true  # Pod starts even if PVC not bound
     - name: source
       emptyDir: {}
     - name: tools
@@ -391,10 +529,3 @@ spec:
     - name: conf
       configMap:
         name: apger-conf
-    - name: credentials
-      secret:
-        secretName: apger-credentials
-        optional: true
-    - name: creds-assembled
-      emptyDir:
-        medium: Memory

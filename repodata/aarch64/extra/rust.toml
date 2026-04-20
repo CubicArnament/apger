@@ -1,6 +1,6 @@
 [package]
 name = "rust"
-version = "1.78.0"
+version = "1.87.0"
 type = "binary"
 architecture = "aarch64"
 description = "Systems programming language focused on safety and performance"
@@ -10,7 +10,7 @@ homepage = "https://rust-lang.org"
 dependencies = ["llvm", "openssl", "zlib"]
 
 [source]
-url = "https://static.rust-lang.org/dist/rustc-1.78.0-src.tar.gz"
+url = "https://static.rust-lang.org/dist/rustc-1.87.0-src.tar.gz"
 type_src = "tarball"
 
 [build]

@@ -1,16 +1,16 @@
 [package]
 name = "git"
-version = "2.45.0"
+version = "2.49.0"
 type = "binary"
 architecture = "aarch64"
-description = "Distributed version control system"
+description = "Fast, scalable, distributed revision control system"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-2.0"
 homepage = "https://git-scm.com"
 dependencies = ["openssl", "curl", "zlib", "pcre2"]
 
 [source]
-url = "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.45.0.tar.xz"
+url = "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.49.0.tar.xz"
 type_src = "tarball"
 
 [build]

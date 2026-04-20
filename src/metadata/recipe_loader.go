@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/BurntSushi/toml"
+	"github.com/pelletier/go-toml/v2"
 )
 
 // LoadRecipe loads a Recipe from a .toml file.
@@ -20,7 +20,7 @@ func LoadRecipe(path string) (Recipe, error) {
 		return Recipe{}, fmt.Errorf("read recipe %s: %w", path, err)
 	}
 	var r Recipe
-	if _, err := toml.Decode(string(data), &r); err != nil {
+	if err := toml.Unmarshal(data, &r); err != nil {
 		return Recipe{}, fmt.Errorf("parse toml recipe %s: %w", path, err)
 	}
 	return r, nil
@@ -47,8 +47,7 @@ func FindRecipes(dir string) (map[string][]string, error) {
 // DecodeRecipeTOML decodes a TOML string into a Recipe.
 // Used by the TUI editor to parse in-memory content without a file.
 func DecodeRecipeTOML(content string, r *Recipe) error {
-	_, err := toml.Decode(content, r)
-	return err
+	return toml.Unmarshal([]byte(content), r)
 }
 
 // RecipeTemplate returns a TOML template string for a new recipe.

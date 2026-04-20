@@ -21,3 +21,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "dhcpcd"
+type = "simple"
+exec = "/usr/sbin/dhcpcd -B"
+restart = true
+
+[scripts]
+post_install = """
+servctl start dhcpcd
+"""
+pre_remove = """
+servctl stop dhcpcd
+"""

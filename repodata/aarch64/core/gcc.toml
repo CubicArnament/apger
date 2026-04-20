@@ -1,23 +1,29 @@
 [package]
 name = "gcc"
-version = "14.1.0"
+version = "15.2.0"
 type = "binary"
 architecture = "aarch64"
-description = "GNU Compiler Collection"
+description = "GNU Compiler Collection — optimising compilers for C, C++, Fortran, Ada, Go, and D; also produces libgcc and libstdc++ runtime libraries"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "GPL-3.0"
-homepage = "https://gcc.gnu.org"
-dependencies = []
+license = "GPL-3.0-or-later"
+homepage = "https://gcc.gnu.org/"
+dependencies = ["binutils", "glibc", "zlib"]
+provides = ["libgcc", "libstdc++"]
 bootstrap = true
 
 [source]
-url = "https://ftp.gnu.org/gnu/gcc/gcc-14.1.0/gcc-14.1.0.tar.xz"
+url = "https://ftp.gnu.org/gnu/gcc/gcc-15.2.0/gcc-15.2.0.tar.xz"
 type_src = "tarball"
 
 [build]
 template = "autotools"
-dependencies = []
+dependencies = ["make", "binutils", "glibc", "zlib-devel", "gmp-devel", "mpfr-devel", "mpc-devel"]
 use = []
 
 [install]
 script = ""
+
+[scripts]
+post_install = """
+ldconfig
+"""

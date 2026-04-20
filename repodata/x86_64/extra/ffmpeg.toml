@@ -1,6 +1,6 @@
 [package]
 name = "ffmpeg"
-version = "7.0"
+version = "7.1.1"
 type = "binary"
 architecture = "x86_64"
 description = "Complete, cross-platform solution to record, convert and stream audio and video"
@@ -8,17 +8,15 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "LGPL-2.1"
 homepage = "https://ffmpeg.org"
 dependencies = ["alsa-lib", "libpng", "libjpeg-turbo", "zlib", "openssl", "libvorbis", "libopus"]
-bootstrap = false
 
 [source]
-url = "https://ffmpeg.org/releases/ffmpeg-7.0.tar.xz"
+url = "https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz"
 type_src = "tarball"
 
 [build]
-template = "custom"
+template = "makefile"
 dependencies = ["alsa-lib-devel", "libpng-devel", "libjpeg-turbo-devel", "zlib-devel", "openssl-devel", "nasm", "yasm", "libvorbis-devel", "libopus-devel", "libvpx-devel"]
 use = []
-script = "./configure --prefix=/usr --enable-shared --disable-static --enable-gpl --enable-openssl --enable-libvorbis --enable-libopus --enable-libvpx && make -j$(nproc) && make install"
 
 [install]
-script = ""
+script = "./configure --prefix=/usr --enable-shared --disable-static --enable-gpl --enable-openssl --enable-libvorbis --enable-libopus --enable-libvpx && make -j$(nproc) && make install"

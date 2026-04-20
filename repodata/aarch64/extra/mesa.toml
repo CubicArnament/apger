@@ -1,6 +1,6 @@
 [package]
 name = "mesa"
-version = "24.1.0"
+version = "26.0.5"
 type = "binary"
 architecture = "aarch64"
 description = "Open-source OpenGL, Vulkan and other graphics API implementations"
@@ -10,7 +10,7 @@ homepage = "https://mesa3d.org"
 dependencies = ["libdrm", "wayland", "libxkbcommon", "llvm", "zlib", "zstd"]
 
 [source]
-url = "https://mesa.freedesktop.org/archive/mesa-24.1.0.tar.xz"
+url = "https://mesa.freedesktop.org/archive/mesa-26.0.5.tar.xz"
 type_src = "tarball"
 
 [build]
@@ -19,4 +19,4 @@ dependencies = ["libdrm-devel", "wayland-devel", "libxkbcommon-devel", "llvm-dev
 use = []
 
 [install]
-script = ""
+script = "ldconfig"

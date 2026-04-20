@@ -1,16 +1,16 @@
 [package]
 name = "curl"
-version = "8.7.1"
+version = "8.19.0"
 type = "binary"
 architecture = "aarch64"
-description = "Command line tool for transferring data with URLs"
+description = "Command line tool and library for transferring data with URLs, supporting HTTP, HTTPS, FTP, SFTP, and 80+ other protocols"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "MIT"
+license = "curl"
 homepage = "https://curl.se"
 dependencies = ["openssl", "zlib"]
 
 [source]
-url = "https://curl.se/download/curl-8.7.1.tar.xz"
+url = "https://curl.se/download/curl-8.19.0.tar.xz"
 type_src = "tarball"
 
 [build]
@@ -20,3 +20,6 @@ use = []
 
 [install]
 script = ""
+
+[scripts]
+ldconfig = true

@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # setup-nfs.sh — NFS server setup for apger package output
 # Works on any systemd-based Linux distro without package manager dependency.
 # Run as root or with sudo.
 set -e
 
+NFS_PORT="${NFS_PORT:-2049}"
 NFS_EXPORT_DIR="${NFS_EXPORT_DIR:-/srv/pvc-nfs}"
 NFS_EXPORT_OPTS="${NFS_EXPORT_OPTS:-*(rw,sync,no_subtree_check,no_root_squash)}"
 APGER_CONF="${APGER_CONF:-apger.conf}"
@@ -83,20 +84,34 @@ else
     warn "apger.conf not found at $APGER_CONF — skipping config update"
 fi
 
-# ── Update k8s-manifest.yml NFS_SERVER ───────────────────────────────────────
+# ── Update k8s-manifest.yml and nfs-config ConfigMap ─────────────────────────
 MANIFEST="${MANIFEST:-k8s-manifest.yml}"
+NFS_ADDR="${HOST_IP}:${NFS_PORT}"
+
 if [ -f "$MANIFEST" ]; then
-    sed -i "s|value: \"[0-9.]*\"  # NFS_SERVER|value: \"$HOST_IP\"  # NFS_SERVER|g" "$MANIFEST"
-    # Also update nfs.server field
-    sed -i "/nfs:/{n; s|server: \"[0-9.]*\"|server: \"$HOST_IP\"|}" "$MANIFEST"
-    ok "Updated NFS_SERVER in $MANIFEST to $HOST_IP"
+    # Update nfs_server in nfs-config ConfigMap
+    sed -i "s|nfs_server: \".*\"|nfs_server: \"${NFS_ADDR}\"|" "$MANIFEST"
+    # Update nfs_path
+    sed -i "s|nfs_path: \".*\"|nfs_path: \"${NFS_EXPORT_DIR}\"|" "$MANIFEST"
+    # Update bare server: fields (nfs volume mount — only IP, no port)
+    sed -i "s|server: \"NFS_SERVER_IP\"|server: \"${HOST_IP}\"|g" "$MANIFEST"
+    ok "Updated $MANIFEST: nfs_server=$NFS_ADDR, nfs_path=$NFS_EXPORT_DIR"
 else
-    warn "$MANIFEST not found — set NFS_SERVER=$HOST_IP manually"
+    warn "$MANIFEST not found — set nfs_server=${NFS_ADDR} manually in nfs-config ConfigMap"
+fi
+
+# ── Patch live ConfigMap if cluster is reachable ──────────────────────────────
+if command -v kubectl >/dev/null 2>&1 && kubectl get ns apger >/dev/null 2>&1; then
+    kubectl create configmap nfs-config \
+        --from-literal=nfs_server="${NFS_ADDR}" \
+        --from-literal=nfs_path="${NFS_EXPORT_DIR}" \
+        -n apger --dry-run=client -o yaml | kubectl apply -f -
+    ok "Live ConfigMap nfs-config updated in cluster"
 fi
 
 echo ""
 echo -e "${GREEN}NFS setup complete!${NC}"
 echo "  Export dir: $NFS_EXPORT_DIR"
-echo "  Server IP:  $HOST_IP"
+echo "  Server:     $HOST_IP:$NFS_PORT"
 echo ""
 echo "Next step: kubectl apply -f $MANIFEST"

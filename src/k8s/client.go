@@ -108,6 +108,8 @@ func (c *Client) WaitForJob(ctx context.Context, name string, logWriter io.Write
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
+	retries := 0
+	maxRetries := 10
 	for {
 		watcher, err := c.clientset.BatchV1().Jobs(c.namespace).Watch(ctx, metav1.SingleObject(metav1.ObjectMeta{Name: name}))
 		if err != nil {
@@ -122,11 +124,16 @@ func (c *Client) WaitForJob(ctx context.Context, name string, logWriter io.Write
 		if done {
 			return nil
 		}
-		// channel closed by server — re-watch
+		// channel closed by server — re-watch with backoff
+		retries++
+		if retries >= maxRetries {
+			return fmt.Errorf("watch channel closed %d times for job %s", retries, name)
+		}
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("timeout waiting for job %s", name)
-		default:
+		case <-time.After(time.Duration(retries) * time.Second):
+			// exponential backoff: 1s, 2s, 3s, ...
 		}
 	}
 }
@@ -233,7 +240,7 @@ func (c *Client) WatchJobs(ctx context.Context) (watch.Interface, error) {
 }
 
 func parseResourceQuantity(s string) resource.Quantity {
-	// Simple parser for quantities like "1Gi", "500Mi", "10Gi"
-	q, _ := resource.ParseQuantity(s)
-	return q
+	// MustParse panics on invalid input, which is appropriate since
+	// invalid resource quantities should be caught at config validation time
+	return resource.MustParse(s)
 }

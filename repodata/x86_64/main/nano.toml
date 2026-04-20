@@ -1,17 +1,16 @@
 [package]
 name = "nano"
-version = "8.0"
+version = "9.0"
 type = "binary"
 architecture = "x86_64"
-description = "GNU nano text editor"
+description = "Small, friendly text editor inspired by Pico"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-3.0"
 homepage = "https://www.nano-editor.org"
 dependencies = ["ncurses"]
-bootstrap = false
 
 [source]
-url = "https://www.nano-editor.org/dist/v8/nano-8.0.tar.xz"
+url = "https://www.nano-editor.org/dist/v9/nano-9.0.tar.xz"
 type_src = "tarball"
 
 [build]

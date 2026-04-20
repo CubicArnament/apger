@@ -28,3 +28,32 @@ use = []
 
 [install]
 script = ""
+
+[scripts]
+# Install/Remove scripts templates
+# Available templates:
+#   - "init" — neoinit service management
+#   - "update-alternatives" — switch alternatives system
+#   - "path" — add to PATH via /etc/profile.d (use add_to_path = true)
+#   - "reload" — reload neoinit services
+#   - "ldconfig" — update library cache
+postinstall = ["init", "ldconfig"]
+preremove = []
+postremove = []
+add_to_path = false  # Generate /etc/profile.d script
+
+# Optional: neoinit service configuration
+# If defined, generates /etc/neoinit/services/<name>.yaml
+[service]
+exec = "/usr/bin/curl --help"  # Command to execute
+description = "Example service"
+working_dir = "/"
+restart = true
+type = "simple"  # simple | forking | oneshot
+# user = "nobody"
+# group = "nogroup"
+
+[service.env]
+# Environment variables
+# CURL_HOME = "/var/lib/curl"
+

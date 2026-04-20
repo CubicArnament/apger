@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -125,8 +126,13 @@ func downloadTarball(ctx context.Context, url, destDir string, cfg config.Aria2C
 		return fmt.Errorf("aria2c not found — install aria2: %w", err)
 	}
 
+	// Use WaitGroup to ensure goroutines finish before returning
+	var wg sync.WaitGroup
+	
 	// Parse progress from stdout
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		sc := bufio.NewScanner(stdout)
 		for sc.Scan() {
 			line := sc.Text()
@@ -146,14 +152,20 @@ func downloadTarball(ctx context.Context, url, destDir string, cfg config.Aria2C
 			})
 		}
 	}()
+	
 	// Drain stderr silently (aria2c writes verbose info there)
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		sc := bufio.NewScanner(stderr)
 		for sc.Scan() {
 		}
 	}()
 
-	if err := cmd.Wait(); err != nil {
+	err = cmd.Wait()
+	wg.Wait() // Wait for goroutines to finish reading pipes
+	
+	if err != nil {
 		return fmt.Errorf("aria2c download %s: %w", url, err)
 	}
 

@@ -1,17 +1,17 @@
 [package]
 name = "coreutils"
-version = "9.5"
+version = "9.11"
 type = "binary"
 architecture = "x86_64"
-description = "GNU Core Utilities — basic file, shell, and text manipulation utilities"
+description = "GNU Core Utilities — essential file, shell, and text manipulation utilities (ls, cp, mv, rm, cat, echo, sort, …)"
 maintainer = "NurOS Team <team@nuros.org>"
-license = "GPL-3.0"
+license = "GPL-3.0-or-later"
 homepage = "https://www.gnu.org/software/coreutils/"
 dependencies = ["glibc"]
 bootstrap = false
 
 [source]
-url = "https://ftp.gnu.org/gnu/coreutils/coreutils-9.5.tar.xz"
+url = "https://ftp.gnu.org/gnu/coreutils/coreutils-9.11.tar.xz"
 type_src = "tarball"
 
 [build]

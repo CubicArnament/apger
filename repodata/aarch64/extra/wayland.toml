@@ -1,6 +1,6 @@
 [package]
 name = "wayland"
-version = "1.23.0"
+version = "1.25.0"
 type = "binary"
 architecture = "aarch64"
 description = "Wayland display server protocol and library"
@@ -10,7 +10,7 @@ homepage = "https://wayland.freedesktop.org"
 dependencies = ["expat", "libffi"]
 
 [source]
-url = "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.23.0/downloads/wayland-1.23.0.tar.xz"
+url = "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.25.0/downloads/wayland-1.25.0.tar.xz"
 type_src = "tarball"
 
 [build]
@@ -19,4 +19,4 @@ dependencies = ["expat-devel", "libffi-devel", "libxml2-devel"]
 use = []
 
 [install]
-script = ""
+script = "ldconfig"

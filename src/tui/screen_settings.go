@@ -108,16 +108,19 @@ func (s *SettingsScreen) Init() tea.Cmd {
 }
 
 func (s *SettingsScreen) checkNFS() tea.Cmd {
-	server := s.nfsServer
-	if server == "" {
-		server = os.Getenv("NFS_SERVER")
+	addr := s.nfsServer
+	if addr == "" {
+		addr = os.Getenv("NFS_SERVER")
 	}
-	if server == "" {
+	if addr == "" {
 		return nil
 	}
+	// Ensure addr has port — if no colon, default to 2049
+	if !strings.Contains(addr, ":") {
+		addr = addr + ":2049"
+	}
 	return func() tea.Msg {
-		// Try TCP port 2049 (NFS)
-		conn, err := net.DialTimeout("tcp", server+":2049", 2*time.Second)
+		conn, err := net.DialTimeout("tcp", addr, 2*time.Second)
 		if err != nil {
 			return nfsCheckMsg(false)
 		}

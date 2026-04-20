@@ -1,7 +1,7 @@
 // Package credentials manages apger credentials.
 //
-// Storage: ~/.credential-manager/apger.json (mode 0600)
-// Format: {"users": [...]} — list of Credentials entries, keyed by email.
+// Storage: ~/.apger/credentials/apger.db (encrypted bbolt database)
+// Encryption: AES-256-GCM with key derived from machine ID + username
 //
 // Authentication priority per user:
 //   1. GitHub App (AppID + PEM) → JWT → installation token
@@ -11,12 +11,20 @@ package credentials
 
 import (
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"strings"
+
+	"go.etcd.io/bbolt"
 )
 
 // Credentials holds all credentials for one user / identity.
@@ -73,152 +81,235 @@ func ghCLIToken() (string, error) {
 
 // ── storage schema ────────────────────────────────────────────────────────────
 
-// store is the on-disk JSON structure.
-type store struct {
-	Users []Credentials `json:"users"`
-}
+const bucketName = "credentials"
 
-// Manager handles loading and saving credentials.
+// Manager handles loading and saving credentials in encrypted bbolt database.
 type Manager struct {
 	path string
+	key  []byte // AES-256 key
 }
 
-// New creates a Manager using ~/.credential-manager/apger.json.
+// New creates a Manager using ~/.apger/credentials/apger.db.
 func New() (*Manager, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, fmt.Errorf("get home dir: %w", err)
 	}
+	key, err := deriveKey()
+	if err != nil {
+		return nil, fmt.Errorf("derive encryption key: %w", err)
+	}
 	return &Manager{
-		path: filepath.Join(home, ".credential-manager", "apger.json"),
+		path: filepath.Join(home, ".apger", "credentials", "apger.db"),
+		key:  key,
 	}, nil
 }
 
 // NewFromEnv creates a Manager that reads from APGER_CREDS_PATH env var,
 // falling back to the default path.
 func NewFromEnv() (*Manager, error) {
-	if p := os.Getenv("APGER_CREDS_PATH"); p != "" {
-		return &Manager{path: p}, nil
+	key, err := deriveKey()
+	if err != nil {
+		return nil, fmt.Errorf("derive encryption key: %w", err)
 	}
-	return New()
+	if p := os.Getenv("APGER_CREDS_PATH"); p != "" {
+		return &Manager{path: p, key: key}, nil
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("get home dir: %w", err)
+	}
+	return &Manager{
+		path: filepath.Join(home, ".apger", "credentials", "apger.db"),
+		key:  key,
+	}, nil
+}
+
+// deriveKey generates AES-256 key from machine ID + username.
+func deriveKey() ([]byte, error) {
+	u, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+	// Use username + hostname as seed
+	hostname, _ := os.Hostname()
+	seed := u.Username + "@" + hostname
+	hash := sha256.Sum256([]byte(seed))
+	return hash[:], nil
 }
 
 // ── multi-user API ────────────────────────────────────────────────────────────
 
 // LoadAll returns all saved users.
 func (m *Manager) LoadAll() ([]Credentials, error) {
-	s, err := m.readStore()
+	db, err := m.openDB()
 	if err != nil {
 		return nil, err
 	}
-	return s.Users, nil
+	defer db.Close()
+
+	var users []Credentials
+	err = db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(bucketName))
+		if b == nil {
+			return nil
+		}
+		return b.ForEach(func(k, v []byte) error {
+			decrypted, err := m.decrypt(v)
+			if err != nil {
+				return fmt.Errorf("decrypt %s: %w", k, err)
+			}
+			var c Credentials
+			if err := json.Unmarshal(decrypted, &c); err != nil {
+				return fmt.Errorf("unmarshal %s: %w", k, err)
+			}
+			users = append(users, c)
+			return nil
+		})
+	})
+	return users, err
 }
 
-// SaveUser creates or updates a user entry (matched by email, then name).
+// SaveUser creates or updates a user entry (matched by email).
 func (m *Manager) SaveUser(c Credentials) error {
-	s, _ := m.readStore()
-	updated := false
-	for i, u := range s.Users {
-		if u.Email == c.Email || (c.Email == "" && u.Name == c.Name) {
-			s.Users[i] = c
-			updated = true
-			break
+	if c.Email == "" {
+		return fmt.Errorf("email is required")
+	}
+	db, err := m.openDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	data, err := json.Marshal(c)
+	if err != nil {
+		return err
+	}
+	encrypted, err := m.encrypt(data)
+	if err != nil {
+		return err
+	}
+
+	return db.Update(func(tx *bbolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		if err != nil {
+			return err
 		}
-	}
-	if !updated {
-		s.Users = append(s.Users, c)
-	}
-	return m.writeStore(s)
+		return b.Put([]byte(c.Email), encrypted)
+	})
 }
 
 // DeleteUser removes a user by email.
 func (m *Manager) DeleteUser(email string) error {
-	s, err := m.readStore()
+	db, err := m.openDB()
 	if err != nil {
 		return err
 	}
-	filtered := s.Users[:0]
-	for _, u := range s.Users {
-		if u.Email != email {
-			filtered = append(filtered, u)
+	defer db.Close()
+
+	return db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(bucketName))
+		if b == nil {
+			return nil
 		}
-	}
-	s.Users = filtered
-	return m.writeStore(s)
+		return b.Delete([]byte(email))
+	})
 }
 
 // ClearPGP removes the PGP key for the user with the given email.
 func (m *Manager) ClearPGP(email string) error {
-	s, err := m.readStore()
+	db, err := m.openDB()
 	if err != nil {
 		return err
 	}
-	for i, u := range s.Users {
-		if u.Email == email {
-			s.Users[i].PGPPrivateKey = ""
-			break
+	defer db.Close()
+
+	return db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(bucketName))
+		if b == nil {
+			return fmt.Errorf("user not found")
 		}
-	}
-	return m.writeStore(s)
+		v := b.Get([]byte(email))
+		if v == nil {
+			return fmt.Errorf("user not found")
+		}
+		decrypted, err := m.decrypt(v)
+		if err != nil {
+			return err
+		}
+		var c Credentials
+		if err := json.Unmarshal(decrypted, &c); err != nil {
+			return err
+		}
+		c.PGPPrivateKey = ""
+		data, err := json.Marshal(c)
+		if err != nil {
+			return err
+		}
+		encrypted, err := m.encrypt(data)
+		if err != nil {
+			return err
+		}
+		return b.Put([]byte(email), encrypted)
+	})
 }
 
 // ── single-user compat API (used by orchestrator / pods) ─────────────────────
 
 // Load returns the first user, or empty Credentials if none saved.
-// Also handles the legacy single-entry format {"name":...} for backwards compat.
 func (m *Manager) Load() (Credentials, error) {
-	s, err := m.readStore()
+	users, err := m.LoadAll()
 	if err != nil {
 		return Credentials{}, err
 	}
-	if len(s.Users) == 0 {
+	if len(users) == 0 {
 		return Credentials{}, nil
 	}
-	return s.Users[0], nil
+	return users[0], nil
 }
 
-// Save writes a single Credentials, replacing the first entry (legacy compat).
+// Save writes a single Credentials (legacy compat).
 func (m *Manager) Save(c Credentials) error {
 	return m.SaveUser(c)
 }
 
 // ── internal ──────────────────────────────────────────────────────────────────
 
-func (m *Manager) readStore() (store, error) {
-	data, err := os.ReadFile(m.path)
-	if os.IsNotExist(err) {
-		return store{}, nil
+func (m *Manager) openDB() (*bbolt.DB, error) {
+	if err := os.MkdirAll(filepath.Dir(m.path), 0700); err != nil {
+		return nil, fmt.Errorf("create credential dir: %w", err)
 	}
-	if err != nil {
-		return store{}, fmt.Errorf("read credentials: %w", err)
-	}
-
-	// Try new multi-user format first
-	var s store
-	if err := json.Unmarshal(data, &s); err == nil && s.Users != nil {
-		return s, nil
-	}
-
-	// Legacy: single Credentials object
-	var c Credentials
-	if err := json.Unmarshal(data, &c); err == nil && (c.Name != "" || c.Email != "") {
-		return store{Users: []Credentials{c}}, nil
-	}
-
-	return store{}, nil
+	return bbolt.Open(m.path, 0600, nil)
 }
 
-func (m *Manager) writeStore(s store) error {
-	if err := os.MkdirAll(filepath.Dir(m.path), 0700); err != nil {
-		return fmt.Errorf("create credential dir: %w", err)
-	}
-	data, err := json.MarshalIndent(s, "", "  ")
+func (m *Manager) encrypt(plaintext []byte) ([]byte, error) {
+	block, err := aes.NewCipher(m.key)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	tmp := m.path + ".tmp"
-	if err := os.WriteFile(tmp, data, 0600); err != nil {
-		return err
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
 	}
-	return os.Rename(tmp, m.path)
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
+	}
+	return gcm.Seal(nonce, nonce, plaintext, nil), nil
+}
+
+func (m *Manager) decrypt(ciphertext []byte) ([]byte, error) {
+	block, err := aes.NewCipher(m.key)
+	if err != nil {
+		return nil, err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+	if len(ciphertext) < gcm.NonceSize() {
+		return nil, fmt.Errorf("ciphertext too short")
+	}
+	nonce, ciphertext := ciphertext[:gcm.NonceSize()], ciphertext[gcm.NonceSize():]
+	return gcm.Open(nil, nonce, ciphertext, nil)
 }

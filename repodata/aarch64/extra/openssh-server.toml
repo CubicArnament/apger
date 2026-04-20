@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "sshd"
+type = "simple"
+exec = "/usr/sbin/sshd -D"
+restart = true
+
+[scripts]
+post_install = """
+servctl start sshd
+"""
+pre_remove = """
+servctl stop sshd
+"""

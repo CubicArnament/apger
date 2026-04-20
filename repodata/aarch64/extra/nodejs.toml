@@ -1,6 +1,6 @@
 [package]
 name = "nodejs"
-version = "22.2.0"
+version = "22.15.0"
 type = "binary"
 architecture = "aarch64"
 description = "JavaScript runtime built on Chrome's V8 engine"
@@ -10,7 +10,7 @@ homepage = "https://nodejs.org"
 dependencies = ["openssl", "zlib", "libuv"]
 
 [source]
-url = "https://nodejs.org/dist/v22.2.0/node-v22.2.0.tar.xz"
+url = "https://nodejs.org/dist/v22.15.0/node-v22.15.0.tar.xz"
 type_src = "tarball"
 
 [build]

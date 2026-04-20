@@ -19,4 +19,4 @@ dependencies = ["libpng-devel", "libjpeg-turbo-devel", "freetype2-devel", "fontc
 use = []
 
 [install]
-script = "./configure -prefix /usr -opensource -confirm-license -release -shared -nomake examples -nomake tests && make -j$(nproc) && make install"
+script = "./configure -prefix /usr -opensource -confirm-license -release -shared -nomake examples -nomake tests && make -j$(nproc) && make install && ldconfig"

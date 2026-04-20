@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "avahi-daemon"
+type = "simple"
+exec = "/usr/sbin/avahi-daemon"
+restart = true
+
+[scripts]
+post_install = """
+servctl start avahi-daemon
+"""
+pre_remove = """
+servctl stop avahi-daemon
+"""

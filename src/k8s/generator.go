@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"fmt"
+	"strings"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -131,7 +132,10 @@ func GenerateBuildJob(cfg JobConfig) *batchv1.Job {
 	args := cfg.Args
 	if len(command) == 0 {
 		command = []string{"/bin/sh", "-c"}
-		outFile := fmt.Sprintf("/output/packages/%s-%s-$(uname -m).apg", cfg.PackageName, cfg.PackageVersion)
+		// Sanitize package name and version to prevent shell injection
+		safeName := shellEscape(cfg.PackageName)
+		safeVersion := shellEscape(cfg.PackageVersion)
+		outFile := fmt.Sprintf("/output/packages/%s-%s-$(uname -m).apg", safeName, safeVersion)
 		args = []string{fmt.Sprintf(
 			`set -e
 ln -sf /output/tools /tools
@@ -212,11 +216,23 @@ func GeneratePVCManifest(name, storageClass, size string) *corev1.PersistentVolu
 }
 
 func joinSpace(items []string) string {
-	result := ""
-	for _, item := range items {
-		result += item + " "
+	if len(items) == 0 {
+		return ""
 	}
-	return result
+	// Use strings.Join for better performance
+	return strings.Join(items, " ")
+}
+
+// shellEscape removes shell metacharacters to prevent injection
+func shellEscape(s string) string {
+	// Only allow alphanumeric, dash, underscore, dot
+	var result strings.Builder
+	for _, r := range s {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '-' || r == '_' || r == '.' {
+			result.WriteRune(r)
+		}
+	}
+	return result.String()
 }
 
 func ptrInt32(v int32) *int32 { return &v }

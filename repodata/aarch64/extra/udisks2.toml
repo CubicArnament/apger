@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "udisks2"
+type = "simple"
+exec = "/usr/lib/udisks2/udisksd"
+restart = true
+
+[scripts]
+post_install = """
+servctl start udisks2
+"""
+pre_remove = """
+servctl stop udisks2
+"""

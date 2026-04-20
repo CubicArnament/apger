@@ -1,6 +1,6 @@
 [package]
 name = "ffmpeg"
-version = "7.0"
+version = "7.1.1"
 type = "binary"
 architecture = "aarch64"
 description = "Complete, cross-platform solution to record, convert and stream audio and video"
@@ -10,7 +10,7 @@ homepage = "https://ffmpeg.org"
 dependencies = ["alsa-lib", "libpng", "libjpeg-turbo", "zlib", "openssl", "libvorbis", "libopus"]
 
 [source]
-url = "https://ffmpeg.org/releases/ffmpeg-7.0.tar.xz"
+url = "https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz"
 type_src = "tarball"
 
 [build]

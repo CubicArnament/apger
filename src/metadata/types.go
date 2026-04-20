@@ -71,7 +71,27 @@ type Recipe struct {
 	Install struct {
 		Script string `toml:"script"`
 	} `toml:"install"`
+	Scripts struct {
+		PreInstall   []string `toml:"preinstall"`
+		PostInstall  []string `toml:"postinstall"`
+		PreRemove    []string `toml:"preremove"`
+		PostRemove   []string `toml:"postremove"`
+		AddToPath    bool     `toml:"add_to_path"` // Generate /etc/profile.d script
+	} `toml:"scripts"`
+	Service *ServiceConfig `toml:"service"` // neoinit service configuration
 	Split *RecipeSplit `toml:"split"`
+}
+
+// ServiceConfig defines neoinit service parameters
+type ServiceConfig struct {
+	Exec        string            `toml:"exec"`         // Command to execute
+	Description string            `toml:"description"`  // Service description
+	WorkingDir  string            `toml:"working_dir"`  // Working directory
+	Restart     bool              `toml:"restart"`      // Auto-restart on failure
+	Type        string            `toml:"type"`         // simple | forking | oneshot
+	Env         map[string]string `toml:"env"`          // Environment variables
+	User        string            `toml:"user"`         // Run as user
+	Group       string            `toml:"group"`        // Run as group
 }
 
 // FileEntry describes a file in the recipe structure.

@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "pulseaudio"
+type = "simple"
+exec = "/usr/bin/pulseaudio --daemonize=no"
+restart = true
+
+[scripts]
+post_install = """
+servctl start pulseaudio
+"""
+pre_remove = """
+servctl stop pulseaudio
+"""

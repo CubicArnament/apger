@@ -1,6 +1,6 @@
 [package]
 name = "podman"
-version = "5.1.1"
+version = "5.7.0"
 type = "binary"
 architecture = "x86_64"
 description = "Daemonless container engine for managing OCI containers"
@@ -8,10 +8,9 @@ maintainer = "NurOS Team <team@nuros.org>"
 license = "Apache-2.0"
 homepage = "https://podman.io"
 dependencies = ["conmon", "runc", "cni-plugins", "iptables"]
-bootstrap = false
 
 [source]
-url = "https://github.com/containers/podman/archive/v5.1.1/podman-5.1.1.tar.gz"
+url = "https://github.com/containers/podman/archive/v5.7.0/podman-5.7.0.tar.gz"
 type_src = "tarball"
 
 [build]
@@ -21,3 +20,18 @@ use = []
 
 [install]
 script = "make BUILDTAGS='seccomp selinux' && make install"
+
+[service]
+name = "podman"
+type = "simple"
+exec = "/usr/bin/podman system service --time=0"
+restart = true
+
+
+[scripts]
+post_install = """
+servctl start podman
+"""
+pre_remove = """
+servctl stop podman
+"""

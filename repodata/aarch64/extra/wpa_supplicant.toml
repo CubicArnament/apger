@@ -20,3 +20,17 @@ use = []
 
 [install]
 script = "cd wpa_supplicant && cp defconfig .config && echo 'CONFIG_CTRL_IFACE_DBUS_NEW=y' >> .config && make -j$(nproc) && make install BINDIR=/usr/bin LIBDIR=/usr/lib"
+
+[service]
+name = "wpa_supplicant"
+type = "simple"
+exec = "/usr/bin/wpa_supplicant -u"
+restart = true
+
+[scripts]
+post_install = """
+servctl start wpa_supplicant
+"""
+pre_remove = """
+servctl stop wpa_supplicant
+"""

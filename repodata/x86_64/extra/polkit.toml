@@ -21,3 +21,17 @@ use = []
 
 [install]
 script = ""
+
+[service]
+name = "polkit"
+type = "simple"
+exec = "/usr/lib/polkit-1/polkitd"
+restart = true
+
+[scripts]
+post_install = """
+servctl start polkit
+"""
+pre_remove = """
+servctl stop polkit
+"""

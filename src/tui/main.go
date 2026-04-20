@@ -16,6 +16,7 @@ import (
 
 	"github.com/NurOS-Linux/apger/src/builder"
 	config "github.com/NurOS-Linux/apger/src/core"
+	"github.com/NurOS-Linux/apger/src/credentials"
 	"github.com/NurOS-Linux/apger/src/metadata"
 	"github.com/NurOS-Linux/apger/src/storage"
 )
@@ -31,6 +32,9 @@ const (
 	screenBuild
 	screenCredentials
 	screenSettings
+	screenMaintainerSelect
+	screenBuildConfirm
+	screenQuitConfirm
 )
 
 // ── Styles ────────────────────────────────────────────────────────────────────
@@ -185,6 +189,13 @@ type Model struct {
 	buildErr  error
 	dlPct     int
 	dlSpeed   string
+	buildPaths []string // paths to build (set before maintainer select)
+
+	// maintainer selection
+	maintainers    []string // list of maintainer emails
+	maintainerIdx  int      // selected maintainer index
+	confirmIdx     int      // 0=Yes, 1=No
+	quitConfirmIdx int      // 0=Yes, 1=No for quit confirmation
 
 	// shared
 	db         *storage.DB
@@ -333,13 +344,18 @@ func (m *Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 	// Global
 	switch key {
-	case "ctrl+c", "q":
+	case "ctrl+c":
+		return m, tea.Quit
+	case "q":
 		if m.screen != screenEditor {
-			return m, tea.Quit
+			// Show quit confirmation
+			m.screen = screenQuitConfirm
+			m.quitConfirmIdx = 1 // Default to "No"
+			return m, nil
 		}
 	case "esc":
 		switch m.screen {
-		case screenFM, screenEditor, screenBuild, screenCredentials, screenSettings:
+		case screenFM, screenEditor, screenBuild, screenCredentials, screenSettings, screenMaintainerSelect, screenBuildConfirm, screenQuitConfirm:
 			m.screen = screenDashboard
 			return m, nil
 		}
@@ -370,6 +386,12 @@ func (m *Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			}
 			return m, cmd
 		}
+	case screenMaintainerSelect:
+		return m.updateMaintainerSelect(key)
+	case screenBuildConfirm:
+		return m.updateBuildConfirm(key)
+	case screenQuitConfirm:
+		return m.updateQuitConfirm(key)
 	}
 	return m, nil
 }
@@ -465,22 +487,46 @@ func (m *Model) updateFM(key string) (tea.Model, tea.Cmd) {
 }
 
 func (m *Model) startBuild(paths []string) (tea.Model, tea.Cmd) {
-	m.screen = screenBuild
-	m.buildBuf.Reset()
-	m.buildDone = false
-	m.buildErr = nil
-	m.buildLog = viewport.New(m.width-4, m.height-8)
+	m.buildPaths = paths
 
-	cmd := func() tea.Msg {
-		for _, path := range paths {
-			name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
-			if err := m.orch.BuildPackage(m.ctx, name); err != nil {
-				return buildDoneMsg{err: err}
-			}
-		}
-		return buildDoneMsg{}
+	// Load maintainers from credential manager
+	mgr, err := credentials.NewFromEnv()
+	if err != nil {
+		m.err = fmt.Errorf("load credentials: %w", err)
+		return m, nil
 	}
-	return m, cmd
+	users, err := mgr.LoadAll()
+	if err != nil {
+		m.err = fmt.Errorf("load maintainers: %w", err)
+		return m, nil
+	}
+
+	// Extract emails
+	m.maintainers = make([]string, 0, len(users))
+	for _, u := range users {
+		if u.Email != "" {
+			m.maintainers = append(m.maintainers, u.Email)
+		}
+	}
+
+	// If no maintainers, show error
+	if len(m.maintainers) == 0 {
+		m.err = fmt.Errorf("no maintainers configured — add credentials first")
+		return m, nil
+	}
+
+	// If only one maintainer, skip selection and go to confirmation
+	if len(m.maintainers) == 1 {
+		m.maintainerIdx = 0
+		m.screen = screenBuildConfirm
+		m.confirmIdx = 0
+		return m, nil
+	}
+
+	// Multiple maintainers — show selection screen
+	m.screen = screenMaintainerSelect
+	m.maintainerIdx = 0
+	return m, nil
 }
 
 // ── Editor ────────────────────────────────────────────────────────────────────
@@ -600,6 +646,12 @@ func (m *Model) View() string {
 		if m.settings != nil {
 			return m.settings.View()
 		}
+	case screenMaintainerSelect:
+		return m.viewMaintainerSelect()
+	case screenBuildConfirm:
+		return m.viewBuildConfirm()
+	case screenQuitConfirm:
+		return m.viewQuitConfirm()
 	}
 	return ""
 }
@@ -778,4 +830,155 @@ func highlightTOML(content string, maxLines int) string {
 // parseTomlString decodes TOML content into a Recipe.
 func parseTomlString(content string, r *metadata.Recipe) error {
 	return metadata.DecodeRecipeTOML(content, r)
+}
+
+
+// ── Maintainer Selection ──────────────────────────────────────────────────────
+
+func (m *Model) updateMaintainerSelect(key string) (tea.Model, tea.Cmd) {
+	switch key {
+	case "up", "k":
+		if m.maintainerIdx > 0 {
+			m.maintainerIdx--
+		}
+	case "down", "j":
+		if m.maintainerIdx < len(m.maintainers)-1 {
+			m.maintainerIdx++
+		}
+	case "enter":
+		// Go to confirmation screen
+		m.screen = screenBuildConfirm
+		m.confirmIdx = 0
+	}
+	return m, nil
+}
+
+func (m *Model) viewMaintainerSelect() string {
+	var b strings.Builder
+	b.WriteString(styleTitle.Render("  Select Maintainer") + "\n\n")
+
+	for i, email := range m.maintainers {
+		line := fmt.Sprintf("  %s", email)
+		if i == m.maintainerIdx {
+			b.WriteString(styleSelected.Render("▶ "+line) + "\n")
+		} else {
+			b.WriteString(styleNormal.Render("  "+line) + "\n")
+		}
+	}
+
+	b.WriteString("\n" + styleHelp.Render("  ↑/↓ navigate  enter select  esc cancel"))
+	return b.String()
+}
+
+// ── Build Confirmation ────────────────────────────────────────────────────────
+
+func (m *Model) updateBuildConfirm(key string) (tea.Model, tea.Cmd) {
+	switch key {
+	case "left", "h":
+		m.confirmIdx = 0
+	case "right", "l":
+		m.confirmIdx = 1
+	case "enter":
+		if m.confirmIdx == 0 {
+			// Yes — start build
+			return m.executeBuild()
+		}
+		// No — back to dashboard
+		m.screen = screenDashboard
+	}
+	return m, nil
+}
+
+func (m *Model) viewBuildConfirm() string {
+	var b strings.Builder
+	b.WriteString(styleTitle.Render("  Confirm Build") + "\n\n")
+
+	// Show selected maintainer
+	if m.maintainerIdx < len(m.maintainers) {
+		b.WriteString(styleNormal.Render(fmt.Sprintf("  Maintainer: %s", m.maintainers[m.maintainerIdx])) + "\n")
+	}
+
+	// Show packages to build
+	b.WriteString(styleNormal.Render(fmt.Sprintf("  Packages: %d", len(m.buildPaths))) + "\n\n")
+
+	// Yes/No buttons
+	yes := "[ Yes ]"
+	no := "[ No ]"
+	if m.confirmIdx == 0 {
+		yes = styleSelected.Render("[ Yes ]")
+		no = styleDim.Render("[ No ]")
+	} else {
+		yes = styleDim.Render("[ Yes ]")
+		no = styleSelected.Render("[ No ]")
+	}
+
+	b.WriteString(fmt.Sprintf("  %s  %s\n\n", yes, no))
+	b.WriteString(styleHelp.Render("  ←/→ select  enter confirm  esc cancel"))
+	return b.String()
+}
+
+func (m *Model) executeBuild() (tea.Model, tea.Cmd) {
+	m.screen = screenBuild
+	m.buildBuf.Reset()
+	m.buildDone = false
+	m.buildErr = nil
+	m.buildLog = viewport.New(m.width-4, m.height-8)
+
+	// TODO: Set selected maintainer in orchestrator context
+
+	cmd := func() tea.Msg {
+		for _, path := range m.buildPaths {
+			name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+			if err := m.orch.BuildPackage(m.ctx, name); err != nil {
+				return buildDoneMsg{err: err}
+			}
+		}
+		return buildDoneMsg{}
+	}
+	return m, cmd
+}
+
+
+// ── Quit Confirmation ─────────────────────────────────────────────────────────
+
+func (m *Model) updateQuitConfirm(key string) (tea.Model, tea.Cmd) {
+	switch key {
+	case "left", "h":
+		m.quitConfirmIdx = 0
+	case "right", "l":
+		m.quitConfirmIdx = 1
+	case "enter":
+		if m.quitConfirmIdx == 0 {
+			// Yes — quit with goodbye message
+			fmt.Println("\n" + styleOK.Render("  Bye Bye! ^_^") + "\n")
+			return m, tea.Quit
+		}
+		// No — back to dashboard
+		m.screen = screenDashboard
+	}
+	return m, nil
+}
+
+func (m *Model) viewQuitConfirm() string {
+	var b strings.Builder
+	b.WriteString(styleTitle.Render("  Quit APGer") + "\n\n")
+
+	b.WriteString(styleNormal.Render("  Are you sure you want to quit?") + "\n")
+	b.WriteString(styleDim.Render("  Pod will terminate completely.") + "\n")
+	b.WriteString(styleDim.Render("  Restart manually: kubectl apply -f k8s-manifest.yml") + "\n\n")
+
+	// Yes/No buttons
+	yes := "[ Yes ]"
+	no := "[ No ]"
+	if m.quitConfirmIdx == 0 {
+		yes = styleError.Render("[ Yes ]")
+		no = styleDim.Render("[ No ]")
+	} else {
+		yes = styleDim.Render("[ Yes ]")
+		no = styleSelected.Render("[ No ]")
+	}
+
+	b.WriteString(fmt.Sprintf("  %s  %s\n\n", yes, no))
+	b.WriteString(styleHelp.Render("  ←/→ select  enter confirm  esc cancel"))
+	return b.String()
 }

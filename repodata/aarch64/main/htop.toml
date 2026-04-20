@@ -1,16 +1,16 @@
 [package]
 name = "htop"
-version = "3.3.0"
+version = "3.5.0"
 type = "binary"
 architecture = "aarch64"
-description = "Interactive process viewer"
+description = "Interactive process viewer with a color display and mouse support"
 maintainer = "NurOS Team <team@nuros.org>"
 license = "GPL-2.0"
 homepage = "https://htop.dev"
 dependencies = ["ncurses"]
 
 [source]
-url = "https://github.com/htop-dev/htop/releases/download/3.3.0/htop-3.3.0.tar.xz"
+url = "https://github.com/htop-dev/htop/releases/download/3.5.0/htop-3.5.0.tar.xz"
 type_src = "tarball"
 
 [build]
