@@ -1,0 +1,311 @@
+# APGer Kubernetes Manifest — hostPath variant (Docker Desktop / local dev)
+#
+# Architecture:
+#   1. Pod `apger` builds libapg.so → apgbuild → apger (init containers)
+#   2. apger copies apgbuild + libapg.so to PVC /output/tools/
+#   3. apger spawns per-package Jobs; each Job mounts PVC and runs apgbuild
+#   4. Job dies, next Job starts — apger orchestrates the queue
+#   5. Built packages in PVC appear on NFS host automatically
+#
+# Prerequisites (WSL2/Linux host, one-time):
+#   sudo apt install nfs-kernel-server
+#   sudo mkdir -p /srv/apger-packages && sudo chmod 777 /srv/apger-packages
+#   echo '/srv/apger-packages *(rw,sync,no_subtree_check,no_root_squash)' | sudo tee -a /etc/exports
+#   sudo exportfs -ra && sudo service nfs-kernel-server start
+#
+# Then set NFS_SERVER below to your WSL2 IP (ip addr show eth0) and apply:
+#   kubectl apply -f k8s-manifest.yml
+#
+# Quick start:
+#   kubectl apply -f k8s-manifest.yml
+#   kubectl attach -it apger -n apger
+#
+# Detach: Ctrl+P, Ctrl+Q  |  Re-attach: kubectl attach -it apger -n apger
+
+# ── NFS Provisioner (no Helm required) ───────────────────────────────────────
+# Change NFS_SERVER to your WSL2/Linux host IP before applying.
+
+---
+# hostPath PersistentVolume — for Docker Desktop / local dev.
+# Data stored at /srv/apger-nfs on the node (Docker Desktop VM).
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: apger-builds-pv
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /srv/apger-nfs
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apger-builds
+  namespace: apger
+  labels:
+    app: apger
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  volumeName: apger-builds-pv
+  storageClassName: ""
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apger-conf
+  namespace: apger
+  labels:
+    app: apger
+data:
+  apger.conf: |
+    [build.packages]
+    march = "x86_64-v2"
+    mtune = "x86_64-v3"
+    opt_level = "O2"
+    lto = "thin"
+    cc = "gcc"
+    cxx = "g++"
+    ld = "mold"
+    library_glibc_hwcaps = true
+    levels_hwcaps = ["x86_64-v3", "x86_64-v2"]
+
+    [aria2]
+    connections = 4
+    splits = 4
+    min_split_size = "1M"
+    max_tries = 5
+    timeout = 60
+    continue = true
+
+    [database.pkgs]
+    type = "bbolt"
+    name = "pkgs.db"
+
+    [kubernetes.options]
+    namespace = "apger"
+    base_image = "fedora:43"
+    search_local = true
+    pull_remote = false
+    kind_load = false
+
+    [kubernetes.options.oomkill_limits]
+    cpu = "10"
+    memory = "16Gi"
+
+    [logging]
+    verbose = false
+
+---
+# DEPRECATED: Credentials now stored in encrypted bbolt database at ~/.apger/credentials/apger.db
+# This Secret is kept for backwards compatibility but not used by the Pod.
+# Use TUI credentials screen (press 'c') to manage maintainers.
+#
+# Legacy kubectl command (not recommended):
+# kubectl create secret generic apger-credentials \
+#   --from-literal=github_app_id=<APP_ID> \
+#   --from-file=github_pem=<path/to/app.private-key.pem> \
+#   --from-literal=pgp_private_key="$(cat private.asc)" \
+#   --from-literal=name="Your Name" --from-literal=email="you@example.com" \
+#   -n apger
+apiVersion: v1
+kind: Secret
+metadata:
+  name: apger-credentials
+  namespace: apger
+  labels:
+    app: apger
+type: Opaque
+stringData:
+  github_app_id: "0"
+  github_pem: ""
+  pat: ""
+  pgp_private_key: ""
+  name: ""
+  email: ""
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: apger
+  namespace: apger
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: apger-secret-manager
+  namespace: apger
+rules:
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get, create, update, patch]
+    resourceNames: [apger-credentials]
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [create]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: apger-secret-manager
+  namespace: apger
+subjects:
+  - kind: ServiceAccount
+    name: apger
+    namespace: apger
+roleRef:
+  kind: Role
+  name: apger-secret-manager
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: apger
+  namespace: apger
+  labels:
+    app: apger
+spec:
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 10
+  serviceAccountName: apger
+
+  initContainers:
+    # Stage 1: install build dependencies
+    - name: install-deps
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+          dnf install -y --setopt=install_weak_deps=False \
+            gcc gcc-c++ make meson ninja-build pkg-config \
+            git aria2 golang \
+            libarchive-devel lmdb-devel yyjson-devel libsodium-devel \
+            mold binutils \
+            && dnf clean all
+      resources:
+        requests: {cpu: "1", memory: 1Gi}
+        limits:   {cpu: "4", memory: 4Gi}
+
+    # Stage 2: clone source with submodules
+    - name: clone-source
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+          git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /src
+      resources:
+        requests: {cpu: "500m", memory: 512Mi}
+        limits:   {cpu: "2",    memory: 2Gi}
+      volumeMounts:
+        - name: source
+          mountPath: /src
+
+    # Stage 3: build libapg.so → apgbuild → apger, install to /tools
+    - name: build-tools
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+          echo "=== libapg + apgbuild + apger ==="
+          cd /src/src
+          meson setup build --prefix=/tools --buildtype=release
+          ninja -C build
+          ninja -C build install
+          ldconfig /tools/lib 2>/dev/null || true
+          echo "=== Done: $(ls /tools/bin/) ==="
+      env:
+        - name: CGO_ENABLED
+          value: "1"
+      resources:
+        requests: {cpu: "2",  memory: 2Gi}
+        limits:   {cpu: "10", memory: 16Gi}
+      volumeMounts:
+        - name: source
+          mountPath: /src
+        - name: tools
+          mountPath: /tools
+
+  containers:
+    - name: apger
+      image: fedora:43
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          export PATH="/tools/bin:$PATH"
+          export LD_LIBRARY_PATH="/tools/lib:$LD_LIBRARY_PATH"
+          # Stage apgbuild + libapg.so to PVC so build Jobs can use them
+          mkdir -p /output/tools/bin /output/tools/lib
+          cp /tools/bin/apgbuild        /output/tools/bin/apgbuild
+          cp /tools/lib/libapg.so*      /output/tools/lib/ 2>/dev/null || true
+          chmod +x /output/tools/bin/apgbuild
+          echo "[apger] Tools staged to PVC at /output/tools/"
+          echo "[apger] Ready. Run: apger --tui"
+          exec /bin/bash --login
+      stdin: true
+      tty: true
+      env:
+        - name: TERM
+          value: "xterm-256color"
+        - name: COLORTERM
+          value: "truecolor"
+        - name: CREDENTIALS_PATH
+          value: "/output/.credentials"
+        - name: BUILD_LOGS_PATH
+          value: "/output/build-logs"
+        - name: OUTPUT_PKGS_PATH
+          value: "/output/output-pkgs"
+        - name: APGER_CREDS_PATH
+          value: "$(CREDENTIALS_PATH)/apger.db"
+        - name: APGER_CONFIG
+          value: "/etc/apger/apger.conf"
+        - name: CGO_ENABLED
+          value: "1"
+        - name: NFS_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: nfs-config
+              key: nfs_server
+      resources:
+        requests: {cpu: "500m", memory: 512Mi}
+        limits:   {cpu: "10",   memory: 16Gi}
+      volumeMounts:
+        - name: tools
+          mountPath: /tools
+        - name: builds
+          mountPath: /output
+        - name: conf
+          mountPath: /etc/apger
+          readOnly: true
+
+  volumes:
+    - name: builds
+      persistentVolumeClaim:
+        claimName: apger-builds
+    - name: source
+      emptyDir: {}
+    - name: tools
+      emptyDir: {}
+    - name: conf
+      configMap:
+        name: apger-conf
