@@ -21,6 +21,11 @@ _K8S_REACHABLE=""
 
 check_root() {
     [ "$EUID" -ne 0 ] && { echo "Error: run as root"; exit 1; }
+    # Preserve kubeconfig from calling user (sudo loses $HOME)
+    if [ -z "$KUBECONFIG" ]; then
+        local user_home; user_home=$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)
+        [ -f "$user_home/.kube/config" ] && export KUBECONFIG="$user_home/.kube/config"
+    fi
     # Pre-check k8s reachability in background
     if command -v kubectl >/dev/null 2>&1; then
         kubectl cluster-info --request-timeout=2s >/dev/null 2>&1 && _K8S_REACHABLE=1 || _K8S_REACHABLE=0
