@@ -25,7 +25,7 @@ while IFS= read -r -d '' file; do
 
     if [ -z "$name" ] || [ -z "$version" ] || [ -z "$arch" ]; then
         echo "SKIP  $file (missing name/version/architecture)"
-        ((skipped++))
+        skipped=$((skipped + 1))
         continue
     fi
 
@@ -33,19 +33,19 @@ while IFS= read -r -d '' file; do
     new_path="$dir/$new_name"
 
     if [ "$file" = "$new_path" ]; then
-        ((skipped++))
+        skipped=$((skipped + 1))
         continue
     fi
 
     if [ -e "$new_path" ]; then
         echo "ERROR $file -> $new_name (target exists)"
-        ((errors++))
+        errors=$((errors + 1))
         continue
     fi
 
     mv "$file" "$new_path"
     echo "OK    $(basename "$file") -> $new_name"
-    ((renamed++))
+    renamed=$((renamed + 1))
 
 done < <(find "$REPODATA" -name "*.toml" -print0)
 
@@ -54,7 +54,7 @@ echo "Done: $renamed renamed, $skipped skipped, $errors errors"
 
 if [ "$renamed" -gt 0 ]; then
     git add "$REPODATA"
-    git commit -m "chore: formatted $renamed packages"
+    git commit -m "chore: formatted $renamed packages, skipped $skipped, errors $errors"
     git push origin main
     echo -e "\nPushed to origin/main"
 fi
