@@ -199,9 +199,10 @@ spec:
             mold binutils \
             && dnf clean all
           echo "=== Stage 2: clone source ==="
-          git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /src
+          git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /repo
+          ls /repo/src
           echo "=== Stage 3: build ==="
-          cd /src/src
+          cd /repo/src
           meson setup build --prefix=/tools --buildtype=release
           ninja -C build
           ninja -C build install
@@ -215,7 +216,7 @@ spec:
         limits:   {cpu: "10", memory: 16Gi}
       volumeMounts:
         - name: source
-          mountPath: /src
+          mountPath: /repo
         - name: tools
           mountPath: /tools
 
