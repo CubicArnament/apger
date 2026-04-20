@@ -400,8 +400,14 @@ spec:
           value: "xterm-256color"
         - name: COLORTERM
           value: "truecolor"
+        - name: CREDENTIALS_PATH
+          value: "/output/.credentials"
+        - name: BUILD_LOGS_PATH
+          value: "/output/build-logs"
+        - name: OUTPUT_PKGS_PATH
+          value: "/output/output-pkgs"
         - name: APGER_CREDS_PATH
-          value: "/output/.credentials/apger.db"
+          value: "$(CREDENTIALS_PATH)/apger.db"
         - name: APGER_CONFIG
           value: "/etc/apger/apger.conf"
         - name: CGO_ENABLED

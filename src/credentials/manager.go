@@ -98,8 +98,12 @@ func New() (*Manager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("derive encryption key: %w", err)
 	}
+	credsPath := os.Getenv("CREDENTIALS_PATH")
+	if credsPath == "" {
+		credsPath = "/srv/apger-nfs/.credentials"
+	}
 	return &Manager{
-		path: "/srv/apger-nfs/.credentials/apger.db",
+		path: filepath.Join(credsPath, "apger.db"),
 		key:  key,
 	}, nil
 }
@@ -114,8 +118,12 @@ func NewFromEnv() (*Manager, error) {
 	if p := os.Getenv("APGER_CREDS_PATH"); p != "" {
 		return &Manager{path: p, key: key}, nil
 	}
+	credsPath := os.Getenv("CREDENTIALS_PATH")
+	if credsPath == "" {
+		credsPath = "/srv/apger-nfs/.credentials"
+	}
 	return &Manager{
-		path: "/srv/apger-nfs/.credentials/apger.db",
+		path: filepath.Join(credsPath, "apger.db"),
 		key:  key,
 	}, nil
 }
