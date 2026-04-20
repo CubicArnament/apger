@@ -21,6 +21,12 @@ _K8S_REACHABLE=""
 
 check_root() {
     [ "$EUID" -ne 0 ] && { echo "Error: run as root"; exit 1; }
+    # Pre-check k8s reachability in background
+    if command -v kubectl >/dev/null 2>&1; then
+        kubectl cluster-info --request-timeout=2s >/dev/null 2>&1 && _K8S_REACHABLE=1 || _K8S_REACHABLE=0
+    else
+        _K8S_REACHABLE=0
+    fi
 }
 
 get_nfs_status() {
@@ -36,7 +42,7 @@ get_nfs_status() {
 
 k8s_reachable() {
     if [ -z "$_K8S_REACHABLE" ]; then
-        if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
+        if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=2s >/dev/null 2>&1; then
             _K8S_REACHABLE=1
         else
             _K8S_REACHABLE=0
