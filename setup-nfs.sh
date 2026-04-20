@@ -213,13 +213,62 @@ ping_cluster() {
     printf "\n"
 }
 
+ping_nfs() {
+    local ip=""
+    [ -f .env.nfs ] && ip=$(grep NFS_SERVER .env.nfs | cut -d= -f2)
+    if [ -z "$ip" ]; then
+        printf "\n  ${RED}✗${NC} .env.nfs not found — run Setup first\n\n"
+        return
+    fi
+    printf "\nChecking NFS server at %s...\n\n" "$ip"
+
+    # 1. ICMP ping
+    if ping -c3 -W2 "$ip" >/dev/null 2>&1; then
+        local ms; ms=$(ping -c3 -W2 "$ip" 2>/dev/null | tail -1 | awk -F'/' '{print $5}')
+        printf "  ${GREEN}✓${NC} Host reachable  (avg ping: %s ms)\n" "$ms"
+    else
+        printf "  ${RED}✗${NC} Host unreachable (ping failed)\n\n"
+        return
+    fi
+
+    # 2. NFS port 2049
+    if command -v nc >/dev/null 2>&1; then
+        if nc -z -w2 "$ip" 2049 2>/dev/null; then
+            printf "  ${GREEN}✓${NC} NFS port 2049 open\n"
+        else
+            printf "  ${RED}✗${NC} NFS port 2049 closed\n"
+        fi
+    fi
+
+    # 3. Mount test (read/write)
+    local mnt; mnt=$(mktemp -d)
+    if mount -t nfs -o ro,soft,timeo=5 "$ip:$NFS_ROOT" "$mnt" 2>/dev/null; then
+        printf "  ${GREEN}✓${NC} NFS mount OK (read)\n"
+        umount "$mnt" 2>/dev/null
+        # write test
+        if mount -t nfs -o rw,soft,timeo=5 "$ip:$NFS_ROOT" "$mnt" 2>/dev/null; then
+            local f="$mnt/.ping_test_$$"
+            if echo "ok" > "$f" 2>/dev/null && rm -f "$f"; then
+                printf "  ${GREEN}✓${NC} NFS write OK\n"
+            else
+                printf "  ${YELLOW}!${NC} NFS mounted but write failed\n"
+            fi
+            umount "$mnt" 2>/dev/null
+        fi
+    else
+        printf "  ${RED}✗${NC} NFS mount failed (server down or not exported)\n"
+    fi
+    rmdir "$mnt" 2>/dev/null
+    printf "\n"
+}
+
 show_menu() {
     clear 2>/dev/null || true
     print_banner
     show_status
     printf "  1) Setup NFS\n  2) Start NFS\n  3) Stop NFS\n"
     printf "  4) Re-generate .env.nfs\n  5) Delete NFS server\n"
-    printf "  6) Delete ConfigMap\n  7) Ping cluster\n  8) Exit\n\n"
+    printf "  6) Delete ConfigMap\n  7) Ping cluster\n  8) Ping NFS server\n  9) Exit\n\n"
     printf "Select option: "
     read -r choice </dev/tty
 }
@@ -237,7 +286,8 @@ main() {
             5) delete_nfs ;;
             6) delete_configmap ;;
             7) ping_cluster ;;
-            8) echo "Exiting..."; exit 0 ;;
+            8) ping_nfs ;;
+            9) echo "Exiting..."; exit 0 ;;
             *) echo "Invalid option"; sleep 1; continue ;;
         esac
         echo ""; read -rp "Press Enter to continue..." </dev/tty
