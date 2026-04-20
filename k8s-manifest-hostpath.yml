@@ -199,7 +199,8 @@ spec:
             mold binutils \
             && dnf clean all
           echo "=== Stage 2: clone source ==="
-          git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /repo
+          git clone https://github.com/NurOS-Linux/apger.git /repo
+          cd /repo && git submodule update --init --recursive
           echo "=== Stage 3: build ==="
           ls /repo/
           cd /repo/src
