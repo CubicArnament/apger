@@ -66,6 +66,7 @@ apger/
 │   ├── go.sum
 │   ├── Meson.build  # build system
 │   └── meson_options.txt  # meson options
+├── .gitattributes
 ├── .gitignore
 ├── .gitmodules
 ├── apger.conf  # build config (single source of truth)
