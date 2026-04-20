@@ -226,7 +226,6 @@ main() {
     check_root
     while true; do
         show_menu
-        read -r choice
         echo ""
         case "$choice" in
             1) setup_nfs ;;
