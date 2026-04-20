@@ -53,9 +53,16 @@ get_nfs_status() {
 show_status() {
     local status=$(get_nfs_status)
 
-    # Kubernetes status
+    # Kubernetes status (cached — check once per script run)
     local k8s_status k8s_cm
-    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
+    if [ -z "$_K8S_REACHABLE" ]; then
+        if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
+            _K8S_REACHABLE=1
+        else
+            _K8S_REACHABLE=0
+        fi
+    fi
+    if [ "$_K8S_REACHABLE" = "1" ]; then
         k8s_status="${GREEN}●${NC} Cluster reachable"
         if kubectl get configmap nfs-config --namespace=apger >/dev/null 2>&1; then
             k8s_cm="${GREEN}●${NC} ConfigMap active"
