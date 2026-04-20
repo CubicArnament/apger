@@ -201,6 +201,7 @@ spec:
           echo "=== Stage 2: clone source ==="
           git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /repo
           echo "=== Stage 3: build ==="
+          ls /repo/
           cd /repo/src
           meson setup build --prefix=/tools --buildtype=release
           ninja -C build
