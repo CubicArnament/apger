@@ -297,7 +297,7 @@ metadata:
   labels:
     app: apger
 spec:
-  restartPolicy: Always
+  restartPolicy: Never
   terminationGracePeriodSeconds: 10
   serviceAccountName: apger
 
