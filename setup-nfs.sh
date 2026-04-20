@@ -27,19 +27,22 @@ check_root() {
 
 get_nfs_status() {
     if [ -n "$_NFS_STATUS" ]; then echo "$_NFS_STATUS"; return; fi
-    local configured=false running=false
-    [ -d "$NFS_ROOT" ] && grep -q "$NFS_ROOT" "$NFS_EXPORTS" 2>/dev/null && configured=true
-    systemctl is-active --quiet "$NFS_SERVICE" 2>/dev/null && running=true
-    if $configured && $running; then _NFS_STATUS="running"
-    elif $configured; then _NFS_STATUS="stopped"
+    local configured=0 running=0
+    [ -d "$NFS_ROOT" ] && grep -q "$NFS_ROOT" "$NFS_EXPORTS" 2>/dev/null && configured=1 || true
+    systemctl is-active --quiet "$NFS_SERVICE" 2>/dev/null && running=1 || true
+    if [ "$configured" = 1 ] && [ "$running" = 1 ]; then _NFS_STATUS="running"
+    elif [ "$configured" = 1 ]; then _NFS_STATUS="stopped"
     else _NFS_STATUS="not_configured"; fi
     echo "$_NFS_STATUS"
 }
 
 k8s_reachable() {
     if [ -z "$_K8S_REACHABLE" ]; then
-        command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1 \
-            && _K8S_REACHABLE=1 || _K8S_REACHABLE=0
+        if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
+            _K8S_REACHABLE=1
+        else
+            _K8S_REACHABLE=0
+        fi
     fi
     [ "$_K8S_REACHABLE" = "1" ]
 }
