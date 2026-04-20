@@ -1,15 +1,15 @@
 // Package credentials manages apger credentials.
 //
-// Storage: /srv/apger-nfs/.credentials/apger.db (encrypted bbolt database on NFS)
+// Storage: /srv/apger-nfs/.credentials/apger.db (encrypted SQLite database on NFS)
 // Encryption: AES-256-GCM with key derived from machine ID + username
 //
 // Multi-node support: All nodes (master + workers) can access credentials via NFS
 // and sign packages. Credentials are encrypted and shared across the cluster.
 //
 // Authentication priority per user:
-//   1. GitHub App (AppID + PEM) → JWT → installation token
-//   2. PAT
-//   3. gh CLI  (`gh auth token`)  — fallback if neither is set
+//  1. GitHub App (AppID + PEM) → JWT → installation token
+//  2. PAT
+//  3. gh CLI  (`gh auth token`)  — fallback if neither is set
 package credentials
 
 import (
@@ -18,6 +18,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,7 +28,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.etcd.io/bbolt"
+	_ "modernc.org/sqlite"
 )
 
 // Credentials holds all credentials for one user / identity.
@@ -51,29 +52,21 @@ type Credentials struct {
 //  2. PAT
 //  3. gh CLI  (`gh auth token --hostname github.com`)
 func (c Credentials) AuthToken(ctx context.Context, org string) (string, error) {
-	// 1. GitHub App
 	if c.GitHubAppID != 0 && c.GitHubPEM != "" {
 		tok, err := InstallationToken(ctx, c.GitHubAppID, c.GitHubPEM, org)
 		if err == nil {
 			return tok, nil
 		}
-		// fall through to PAT / gh cli
 	}
-
-	// 2. PAT
 	if c.PAT != "" {
 		return c.PAT, nil
 	}
-
-	// 3. gh CLI
 	if tok, err := ghCLIToken(); err == nil && tok != "" {
 		return tok, nil
 	}
-
 	return "", fmt.Errorf("no GitHub credentials configured (set github_app_id+github_pem, pat, or run 'gh auth login')")
 }
 
-// ghCLIToken calls `gh auth token` and returns the token string.
 func ghCLIToken() (string, error) {
 	out, err := exec.Command("gh", "auth", "token", "--hostname", "github.com").Output()
 	if err != nil {
@@ -82,17 +75,14 @@ func ghCLIToken() (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-// ── storage schema ────────────────────────────────────────────────────────────
-
-const bucketName = "credentials"
-
-// Manager handles loading and saving credentials in encrypted bbolt database.
+// Manager handles loading and saving credentials in an encrypted SQLite database.
 type Manager struct {
 	path string
 	key  []byte // AES-256 key
 }
 
-// New creates a Manager using /srv/apger-nfs/.credentials/apger.db (NFS shared storage).
+// New creates a Manager using CREDENTIALS_PATH env var + /apger.db,
+// falling back to /srv/apger-nfs/.credentials/apger.db.
 func New() (*Manager, error) {
 	key, err := deriveKey()
 	if err != nil {
@@ -102,10 +92,7 @@ func New() (*Manager, error) {
 	if credsPath == "" {
 		credsPath = "/srv/apger-nfs/.credentials"
 	}
-	return &Manager{
-		path: filepath.Join(credsPath, "apger.db"),
-		key:  key,
-	}, nil
+	return &Manager{path: filepath.Join(credsPath, "apger.db"), key: key}, nil
 }
 
 // NewFromEnv creates a Manager that reads from APGER_CREDS_PATH env var,
@@ -122,22 +109,16 @@ func NewFromEnv() (*Manager, error) {
 	if credsPath == "" {
 		credsPath = "/srv/apger-nfs/.credentials"
 	}
-	return &Manager{
-		path: filepath.Join(credsPath, "apger.db"),
-		key:  key,
-	}, nil
+	return &Manager{path: filepath.Join(credsPath, "apger.db"), key: key}, nil
 }
 
-// deriveKey generates AES-256 key from machine ID + username.
 func deriveKey() ([]byte, error) {
 	u, err := user.Current()
 	if err != nil {
 		return nil, err
 	}
-	// Use username + hostname as seed
 	hostname, _ := os.Hostname()
-	seed := u.Username + "@" + hostname
-	hash := sha256.Sum256([]byte(seed))
+	hash := sha256.Sum256([]byte(u.Username + "@" + hostname))
 	return hash[:], nil
 }
 
@@ -151,26 +132,29 @@ func (m *Manager) LoadAll() ([]Credentials, error) {
 	}
 	defer db.Close()
 
+	rows, err := db.Query(`SELECT data FROM credentials`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
 	var users []Credentials
-	err = db.View(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
-		if b == nil {
-			return nil
+	for rows.Next() {
+		var blob []byte
+		if err := rows.Scan(&blob); err != nil {
+			return nil, err
 		}
-		return b.ForEach(func(k, v []byte) error {
-			decrypted, err := m.decrypt(v)
-			if err != nil {
-				return fmt.Errorf("decrypt %s: %w", k, err)
-			}
-			var c Credentials
-			if err := json.Unmarshal(decrypted, &c); err != nil {
-				return fmt.Errorf("unmarshal %s: %w", k, err)
-			}
-			users = append(users, c)
-			return nil
-		})
-	})
-	return users, err
+		decrypted, err := m.decrypt(blob)
+		if err != nil {
+			return nil, fmt.Errorf("decrypt: %w", err)
+		}
+		var c Credentials
+		if err := json.Unmarshal(decrypted, &c); err != nil {
+			return nil, fmt.Errorf("unmarshal: %w", err)
+		}
+		users = append(users, c)
+	}
+	return users, rows.Err()
 }
 
 // SaveUser creates or updates a user entry (matched by email).
@@ -192,14 +176,8 @@ func (m *Manager) SaveUser(c Credentials) error {
 	if err != nil {
 		return err
 	}
-
-	return db.Update(func(tx *bbolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
-		if err != nil {
-			return err
-		}
-		return b.Put([]byte(c.Email), encrypted)
-	})
+	_, err = db.Exec(`INSERT INTO credentials(email, data) VALUES(?,?) ON CONFLICT(email) DO UPDATE SET data=excluded.data`, c.Email, encrypted)
+	return err
 }
 
 // DeleteUser removes a user by email.
@@ -209,80 +187,78 @@ func (m *Manager) DeleteUser(email string) error {
 		return err
 	}
 	defer db.Close()
+	_, err = db.Exec(`DELETE FROM credentials WHERE email=?`, email)
+	return err
+}
 
-	return db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
-		if b == nil {
-			return nil
-		}
-		return b.Delete([]byte(email))
-	})
+// GetUser returns the credentials for a specific email, or an error if not found.
+func (m *Manager) GetUser(email string) (Credentials, error) {
+	db, err := m.openDB()
+	if err != nil {
+		return Credentials{}, err
+	}
+	defer db.Close()
+
+	var blob []byte
+	err = db.QueryRow(`SELECT data FROM credentials WHERE email=?`, email).Scan(&blob)
+	if err == sql.ErrNoRows {
+		return Credentials{}, fmt.Errorf("user not found: %s", email)
+	}
+	if err != nil {
+		return Credentials{}, err
+	}
+	decrypted, err := m.decrypt(blob)
+	if err != nil {
+		return Credentials{}, fmt.Errorf("decrypt: %w", err)
+	}
+	var c Credentials
+	if err := json.Unmarshal(decrypted, &c); err != nil {
+		return Credentials{}, err
+	}
+	return c, nil
 }
 
 // ClearPGP removes the PGP key for the user with the given email.
 func (m *Manager) ClearPGP(email string) error {
-	db, err := m.openDB()
+	c, err := m.GetUser(email)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
-
-	return db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
-		if b == nil {
-			return fmt.Errorf("user not found")
-		}
-		v := b.Get([]byte(email))
-		if v == nil {
-			return fmt.Errorf("user not found")
-		}
-		decrypted, err := m.decrypt(v)
-		if err != nil {
-			return err
-		}
-		var c Credentials
-		if err := json.Unmarshal(decrypted, &c); err != nil {
-			return err
-		}
-		c.PGPPrivateKey = ""
-		data, err := json.Marshal(c)
-		if err != nil {
-			return err
-		}
-		encrypted, err := m.encrypt(data)
-		if err != nil {
-			return err
-		}
-		return b.Put([]byte(email), encrypted)
-	})
+	c.PGPPrivateKey = ""
+	return m.SaveUser(c)
 }
 
-// ── single-user compat API (used by orchestrator / pods) ─────────────────────
+// ── single-user compat API ────────────────────────────────────────────────────
 
 // Load returns the first user, or empty Credentials if none saved.
 func (m *Manager) Load() (Credentials, error) {
 	users, err := m.LoadAll()
-	if err != nil {
+	if err != nil || len(users) == 0 {
 		return Credentials{}, err
-	}
-	if len(users) == 0 {
-		return Credentials{}, nil
 	}
 	return users[0], nil
 }
 
 // Save writes a single Credentials (legacy compat).
-func (m *Manager) Save(c Credentials) error {
-	return m.SaveUser(c)
-}
+func (m *Manager) Save(c Credentials) error { return m.SaveUser(c) }
 
 // ── internal ──────────────────────────────────────────────────────────────────
 
-func (m *Manager) openDB() (*bbolt.DB, error) {
+func (m *Manager) openDB() (*sql.DB, error) {
 	if err := os.MkdirAll(filepath.Dir(m.path), 0700); err != nil {
 		return nil, fmt.Errorf("create credential dir: %w", err)
 	}
-	return bbolt.Open(m.path, 0600, nil)
+	dsn := "file:" + m.path + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)"
+	db, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return nil, err
+	}
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS credentials (email TEXT PRIMARY KEY, data BLOB NOT NULL)`)
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+	return db, nil
 }
 
 func (m *Manager) encrypt(plaintext []byte) ([]byte, error) {

@@ -286,12 +286,6 @@ type PodOptions struct {
 	TTY   bool `toml:"tty"`
 }
 
-// DatabaseConfig holds database settings.
-type DatabaseConfig struct {
-	Type string `toml:"type"`
-	Name string `toml:"name"`
-}
-
 // PackageSortMode controls subdirectory structure for local package output.
 type PackageSortMode string
 
@@ -356,9 +350,6 @@ type Config struct {
 	} `toml:"build"`
 	Aria2       Aria2Config       `toml:"aria2"`
 	Compression CompressionConfig `toml:"compression"`
-	Database struct {
-		Pkgs DatabaseConfig `toml:"pkgs"`
-	} `toml:"database"`
 	Kubernetes struct {
 		Options KubernetesOptions `toml:"options"`
 	} `toml:"kubernetes"`
@@ -418,9 +409,6 @@ func DefaultConfig() Config {
 			Target: "riscv64-linux-gnu",
 		},
 	}
-
-	cfg.Database.Pkgs.Type = "bbolt"
-	cfg.Database.Pkgs.Name = "pkgs.db"
 
 	cfg.Compression.Type = "zstd"
 	cfg.Compression.Level = 19
