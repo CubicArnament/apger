@@ -52,25 +52,42 @@ get_nfs_status() {
 
 show_status() {
     local status=$(get_nfs_status)
-    
+
+    # Kubernetes status
+    local k8s_status k8s_cm
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+        k8s_status="${GREEN}●${NC} Cluster reachable"
+        if kubectl get configmap nfs-config --namespace=apger >/dev/null 2>&1; then
+            k8s_cm="${GREEN}●${NC} ConfigMap active"
+        else
+            k8s_cm="${GRAY}●${NC} ConfigMap not found"
+        fi
+    else
+        k8s_status="${GRAY}●${NC} Cluster unreachable"
+        k8s_cm="${GRAY}●${NC} Unknown"
+    fi
+
     echo ""
     echo "=== APGer NFS Server Status ==="
     echo ""
-    
+
     case "$status" in
         running)
-            echo -e "Status: $STATUS_CONFIGURED_ON"
-            echo "Path:   $NFS_ROOT"
-            echo "Export: $(grep "$NFS_ROOT" "$NFS_EXPORTS" 2>/dev/null | awk '{print $2}')"
+            echo -e "NFS:        $STATUS_CONFIGURED_ON"
+            echo "Path:       $NFS_ROOT"
+            echo "Export:     $(grep "$NFS_ROOT" "$NFS_EXPORTS" 2>/dev/null | awk '{print $2}')"
             ;;
         stopped)
-            echo -e "Status: $STATUS_CONFIGURED_OFF"
-            echo "Path:   $NFS_ROOT"
+            echo -e "NFS:        $STATUS_CONFIGURED_OFF"
+            echo "Path:       $NFS_ROOT"
             ;;
         not_configured)
-            echo -e "Status: $STATUS_NOT_CONFIGURED"
+            echo -e "NFS:        $STATUS_NOT_CONFIGURED"
             ;;
     esac
+
+    echo -e "Kubernetes: $k8s_status"
+    echo -e "ConfigMap:  $k8s_cm"
     echo ""
 }
 
@@ -250,6 +267,16 @@ stop_nfs() {
     echo -e "${YELLOW}✓${NC} NFS server stopped"
 }
 
+delete_configmap() {
+    rm -f .env.nfs
+    if command -v kubectl >/dev/null 2>&1 && kubectl cluster-info --request-timeout=3s >/dev/null 2>&1; then
+        kubectl delete configmap nfs-config --namespace=apger --ignore-not-found=true
+        echo -e "${GREEN}✓${NC} ConfigMap deleted"
+    else
+        echo -e "${YELLOW}!${NC} Cluster unreachable — only .env.nfs removed"
+    fi
+}
+
 show_menu() {
     clear
     show_status
@@ -260,7 +287,8 @@ show_menu() {
     echo "3) Stop NFS server"
     echo "4) Re-generate .env.nfs and ConfigMap"
     echo "5) Delete NFS server"
-    echo "6) Exit"
+    echo "6) Delete ConfigMap and .env.nfs"
+    echo "7) Exit"
     echo ""
     echo -n "Select option: "
 }
@@ -304,6 +332,12 @@ main() {
                 read -p "Press Enter to continue..."
                 ;;
             6)
+                echo ""
+                delete_configmap
+                echo ""
+                read -p "Press Enter to continue..."
+                ;;
+            7)
                 echo "Exiting..."
                 exit 0
                 ;;
