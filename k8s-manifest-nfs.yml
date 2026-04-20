@@ -294,49 +294,23 @@ spec:
   serviceAccountName: apger
 
   initContainers:
-    # Stage 1: install build dependencies
-    - name: install-deps
+    - name: build-apger
       image: fedora:43
       imagePullPolicy: IfNotPresent
       command: ["/bin/sh", "-c"]
       args:
         - |
           set -e
+          echo "=== Stage 1: install deps ==="
           dnf install -y --setopt=install_weak_deps=False \
             gcc gcc-c++ make meson ninja-build pkg-config \
             git aria2 golang \
             libarchive-devel lmdb-devel yyjson-devel libsodium-devel \
             mold binutils \
             && dnf clean all
-      resources:
-        requests: {cpu: "1", memory: 1Gi}
-        limits:   {cpu: "4", memory: 4Gi}
-
-    # Stage 2: clone source with submodules
-    - name: clone-source
-      image: fedora:43
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          set -e
+          echo "=== Stage 2: clone source ==="
           git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /src
-      resources:
-        requests: {cpu: "500m", memory: 512Mi}
-        limits:   {cpu: "2",    memory: 2Gi}
-      volumeMounts:
-        - name: source
-          mountPath: /src
-
-    # Stage 3: build libapg.so → apgbuild → apger, install to /tools
-    - name: build-tools
-      image: fedora:43
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          set -e
-          echo "=== libapg + apgbuild + apger ==="
+          echo "=== Stage 3: build ==="
           cd /src/src
           meson setup build --prefix=/tools --buildtype=release
           ninja -C build
