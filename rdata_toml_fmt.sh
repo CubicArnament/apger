@@ -51,3 +51,10 @@ done < <(find "$REPODATA" -name "*.toml" -print0)
 
 echo ""
 echo "Done: $renamed renamed, $skipped skipped, $errors errors"
+
+if [ "$renamed" -gt 0 ]; then
+    git add "$REPODATA"
+    git commit -m "chore: formatted $renamed packages"
+    git push origin main
+    echo -e "\nPushed to origin/main"
+fi
