@@ -278,13 +278,42 @@ view_logs() {
 
 repodata_fmt() {
     local script_dir; script_dir=$(dirname "$(realpath "$0")")
-    local fmt="$script_dir/rdata_toml_fmt.sh"
-    if [ ! -f "$fmt" ]; then
-        printf "\n  ${RED}✗${NC} rdata_toml_fmt.sh not found at %s\n\n" "$fmt"
+    local repodata="$script_dir/repodata"
+    if [ ! -d "$repodata" ]; then
+        printf "\n  ${RED}✗${NC} repodata directory not found at %s\n\n" "$repodata"
         return
     fi
-    printf "\nRunning repodata formatter...\n\n"
-    bash "$fmt"
+    local renamed=0 skipped=0 errors=0
+    while IFS= read -r -d '' file; do
+        local dir; dir=$(dirname "$file")
+        local name version arch
+        name=$(grep -m1 '^name\s*=' "$file" | sed 's/.*=\s*"\(.*\)"/\1/')
+        version=$(grep -m1 '^version\s*=' "$file" | sed 's/.*=\s*"\(.*\)"/\1/')
+        arch=$(grep -m1 '^architecture\s*=' "$file" | sed 's/.*=\s*"\(.*\)"/\1/')
+        if [ -z "$name" ] || [ -z "$version" ] || [ -z "$arch" ]; then
+            printf "SKIP  %s (missing fields)\n" "$file"
+            skipped=$((skipped + 1)); continue
+        fi
+        local new_name="${name}_${arch}_${version}.toml"
+        local new_path="$dir/$new_name"
+        if [ "$file" = "$new_path" ]; then skipped=$((skipped + 1)); continue; fi
+        if [ -e "$new_path" ]; then
+            printf "ERROR %s -> %s (target exists)\n" "$(basename "$file")" "$new_name"
+            errors=$((errors + 1)); continue
+        fi
+        mv "$file" "$new_path"
+        printf "OK    %s -> %s\n" "$(basename "$file")" "$new_name"
+        renamed=$((renamed + 1))
+    done < <(find "$repodata" -name "*.toml" -print0)
+    printf "\nDone: %s renamed, %s skipped, %s errors\n" "$renamed" "$skipped" "$errors"
+    if [ "$renamed" -gt 0 ]; then
+        git -C "$script_dir" config user.email "github-actions[bot]@users.noreply.github.com"
+        git -C "$script_dir" config user.name "github-actions[bot]"
+        git -C "$script_dir" add repodata
+        git -C "$script_dir" commit -m "chore: formatted $renamed packages, skipped $skipped, errors $errors"
+        git -C "$script_dir" push origin main
+        printf "\nPushed to origin/main\n"
+    fi
 }
 
 show_menu() {
