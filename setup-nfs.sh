@@ -110,24 +110,31 @@ setup_nfs() {
     # Apply exports
     exportfs -ra
     
-    # Generate NFS ConfigMap
-    echo "Generating NFS ConfigMap..."
+    # Generate .env.nfs and apply ConfigMap to Kubernetes
+    echo "Generating NFS config..."
     local nfs_ip=$(ip route get 1 | awk '{print $7; exit}')
-    cat > nfs-config.yml <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nfs-config
-  namespace: apger
-data:
-  nfs_server: "$nfs_ip"
-  nfs_path: "$NFS_ROOT"
+    
+    cat > .env.nfs <<EOF
+NFS_SERVER=$nfs_ip
+NFS_PATH=$NFS_ROOT
 EOF
+    
+    if command -v kubectl >/dev/null 2>&1; then
+        kubectl create configmap nfs-config \
+            --namespace=apger \
+            --from-literal=nfs_server="$nfs_ip" \
+            --from-literal=nfs_path="$NFS_ROOT" \
+            --dry-run=client -o yaml | kubectl apply -f -
+        echo -e "${GREEN}✓${NC} ConfigMap applied to Kubernetes"
+    else
+        echo -e "${YELLOW}!${NC} kubectl not found — ConfigMap not applied"
+        echo "    Run manually: kubectl create configmap nfs-config --namespace=apger --from-env-file=.env.nfs"
+    fi
     
     echo -e "${GREEN}✓${NC} NFS server configured successfully"
     echo "Path: $NFS_ROOT"
     echo "IP:   $nfs_ip"
-    echo "ConfigMap: nfs-config.yml (apply with: kubectl apply -f nfs-config.yml)"
+    echo "Env:  .env.nfs"
 }
 
 start_nfs() {

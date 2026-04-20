@@ -28,6 +28,7 @@ vendor/
 *configmap*.yml
 *configmap*.yaml
 nfs-config.yml
+.env.nfs
 *.env
 .env.*
 apger.json
