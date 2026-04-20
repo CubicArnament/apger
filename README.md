@@ -54,8 +54,7 @@ apger/
 │   ├── reporter/
 │   │   └── build_report.go  # build report generation
 │   ├── storage/
-│   │   ├── packages_db_bbolt.go  # bbolt backend  (build tag: bbolt)
-│   │   ├── packages_db_sqlite.go  # SQLite3 backend (build tag: sqlite)
+│   │   ├── packages_db.go
 │   │   └── store.go  # Store interface + DB wrapper
 │   ├── tui/
 │   │   ├── icons.go  # Nerd Font icons per build template
