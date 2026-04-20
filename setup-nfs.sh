@@ -110,8 +110,24 @@ setup_nfs() {
     # Apply exports
     exportfs -ra
     
+    # Generate NFS ConfigMap
+    echo "Generating NFS ConfigMap..."
+    local nfs_ip=$(ip route get 1 | awk '{print $7; exit}')
+    cat > nfs-config.yml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nfs-config
+  namespace: apger
+data:
+  nfs_server: "$nfs_ip"
+  nfs_path: "$NFS_ROOT"
+EOF
+    
     echo -e "${GREEN}✓${NC} NFS server configured successfully"
     echo "Path: $NFS_ROOT"
+    echo "IP:   $nfs_ip"
+    echo "ConfigMap: nfs-config.yml (apply with: kubectl apply -f nfs-config.yml)"
 }
 
 start_nfs() {
