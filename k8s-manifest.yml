@@ -138,7 +138,7 @@ spec:
       volumes:
         - name: nfs-root
           nfs:
-            server: "NFS_SERVER_IP"   # set by setup-nfs.sh
+            server: "$(NFS_SERVER)"
             path: /srv/apger-nfs
 
 ---
@@ -297,7 +297,7 @@ metadata:
   labels:
     app: apger
 spec:
-  restartPolicy: Never
+  restartPolicy: Always
   terminationGracePeriodSeconds: 10
   serviceAccountName: apger
 
@@ -379,7 +379,7 @@ spec:
           chmod +x /output/tools/bin/apgbuild
           echo "[apger] Tools staged to PVC at /output/tools/"
           echo "[apger] Ready. Run: apger --tui"
-          exec /bin/bash --login || sleep infinity
+          exec /bin/bash --login
       stdin: true
       tty: true
       env:
