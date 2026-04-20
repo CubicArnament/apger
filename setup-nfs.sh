@@ -146,7 +146,7 @@ delete_nfs() {
     local status; status=$(get_nfs_status)
     [ "$status" = "not_configured" ] && { echo "Not configured."; return 0; }
     echo -e "${RED}WARNING: $NFS_ROOT will be deleted permanently!${NC}"
-    echo -n "Type 'yes' to confirm: "; read -r confirm
+    echo -n "Type 'yes' to confirm: "; read -r confirm </dev/tty
     [ "$confirm" != "yes" ] && { echo "Cancelled."; return 0; }
     [ "$status" = "running" ] && systemctl stop "$NFS_SERVICE" && systemctl disable "$NFS_SERVICE"
     sed -i "\|$NFS_ROOT|d" "$NFS_EXPORTS"; exportfs -ra
@@ -184,6 +184,7 @@ show_menu() {
     printf "  4) Re-generate .env.nfs\n  5) Delete NFS server\n"
     printf "  6) Delete ConfigMap\n  7) Exit\n\n"
     printf "Select option: "
+    read -r choice </dev/tty
 }
 
 main() {
@@ -202,7 +203,7 @@ main() {
             7) echo "Exiting..."; exit 0 ;;
             *) echo "Invalid option"; sleep 1; continue ;;
         esac
-        echo ""; read -rp "Press Enter to continue..."
+        echo ""; read -rp "Press Enter to continue..." </dev/tty
     done
 }
 
