@@ -74,7 +74,6 @@ apger/
 ├── k8s-manifest.yml  # Kubernetes PVC + ConfigMap + Job + Pod
 ├── README.md
 ├── SCRIPTS.md
-├── setup-credentials.sh
 └── setup-nfs.sh
 ```
 <!-- TREE_END -->
