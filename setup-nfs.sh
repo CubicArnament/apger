@@ -82,22 +82,17 @@ setup_nfs() {
         return 0
     fi
     
-    echo "Setting up NFS server..."
-    
-    # Install NFS server if not present
+    # Check if NFS server is installed
     if ! command -v exportfs >/dev/null 2>&1; then
-        echo "Installing NFS server..."
-        if command -v apt-get >/dev/null 2>&1; then
-            apt-get update && apt-get install -y nfs-kernel-server
-        elif command -v dnf >/dev/null 2>&1; then
-            dnf install -y nfs-utils
-        elif command -v pacman >/dev/null 2>&1; then
-            pacman -S --noconfirm nfs-utils
-        else
-            echo "Error: Unsupported package manager"
-            return 1
-        fi
+        echo -e "${RED}Error: NFS server not found${NC}"
+        echo "Please install NFS server first:"
+        echo "  Debian/Ubuntu: apt install nfs-kernel-server"
+        echo "  Fedora/RHEL:   dnf install nfs-utils"
+        echo "  Arch:          pacman -S nfs-utils"
+        return 1
     fi
+    
+    echo "Setting up NFS server..."
     
     # Create directory structure
     echo "Creating directory structure..."
