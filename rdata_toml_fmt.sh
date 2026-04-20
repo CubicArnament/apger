@@ -53,6 +53,8 @@ echo ""
 echo "Done: $renamed renamed, $skipped skipped, $errors errors"
 
 if [ "$renamed" -gt 0 ]; then
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git config user.name "github-actions[bot]"
     git add "$REPODATA"
     git commit -m "chore: formatted $renamed packages, skipped $skipped, errors $errors"
     git push origin main
