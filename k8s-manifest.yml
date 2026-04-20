@@ -152,15 +152,7 @@ parameters:
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
 
-# ── apger resources ───────────────────────────────────────────────────────────
-
 ---
-# NFS StorageClass — provisioned by nfs-subdir-external-provisioner.
-# Run setup-nfs.sh first — it sets NFS_SERVER_IP automatically.
-# All data stored in /srv/apger-nfs/:
-#   - .credentials/     — encrypted credential database (shared across cluster)
-#   - build-logs/       — build logs sorted by arch/type
-#   - output-pkgs/      — built packages (if local publish enabled)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
