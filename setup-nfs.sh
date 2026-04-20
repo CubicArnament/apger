@@ -179,13 +179,38 @@ print_banner() {
     printf '\n'
 }
 
+ping_cluster() {
+    printf "\nChecking Kubernetes cluster...\n\n"
+    if ! command -v kubectl >/dev/null 2>&1; then
+        printf "  ${RED}✗${NC} kubectl not found\n"
+        return
+    fi
+    local out err
+    out=$(kubectl cluster-info --request-timeout=2s 2>&1)
+    if [ $? -eq 0 ]; then
+        _K8S_REACHABLE=1
+        printf "  ${GREEN}✓${NC} Cluster reachable\n"
+        printf "%s\n" "$out" | grep -E "running at" | while read -r line; do
+            printf "    %s\n" "$line"
+        done
+    else
+        _K8S_REACHABLE=0
+        printf "  ${RED}✗${NC} Cluster unreachable\n"
+        printf "  Reason: %s\n" "$(echo "$out" | head -3)"
+        printf "\n  Check:\n"
+        printf "    kubectl config current-context\n"
+        printf "    kubectl config get-contexts\n"
+    fi
+    printf "\n"
+}
+
 show_menu() {
     clear 2>/dev/null || true
     print_banner
     show_status
     printf "  1) Setup NFS\n  2) Start NFS\n  3) Stop NFS\n"
     printf "  4) Re-generate .env.nfs\n  5) Delete NFS server\n"
-    printf "  6) Delete ConfigMap\n  7) Exit\n\n"
+    printf "  6) Delete ConfigMap\n  7) Ping cluster\n  8) Exit\n\n"
     printf "Select option: "
     read -r choice </dev/tty
 }
@@ -203,7 +228,8 @@ main() {
             4) regenerate_env ;;
             5) delete_nfs ;;
             6) delete_configmap ;;
-            7) echo "Exiting..."; exit 0 ;;
+            7) ping_cluster ;;
+            8) echo "Exiting..."; exit 0 ;;
             *) echo "Invalid option"; sleep 1; continue ;;
         esac
         echo ""; read -rp "Press Enter to continue..." </dev/tty
