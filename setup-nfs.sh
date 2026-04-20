@@ -277,8 +277,31 @@ delete_configmap() {
     fi
 }
 
+print_banner() {
+    # Colors: NFS=yellow, K8s=blue (truecolor)
+    local NFS_C='\033[38;2;255;180;0m'
+    local K8S_C='\033[38;2;50;108;229m'
+    local G1='\033[38;2;255;180;0m'
+    local G2='\033[38;2;180;140;100m'
+    local G3='\033[38;2;100;108;180m'
+    local G4='\033[38;2;50;108;229m'
+    local W='\033[1;37m'
+    local NC='\033[0m'
+
+    # NFS icon (left) and K8s icon (right) using Nerd Font glyphs
+    local NFS_ICON="${NFS_C}󰒋 ${NC}"   # nf-md-server_network
+    local K8S_ICON="${K8S_C}󱃾 ${NC}"   # nf-md-kubernetes
+
+    echo -e ""
+    echo -e "  ${NFS_ICON}  ${NFS_C}╔══════════════════════════════════╗${NC}  ${K8S_ICON}"
+    echo -e "  ${NFS_C}    ║${NC}  ${G1}K${G2}u${G3}b${G4}e${G3}r${G2}n${G1}e${G2}t${G3}e${G4}s${NC} ${W}·${NC} ${G4}N${G3}F${G2}S${NC} ${W}·${NC} ${G1}C${G2}o${G3}n${G4}f${G3}i${G2}g${G1}u${G2}r${G3}e${G4}r${NC}  ${K8S_C}║${NC}    "
+    echo -e "  ${NFS_ICON}  ${K8S_C}╚══════════════════════════════════╝${NC}  ${K8S_ICON}"
+    echo -e ""
+}
+
 show_menu() {
     clear
+    print_banner
     show_status
     echo "=== APGer NFS Management ==="
     echo ""
