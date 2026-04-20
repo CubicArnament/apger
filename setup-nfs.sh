@@ -210,6 +210,8 @@ delete_nfs() {
 
     echo -e "${GREEN}✓${NC} NFS server deleted"
 }
+
+start_nfs() {
     local status=$(get_nfs_status)
     
     if [ "$status" = "not_configured" ]; then
