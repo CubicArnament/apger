@@ -92,12 +92,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 
 ---
-# NFS connection config — edit before applying.
-# Set by setup-nfs.sh automatically, or edit manually.
-# Format: "ip:port" — port 2049 is NFS default.
-# Worker nodes use the same server — Kubernetes passes this to kubelet automatically.
-apiVersion: v1
----
 # NFS ConfigMap is created by setup-nfs.sh via kubectl.
 # Run setup-nfs.sh before applying this manifest.
 
