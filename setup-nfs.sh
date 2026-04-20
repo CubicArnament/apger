@@ -2,6 +2,7 @@
 # APGer NFS Server Management CLI
 
 set -e
+trap 'echo "ERR at line $LINENO: $BASH_COMMAND" >&2' ERR
 
 NFS_ROOT="/srv/apger-nfs"
 NFS_EXPORTS="/etc/exports"
