@@ -180,12 +180,12 @@ delete_configmap() {
 
 print_banner() {
     printf '\n'
-    printf '  \033[38;2;255;210;0m███╗   ██╗███████╗███████╗    ██████╗ ██████╗ ███╗   ██╗███████╗\033[0m\n'
-    printf '  \033[38;2;255;160;0m████╗  ██║██╔════╝██╔════╝   ██╔════╝██╔═══██╗████╗  ██║██╔════╝\033[0m\n'
-    printf '  \033[38;2;255;100;0m██╔██╗ ██║█████╗  ███████╗   ██║     ██║   ██║██╔██╗ ██║█████╗  \033[0m\n'
-    printf '  \033[38;2;220;80;20m██║╚██╗██║██╔══╝  ╚════██║   ██║     ██║   ██║██║╚██╗██║██╔══╝  \033[0m\n'
-    printf '  \033[38;2;200;40;40m██║ ╚████║██║     ███████║   ╚██████╗╚██████╔╝██║ ╚████║██║     \033[0m\n'
-    printf '  \033[38;2;180;20;20m╚═╝  ╚═══╝╚═╝     ╚══════╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     \033[0m\n'
+    printf '  \033[38;2;255;210;0m █████╗ ██████╗  ██████╗ ███████╗██████╗     ██████╗████████╗██████╗ ██╗     \033[0m\n'
+    printf '  \033[38;2;255;160;0m██╔══██╗██╔══██╗██╔════╝ ██╔════╝██╔══██╗   ██╔════╝╚══██╔══╝██╔══██╗██║     \033[0m\n'
+    printf '  \033[38;2;255;100;0m███████║██████╔╝██║  ███╗█████╗  ██████╔╝   ██║        ██║   ██████╔╝██║     \033[0m\n'
+    printf '  \033[38;2;220;80;20m██╔══██║██╔═══╝ ██║   ██║██╔══╝  ██╔══██╗   ██║        ██║   ██╔══██╗██║     \033[0m\n'
+    printf '  \033[38;2;200;40;40m██║  ██║██║     ╚██████╔╝███████╗██║  ██║   ╚██████╗   ██║   ██║  ██║███████╗\033[0m\n'
+    printf '  \033[38;2;180;20;20m╚═╝  ╚═╝╚═╝      ╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝\033[0m\n'
     printf '\n'
 }
 
@@ -263,13 +263,40 @@ ping_nfs() {
     printf "\n"
 }
 
+view_logs() {
+    local log_dir="${BUILD_LOGS_PATH:-/output/build-logs}"
+    [ -d "$log_dir" ] || log_dir="$NFS_ROOT/build-logs"
+    local files; files=$(find "$log_dir" -name "*.log" 2>/dev/null | sort)
+    local count; count=$(echo "$files" | grep -c . 2>/dev/null || echo 0)
+    if [ "$count" -eq 0 ]; then
+        printf "\n  ${YELLOW}!${NC} No build logs found in %s\n\n" "$log_dir"
+        return
+    fi
+    printf "\n  Found %s log pages. Opening with less...\n\n" "$count"
+    echo "$files" | xargs cat 2>/dev/null | less -R
+}
+
+repodata_fmt() {
+    local script_dir; script_dir=$(dirname "$(realpath "$0")")
+    local fmt="$script_dir/rdata_toml_fmt.sh"
+    if [ ! -f "$fmt" ]; then
+        printf "\n  ${RED}✗${NC} rdata_toml_fmt.sh not found at %s\n\n" "$fmt"
+        return
+    fi
+    printf "\nRunning repodata formatter...\n\n"
+    bash "$fmt"
+}
+
 show_menu() {
     clear 2>/dev/null || true
     print_banner
     show_status
+    local log_dir="${BUILD_LOGS_PATH:-$NFS_ROOT/build-logs}"
+    local log_count; log_count=$(find "$log_dir" -name "*.log" 2>/dev/null | wc -l)
     printf "  1) Setup NFS\n  2) Start NFS\n  3) Stop NFS\n"
     printf "  4) Re-generate .env.nfs\n  5) Delete NFS server\n"
-    printf "  6) Delete ConfigMap\n  7) Ping cluster\n  8) Ping NFS server\n  9) Exit\n\n"
+    printf "  6) Delete ConfigMap\n  7) Ping cluster\n  8) Ping NFS server\n"
+    printf "  9) View build logs (%s pages)\n  10) Repodata fmt\n  11) Exit\n\n" "$log_count"
     printf "Select option: "
     read -r choice </dev/tty
 }
@@ -288,7 +315,9 @@ main() {
             6) delete_configmap ;;
             7) ping_cluster ;;
             8) ping_nfs ;;
-            9) echo "Exiting..."; exit 0 ;;
+            9) view_logs ;;
+            10) repodata_fmt ;;
+            11) echo "Exiting..."; exit 0 ;;
             *) echo "Invalid option"; sleep 1; continue ;;
         esac
         echo ""; read -rp "Press Enter to continue..." </dev/tty
