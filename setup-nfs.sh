@@ -59,6 +59,7 @@ k8s_reachable() {
 apply_configmap() {
     local ip=$1
     if k8s_reachable; then
+        kubectl get namespace apger >/dev/null 2>&1 || kubectl create namespace apger
         kubectl create configmap nfs-config --namespace=apger \
             --from-literal=nfs_server="$ip" --from-literal=nfs_path="$NFS_ROOT" \
             --dry-run=client -o yaml | kubectl apply -f -
