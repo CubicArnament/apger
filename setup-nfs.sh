@@ -176,7 +176,7 @@ print_banner() {
 }
 
 show_menu() {
-    clear
+    clear 2>/dev/null || true
     print_banner
     show_status
     printf "  1) Setup NFS\n  2) Start NFS\n  3) Stop NFS\n"
