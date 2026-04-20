@@ -80,9 +80,6 @@ show_status() {
         k8s_status="${GRAY}●${NC} Cluster unreachable"
         k8s_cm="${GRAY}●${NC} Unknown"
     fi
-        k8s_status="${GRAY}●${NC} Cluster unreachable"
-        k8s_cm="${GRAY}●${NC} Unknown"
-    fi
     echo ""
     case "$status" in
         running)
