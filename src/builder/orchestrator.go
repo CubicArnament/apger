@@ -19,6 +19,7 @@ import (
 	"github.com/NurOS-Linux/apger/src/k8s"
 	"github.com/NurOS-Linux/apger/src/logger"
 	"github.com/NurOS-Linux/apger/src/metadata"
+	apgerSettings "github.com/NurOS-Linux/apger/src/settings"
 	pgpsigner "github.com/NurOS-Linux/apger/src/pgp"
 	ghpublisher "github.com/NurOS-Linux/apger/src/publisher"
 	"github.com/NurOS-Linux/apger/src/reporter"
@@ -129,16 +130,9 @@ func (o *Orchestrator) Close() error {
 	return o.db.Close()
 }
 
-// ensureImage loads the image into Kind cluster if kind_load = true in config.
+// ensureImage is a no-op — kind_load removed, k3s pulls images directly.
 func (o *Orchestrator) ensureImage(ctx context.Context, image string) error {
-	if !o.apgerCfg.Kubernetes.Options.KindLoad {
-		return nil
-	}
-	o.log.Printf("kind load docker-image %s", image)
-	cmd := exec.CommandContext(ctx, "kind", "load", "docker-image", image)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return nil
 }
 
 // RunMultistage runs the complete multistage build pipeline.
@@ -233,7 +227,6 @@ func (o *Orchestrator) BuildPackage(ctx context.Context, packageName string) err
 		PackageName:     packageName,
 		PackageVersion:  recipe.Package.Version,
 		Image:           o.image,
-		ImagePullPolicy: o.apgerCfg.Kubernetes.Options.ImagePullPolicy(),
 		PVCName:         o.pvcName,
 		PVCMountPath:    "/output",
 		BuildFlags:      &pkgFlags,
@@ -337,7 +330,7 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 
 	// Publish based on configured target
 	if len(assetPaths) > 0 {
-		pub := ghpublisher.New(creds, o.apgerCfg.Save.Options.GithubOrgName)
+		pub := ghpublisher.New(creds, creds.GitHubOrg)
 		target := o.publishTarget
 
 		if target&config.PublishNurOSOrg != 0 {
@@ -351,18 +344,15 @@ func (o *Orchestrator) postBuild(ctx context.Context, pkgName, ver string, split
 			}
 		}
 		if target&config.PublishLocal != 0 {
-			localSub := o.apgerCfg.Save.Options.LocalPath
-			if localSub == "" {
-				localSub = "packages"
-			}
-			destDir := filepath.Join(o.outputDir, localSub)
-			switch o.apgerCfg.Save.Options.SortMode {
-			case config.SortByType:
+			s := apgerSettings.Load()
+			destDir := filepath.Join(o.outputDir, "output-pkgs")
+			switch s.SortMode {
+			case apgerSettings.SortByType:
 				destDir = filepath.Join(destDir, pkgRepoType(pkgName))
-			case config.SortByArch:
-				destDir = filepath.Join(destDir, pkgArchFromPaths(assetPaths))
-			case config.SortByBoth:
-				destDir = filepath.Join(destDir, pkgArchFromPaths(assetPaths), pkgRepoType(pkgName))
+			case apgerSettings.SortByArch:
+				destDir = filepath.Join(destDir, arch)
+			case apgerSettings.SortByBoth:
+				destDir = filepath.Join(destDir, arch, pkgRepoType(pkgName))
 			}
 			if err := os.MkdirAll(destDir, 0755); err != nil {
 				o.log.Printf("[postBuild] mkdir local dest: %v", err)
@@ -423,7 +413,6 @@ func (o *Orchestrator) runAPGBuildStage(ctx context.Context) error {
 	cfg := k8s.JobConfig{
 		JobName:         "build-apgbuild",
 		Image:           o.image,
-		ImagePullPolicy: o.apgerCfg.Kubernetes.Options.ImagePullPolicy(),
 		PVCName:         o.pvcName,
 		PVCMountPath:    "/output",
 		OOMKillLimits:   &o.apgerCfg.Kubernetes.Options.OOMKillLimits,
@@ -454,7 +443,6 @@ func (o *Orchestrator) runAPGerStage(ctx context.Context) error {
 	cfg := k8s.JobConfig{
 		JobName:         "build-apger",
 		Image:           o.image,
-		ImagePullPolicy: o.apgerCfg.Kubernetes.Options.ImagePullPolicy(),
 		PVCName:         o.pvcName,
 		PVCMountPath:    "/output",
 		OOMKillLimits:   &o.apgerCfg.Kubernetes.Options.OOMKillLimits,

@@ -73,17 +73,19 @@ const (
 const (
 	fName      = 0
 	fEmail     = 1
-	fPAT       = 2 // PAT mode only
-	fAppID     = 3 // PEM mode only
-	fPEM       = 4 // PEM mode only
-	fPGP       = 5
-	fNamespace = 6
-	fCount     = 7
+	fGitHubOrg = 2
+	fPAT       = 3 // PAT mode only
+	fAppID     = 4 // PEM mode only
+	fPEM       = 5 // PEM mode only
+	fPGP       = 6
+	fNamespace = 7
+	fCount     = 8
 )
 
 var formLabels = [fCount]string{
 	"Name",
 	"Email",
+	"GitHub Org",
 	"PAT",
 	"App ID",
 	"App PEM (paste)",
@@ -193,6 +195,7 @@ func (s *CredentialsScreen) loadUserList() {
 func (s *CredentialsScreen) loadUserIntoForm(c credentials.Credentials) {
 	s.fields[fName].SetValue(c.Name)
 	s.fields[fEmail].SetValue(c.Email)
+	s.fields[fGitHubOrg].SetValue(c.GitHubOrg)
 	s.fields[fPAT].SetValue(c.PAT)
 	if c.GitHubAppID != 0 {
 		s.fields[fAppID].SetValue(fmt.Sprintf("%d", c.GitHubAppID))
@@ -601,8 +604,9 @@ func (s *CredentialsScreen) viewDestroyOverlay() string {
 // currentFormCreds builds a Credentials from the current form values (not saved yet).
 func (s *CredentialsScreen) currentFormCreds() credentials.Credentials {
 	c := credentials.Credentials{
-		Name:  s.fields[fName].Value(),
-		Email: s.fields[fEmail].Value(),
+		Name:      s.fields[fName].Value(),
+		Email:     s.fields[fEmail].Value(),
+		GitHubOrg: s.fields[fGitHubOrg].Value(),
 	}
 	switch s.authMode {
 	case credAuthPAT:
@@ -629,8 +633,9 @@ type k8sSecretDoneMsg struct{ msg string }
 func (s *CredentialsScreen) save() tea.Cmd {
 	// snapshot form values before goroutine
 	c := credentials.Credentials{
-		Name:  s.fields[fName].Value(),
-		Email: s.fields[fEmail].Value(),
+		Name:      s.fields[fName].Value(),
+		Email:     s.fields[fEmail].Value(),
+		GitHubOrg: s.fields[fGitHubOrg].Value(),
 	}
 	switch s.authMode {
 	case credAuthPAT:

@@ -18,7 +18,6 @@ type JobConfig struct {
 	PackageName    string
 	PackageVersion string
 	Image          string
-	ImagePullPolicy string
 	// Command/Args override the default apgbuild invocation (optional)
 	Command []string
 	Args    []string
@@ -67,17 +66,6 @@ func oomResources(limits *config.OOMKillLimits) corev1.ResourceRequirements {
 			corev1.ResourceCPU:    resource.MustParse(cpuLimit),
 			corev1.ResourceMemory: resource.MustParse(memLimit),
 		},
-	}
-}
-
-func pullPolicyFromString(s string) corev1.PullPolicy {
-	switch s {
-	case "Always":
-		return corev1.PullAlways
-	case "Never":
-		return corev1.PullNever
-	default:
-		return corev1.PullIfNotPresent
 	}
 }
 
@@ -144,7 +132,7 @@ apgbuild build /build/src -o %s`, outFile)}
 	}
 
 	depInstallCmd := "dnf install -y --setopt=install_weak_deps=False " + joinSpace(cfg.Dependencies) + " && dnf clean all"
-	pullPolicy := pullPolicyFromString(cfg.ImagePullPolicy)
+	pullPolicy := corev1.PullAlways
 	res := oomResources(cfg.OOMKillLimits)
 
 	return &batchv1.Job{

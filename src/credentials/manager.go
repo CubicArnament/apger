@@ -36,6 +36,9 @@ type Credentials struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 
+	// GitHub organisation where packages are published
+	GitHubOrg string `json:"github_org,omitempty"`
+
 	// GitHub App (preferred)
 	GitHubAppID int64  `json:"github_app_id,omitempty"`
 	GitHubPEM   string `json:"github_pem,omitempty"`

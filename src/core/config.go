@@ -253,60 +253,10 @@ func (cfg Config) crossForFamily(family ArchFamily) (CrossProfile, bool) {
 	return CrossProfile{}, false
 }
 
-// OOMKillLimits holds resource limits for Kubernetes pods.
+// OOMKillLimits holds resource limits for Kubernetes build Jobs.
 type OOMKillLimits struct {
 	CPU    string `toml:"cpu"`
 	Memory string `toml:"memory"`
-}
-
-// KubernetesOptions holds K8s cluster settings.
-type KubernetesOptions struct {
-	Namespace     string        `toml:"namespace"`
-	BaseImage     string        `toml:"base_image"`
-	SearchLocal   bool          `toml:"search_local"`
-	PullRemote    bool          `toml:"pull_remote"`
-	KindLoad      bool          `toml:"kind_load"`
-	OOMKillLimits OOMKillLimits `toml:"oomkill_limits"`
-}
-
-// ImagePullPolicy returns the Kubernetes imagePullPolicy string.
-func (o KubernetesOptions) ImagePullPolicy() string {
-	if o.PullRemote {
-		return "Always"
-	}
-	if !o.SearchLocal {
-		return "Never"
-	}
-	return "IfNotPresent"
-}
-
-// PodOptions holds Pod container settings.
-type PodOptions struct {
-	Stdin bool `toml:"stdin"`
-	TTY   bool `toml:"tty"`
-}
-
-// PackageSortMode controls subdirectory structure for local package output.
-type PackageSortMode string
-
-const (
-	SortNone   PackageSortMode = "none"  // output-pkgs/pkg.apg
-	SortByType PackageSortMode = "type"  // output-pkgs/extra/pkg.apg
-	SortByArch PackageSortMode = "arch"  // output-pkgs/x86_64/pkg.apg
-	SortByBoth PackageSortMode = "both"  // output-pkgs/x86_64/extra/pkg.apg
-)
-
-// SaveOptions holds package save/publish options.
-type SaveOptions struct {
-	Remote        bool            `toml:"remote"`
-	Type          string          `toml:"type"`
-	GithubOrgName string          `toml:"github_org_name"`
-	Method        string          `toml:"method"`
-	Repository    bool            `toml:"repository"`
-	// LocalPath is a subdirectory inside the NFS-mounted PVC root.
-	LocalPath     string          `toml:"local_path"`
-	// SortMode controls subdirectory structure for local packages.
-	SortMode      PackageSortMode `toml:"sort_mode"`
 }
 
 // LoggingOptions holds logging/output settings.
@@ -351,14 +301,10 @@ type Config struct {
 	Aria2       Aria2Config       `toml:"aria2"`
 	Compression CompressionConfig `toml:"compression"`
 	Kubernetes struct {
-		Options KubernetesOptions `toml:"options"`
+		Options struct {
+			OOMKillLimits OOMKillLimits `toml:"oomkill_limits"`
+		} `toml:"options"`
 	} `toml:"kubernetes"`
-	Pod struct {
-		Options PodOptions `toml:"options"`
-	} `toml:"pod"`
-	Save struct {
-		Options SaveOptions `toml:"options"`
-	} `toml:"save"`
 	Logging LoggingOptions `toml:"logging"`
 }
 
@@ -420,21 +366,7 @@ func DefaultConfig() Config {
 	cfg.Aria2.Timeout = 60
 	cfg.Aria2.ContinueDownload = true
 
-	cfg.Kubernetes.Options.Namespace = "apger"
-	cfg.Kubernetes.Options.BaseImage = "fedora:43"
-	cfg.Kubernetes.Options.SearchLocal = true
-	cfg.Kubernetes.Options.PullRemote = false
-	cfg.Kubernetes.Options.KindLoad = false
 	cfg.Kubernetes.Options.OOMKillLimits = OOMKillLimits{CPU: "10", Memory: "16Gi"}
-
-	cfg.Pod.Options.Stdin = true
-	cfg.Pod.Options.TTY = true
-
-	cfg.Save.Options.Remote = true
-	cfg.Save.Options.Type = "forgejo:github"
-	cfg.Save.Options.GithubOrgName = "NurOS-Packages"
-	cfg.Save.Options.Method = "create_or_update"
-	cfg.Save.Options.Repository = true
 
 	return cfg
 }

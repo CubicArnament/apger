@@ -21,6 +21,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	core "github.com/NurOS-Linux/apger/src/core"
+	"github.com/NurOS-Linux/apger/src/settings"
 )
 
 // PublishTarget is an alias for core.PublishTarget.
@@ -49,23 +50,23 @@ type SettingsScreen struct {
 	suggestion string
 	LocalPath  string
 	sortCursor int
-	SortMode   core.PackageSortMode
+	SortMode   settings.SortMode
 	// NFS status
-	nfsServer string // from apger.conf or env
-	nfsUp     *bool  // nil=unknown, true=up, false=down
+	nfsServer string
+	nfsUp     *bool
 }
 
-type nfsCheckMsg bool // true=up, false=down
+type nfsCheckMsg bool
 
 var sortModes = []struct {
-	mode    core.PackageSortMode
+	mode    settings.SortMode
 	label   string
 	example string
 }{
-	{core.SortNone,   "No sorting",              "output-pkgs/pkg.apg"},
-	{core.SortByType, "Sort by type",             "output-pkgs/extra/pkg.apg"},
-	{core.SortByArch, "Sort by architecture",     "output-pkgs/x86_64/pkg.apg"},
-	{core.SortByBoth, "Sort by arch + type",      "output-pkgs/x86_64/extra/pkg.apg"},
+	{settings.SortNone,   "No sorting",          "output-pkgs/pkg.apg"},
+	{settings.SortByType, "Sort by type",         "output-pkgs/extra/pkg.apg"},
+	{settings.SortByArch, "Sort by architecture", "output-pkgs/x86_64/pkg.apg"},
+	{settings.SortByBoth, "Sort by arch + type",  "output-pkgs/x86_64/extra/pkg.apg"},
 }
 
 type settingsItem struct {
@@ -92,12 +93,19 @@ var settingsItems = []settingsItem{
 	},
 }
 
-// NewSettingsScreen creates a settings screen with the given initial targets.
+// NewSettingsScreen creates a settings screen, loading saved settings from NFS.
 func NewSettingsScreen(targets PublishTarget) *SettingsScreen {
-	if targets == 0 {
-		targets = PublishGitHubReleases
+	s := settings.Load()
+	t := PublishTarget(s.PublishTargets)
+	if t == 0 {
+		t = PublishGitHubReleases
 	}
-	return &SettingsScreen{targets: targets, SortMode: core.SortNone}
+	return &SettingsScreen{
+		targets:   t,
+		SortMode:  s.SortMode,
+		LocalPath: s.LocalPath,
+		pathInput: s.LocalPath,
+	}
 }
 
 // Targets returns the currently selected publish targets.
@@ -234,6 +242,11 @@ func (s *SettingsScreen) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			if s.targets&PublishLocal != 0 {
 				s.LocalPath = s.pathInput
 			}
+			_ = settings.Save(settings.Settings{
+				PublishTargets: int(s.targets),
+				LocalPath:      s.LocalPath,
+				SortMode:       s.SortMode,
+			})
 			s.saved = true
 		}
 	}

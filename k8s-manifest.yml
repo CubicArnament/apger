@@ -197,17 +197,6 @@ data:
     timeout = 60
     continue = true
 
-    [database.pkgs]
-    type = "bbolt"
-    name = "pkgs.db"
-
-    [kubernetes.options]
-    namespace = "apger"
-    base_image = "fedora:43"
-    search_local = true
-    pull_remote = false
-    kind_load = false
-
     [kubernetes.options.oomkill_limits]
     cpu = "10"
     memory = "16Gi"
@@ -284,7 +273,7 @@ roleRef:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: apger
+  name: apger-tui
   namespace: apger
   labels:
     app: apger
@@ -296,7 +285,7 @@ spec:
   initContainers:
     - name: build-apger
       image: fedora:43
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       command: ["/bin/sh", "-c"]
       args:
         - |
@@ -309,7 +298,8 @@ spec:
             mold binutils \
             && dnf clean all
           echo "=== Stage 2: clone source ==="
-          git clone --recurse-submodules https://github.com/NurOS-Linux/apger.git /repo
+          git clone https://github.com/NurOS-Linux/apger.git /repo
+          cd /repo && git submodule update --init --recursive
           echo "=== Stage 3: build ==="
           cd /repo/src
           meson setup build --prefix=/tools --buildtype=release
@@ -332,7 +322,7 @@ spec:
   containers:
     - name: apger
       image: fedora:43
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       command: ["/bin/sh", "-c"]
       args:
         - |
