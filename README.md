@@ -53,6 +53,8 @@ apger/
 │   │   └── github.go  # publish .apg to GitHub Releases
 │   ├── reporter/
 │   │   └── build_report.go  # build report generation
+│   ├── settings/
+│   │   └── settings.go
 │   ├── storage/
 │   │   ├── packages_db.go
 │   │   └── store.go  # Store interface + DB wrapper
@@ -71,7 +73,6 @@ apger/
 ├── COMMANDS.md
 ├── CREDENTIAL_MANAGER.md
 ├── k8s-manifest.yml  # Kubernetes PVC + ConfigMap + Job + Pod
-├── rdata_toml_fmt.sh
 ├── README.md
 ├── SCRIPTS.md
 └── setup-nfs.sh
