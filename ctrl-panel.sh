@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# APGer NFS Server Management CLI
+# APGer Control Panel CLI
 
 NFS_ROOT="/srv/apger-nfs"
 NFS_EXPORTS="/etc/exports"
