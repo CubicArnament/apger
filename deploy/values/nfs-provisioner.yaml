@@ -1,0 +1,15 @@
+storageClass:
+  create: true
+  name: nfs-client
+  defaultClass: false
+  allowVolumeExpansion: true
+  reclaimPolicy: Retain
+  archiveOnDelete: true
+  accessModes: ReadWriteMany
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi

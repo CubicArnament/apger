@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "apgbuild.fullname" . }}
+  labels:
+    {{- include "apgbuild.labels" . | nindent 4 }}
+spec:
+  suspend: {{ .Values.job.suspend }}
+  backoffLimit: {{ .Values.job.backoffLimit }}
+  ttlSecondsAfterFinished: {{ .Values.job.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "apgbuild.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: apgbuild
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [/usr/local/bin/apgbuild]
+          args:
+            - build
+            - -o
+            - {{ .Values.job.output | quote }}
+            - --compression
+            - {{ .Values.job.compression | quote }}
+            - --level
+            - {{ .Values.job.compressionLevel | quote }}
+            - {{ .Values.job.packageDirectory | quote }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: {{ include "apgbuild.workspacePVC" . }}
+        - name: tmp
+          emptyDir: {}

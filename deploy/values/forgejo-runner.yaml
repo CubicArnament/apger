@@ -1,0 +1,24 @@
+replicaCount: 1
+
+runner:
+  config:
+    create: true
+    existingInitSecret: forgejo-runner-init
+    file:
+      log:
+        level: info
+        job_level: info
+      runner:
+        capacity: 2
+        labels:
+          - docker:docker://node:22-bookworm
+      cache:
+        enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 1
+    memory: 1Gi

@@ -1,0 +1,5 @@
+The apgbuild Job is suspended by default.
+
+1. Put an APG package tree at {{ .Values.job.packageDirectory }} on PVC {{ include "apgbuild.workspacePVC" . }}.
+2. Set job.suspend=false during install, or unsuspend the Job after populating the workspace.
+3. The APG archive is written to {{ .Values.job.output }}.

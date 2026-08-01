@@ -1,0 +1,4 @@
+Apger is available inside the cluster at:
+  http://{{ include "apger.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+
+Submit a PKGBUILD from ACP with POST /v1/builds.

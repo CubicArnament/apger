@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["image", "job", "workspace"],
+  "properties": {
+    "image": {
+      "type": "object",
+      "required": ["repository", "pullPolicy"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "tag": {"type": "string"},
+        "pullPolicy": {"enum": ["Always", "IfNotPresent", "Never"]}
+      }
+    },
+    "job": {
+      "type": "object",
+      "required": ["packageDirectory", "output", "compression"],
+      "properties": {
+        "packageDirectory": {"type": "string", "pattern": "^/workspace/"},
+        "output": {"type": "string", "pattern": "^/workspace/"},
+        "compression": {"enum": ["zstd", "xz", "bz2", "gz", "lz4", "lzma"]}
+      }
+    }
+  }
+}

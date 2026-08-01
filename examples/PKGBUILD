@@ -1,0 +1,16 @@
+pkgname=apger-example
+pkgver=1.0.0
+pkgrel=1
+pkgdesc='Minimal PKGBUILD example for Apger'
+arch=('any')
+url='https://github.com/NurOS-Linux/apger'
+license=('MIT')
+source=()
+sha256sums=()
+
+package() {
+  install -Dm755 /dev/stdin "$pkgdir/usr/bin/apger-example" <<'SCRIPT'
+#!/bin/sh
+echo "Hello from an APG package"
+SCRIPT
+}

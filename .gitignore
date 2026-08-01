@@ -1,0 +1,8 @@
+/apger
+/apgbuild
+/.apger-work/
+/output/
+/charts/*/charts/
+/charts/*/Chart.lock
+*.apg
+*.part

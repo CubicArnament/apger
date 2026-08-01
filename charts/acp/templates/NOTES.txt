@@ -1,0 +1,5 @@
+{{- if .Values.enabled }}
+ACP is available at http://{{ include "acp.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+{{- else }}
+ACP is intentionally disabled. Set enabled=true after the ACP image is implemented.
+{{- end }}

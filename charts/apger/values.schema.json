@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["image", "workerImage", "persistence", "config"],
+  "properties": {
+    "replicaCount": {"type": "integer", "minimum": 1},
+    "image": {"$ref": "#/$defs/image"},
+    "workerImage": {"$ref": "#/$defs/image"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "jobTTL": {"type": "string", "minLength": 2},
+        "buildTimeout": {"type": "string", "minLength": 2},
+        "maxPKGBUILDBytes": {"type": "integer", "minimum": 1024}
+      }
+    }
+  },
+  "$defs": {
+    "image": {
+      "type": "object",
+      "required": ["repository", "pullPolicy"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "tag": {"type": "string"},
+        "pullPolicy": {"enum": ["Always", "IfNotPresent", "Never"]}
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+image:
+  repository: ghcr.io/nuros-linux/apger
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+job:
+  suspend: true
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  packageDirectory: /workspace/package
+  output: /workspace/output/package.apg
+  compression: zstd
+  compressionLevel: 19
+
+workspace:
+  create: true
+  existingClaim: ""
+  storageClass: nfs-client
+  accessModes: [ReadWriteMany]
+  size: 20Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 2
+    memory: 2Gi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]

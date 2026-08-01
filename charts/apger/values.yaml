@@ -1,0 +1,69 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/nuros-linux/apger
+  tag: ""
+  pullPolicy: IfNotPresent
+
+workerImage:
+  repository: ghcr.io/nuros-linux/apger
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+persistence:
+  output:
+    create: true
+    existingClaim: ""
+    storageClass: nfs-client
+    accessModes: [ReadWriteMany]
+    size: 100Gi
+  cache:
+    create: true
+    existingClaim: ""
+    storageClass: nfs-client
+    accessModes: [ReadWriteMany]
+    size: 50Gi
+
+config:
+  jobTTL: 24h
+  buildTimeout: 2h
+  maxPKGBUILDBytes: 524288
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+
+networkPolicy:
+  enabled: false
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

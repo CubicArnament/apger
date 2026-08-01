@@ -1,0 +1,29 @@
+global:
+  enabled: true
+
+injector:
+  enabled: false
+
+server:
+  standalone:
+    enabled: true
+  dataStorage:
+    enabled: true
+    storageClass: nfs-client
+    accessMode: ReadWriteOnce
+    size: 10Gi
+  auditStorage:
+    enabled: true
+    storageClass: nfs-client
+    accessMode: ReadWriteOnce
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+ui:
+  enabled: false
